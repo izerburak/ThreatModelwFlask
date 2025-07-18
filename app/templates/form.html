@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h4>🧩 System Questionnaire - {{ layer|capitalize }}</h4>
+
+<form method="post" action="/submit-answers">
+  <!-- Send current layer name to backend -->
+  <input type="hidden" name="layer_name" value="{{ layer }}">
+
+  {% if questions %}
+    {% for question in questions %}
+      <div class="mb-4 border rounded p-3">
+        <label class="form-label"><strong>{{ question.text }}</strong></label>
+        {% for option in question.options %}
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="{{ question.id }}[]" value="{{ option }}">
+            <label class="form-check-label">{{ option }}</label>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No questions available for this layer.</p>
+  {% endif %}
+
+  <button type="submit" class="btn btn-primary">Submit Answers</button>
+</form>
+
+{% endblock %}

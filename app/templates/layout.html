@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Threat Modeling Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">🛡️ Threat Modeling Dashboard</h2>
+
+    <!-- Navigation tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'home' %}active{% endif %}" href="{{ url_for('main.home') }}">🏠 Home</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if active_tab == 'form' %}active{% endif %}" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                📝 Form
+            </a>
+            <ul class="dropdown-menu">
+                {% for lyr in available_layers %}
+                    <li>
+                        <a class="dropdown-item {% if lyr == layer %}active{% endif %}" href="{{ url_for('main.form', layer_name=lyr) }}">
+                            {{ lyr|capitalize }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'add' %}active{% endif %}" href="{{ url_for('main.add_question') }}">➕ Add Question</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'dfd' %}active{% endif %}" href="{{ url_for('main.dfd') }}">📊 DFD Drawing</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'risk' %}active{% endif %}" href="{{ url_for('main.risk') }}">⚠️ Risk Analysis</a>
+        </li>
+    </ul>
+
+    <!-- Page-specific content goes here -->
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Include Bootstrap JS for dropdowns to work -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
