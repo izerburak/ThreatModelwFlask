@@ -1,29 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
+  <h3>Form - {{ layer_name|capitalize }}</h3>
 
-<h4>🧩 System Questionnaire - {{ layer|capitalize }}</h4>
+  <form method="post" class="mt-3">
 
-<form method="post" action="/submit-answers">
-  <!-- Send current layer name to backend -->
-  <input type="hidden" name="layer_name" value="{{ layer }}">
+    {% for q in questions %}
+      <div class="mb-4">
+        <label class="form-label fw-semibold">
+          {{ loop.index }}. {{ q.text }}
+        </label>
 
-  {% if questions %}
-    {% for question in questions %}
-      <div class="mb-4 border rounded p-3">
-        <label class="form-label"><strong>{{ question.text }}</strong></label>
-        {% for option in question.options %}
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="{{ question.id }}[]" value="{{ option }}">
-            <label class="form-check-label">{{ option }}</label>
-          </div>
-        {% endfor %}
+        {% if q.options %}
+          {# Çoktan seçmeli: checkbox (çoklu seçime uygun) #}
+          {% for opt in q.options %}
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="q_{{ q.id }}_{{ loop.index }}"
+                     name="q_{{ q.id }}"
+                     value="{{ opt }}">
+              <label class="form-check-label" for="q_{{ q.id }}_{{ loop.index }}">
+                {{ opt }}
+              </label>
+            </div>
+          {% endfor %}
+        {% else %}
+          {# Açık uçlu metin #}
+          <input class="form-control" name="q_{{ q.id }}" placeholder="Type your answer here">
+        {% endif %}
       </div>
     {% endfor %}
-  {% else %}
-    <p>No questions available for this layer.</p>
-  {% endif %}
 
-  <button type="submit" class="btn btn-primary">Submit Answers</button>
-</form>
-
+    <button class="btn btn-primary" type="submit">Submit and Move to Next Layer</button>
+  </form>
 {% endblock %}

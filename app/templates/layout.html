@@ -14,19 +14,13 @@
         <li class="nav-item">
             <a class="nav-link {% if active_tab == 'home' %}active{% endif %}" href="{{ url_for('main.home') }}">🏠 Home</a>
         </li>
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {% if active_tab == 'form' %}active{% endif %}" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+        <li class="nav-item">
+            <a
+                class="nav-link {% if active_tab == 'form' %}active{% endif %}"
+                href="{{ url_for('main.form', layer_name='layer1') }}"
+            >
                 📝 Form
             </a>
-            <ul class="dropdown-menu">
-                {% for lyr in available_layers %}
-                    <li>
-                        <a class="dropdown-item {% if lyr == layer %}active{% endif %}" href="{{ url_for('main.form', layer_name=lyr) }}">
-                            {{ lyr|capitalize }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if active_tab == 'add' %}active{% endif %}" href="{{ url_for('main.add_question') }}">➕ Add Question</a>

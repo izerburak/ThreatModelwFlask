@@ -7,3 +7,4 @@ data/
 *.sqlite
 .vscode/
 .idea/
+responses/

@@ -2,6 +2,8 @@ import os
 import json
 from flask import Blueprint, render_template, abort, request, redirect, url_for
 from app.utils.save_utils import save_answers
+from flask import Blueprint, render_template, redirect, url_for, request, abort, current_app
+from pathlib import Path
 
 AVAILABLE_LAYERS = ["layer1", "layer2", "layer3", "layer4", "layer5", "layer6"]
 
@@ -9,36 +11,54 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def home():
-    return render_template("home.html", active_tab="")
+    return render_template("home.html", active_tab="home")
 
-@main.route('/form')
+@main.route("/favicon.ico")
+def favicon():
+    return ("", 204)
+
+@main.route("/form")
 def form_redirect():
-    return redirect(url_for('main.form', layer_name=AVAILABLE_LAYERS[0]))
+    # Always go to /form/layer1
+    return redirect(url_for("main.form", layer_name="layer1"), code=302)
 
-
-@main.route('/form/<layer_name>')
+@main.route("/form/<layer_name>", methods=["GET", "POST"])
 def form(layer_name):
-    filename = f"data/{layer_name}_questions.json"
-    if not os.path.exists(filename):
+    questions_path = Path(current_app.root_path) / "questions" / f"{layer_name}.json"
+
+    if not questions_path.exists():
         abort(404, description=f"Question file for {layer_name} not found.")
 
-    with open(filename, 'r') as file:
-        questions = json.load(file)
+    with questions_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # JSON kökü liste veya {"questions": [...]} olabilir; ikisini de destekle
+    if isinstance(data, dict) and "questions" in data:
+        questions = data["questions"]
+    else:
+        questions = data
+
+    if request.method == "POST":
+        # Cevapları kaydet (send edilen name'ler q_<id> veya q_<id>[] olacak)
+        save_answers(request.form, layer_name=layer_name)
+
+        # Sonraki layer'a geçiş (isteğe bağlı)
+        try:
+            current_index = AVAILABLE_LAYERS.index(layer_name)
+            if current_index + 1 < len(AVAILABLE_LAYERS):
+                next_layer = AVAILABLE_LAYERS[current_index + 1]
+                return redirect(url_for("main.form", layer_name=next_layer))
+        except ValueError:
+            pass
+        return redirect(url_for("main.home"))
 
     return render_template(
         "form.html",
         active_tab="form",
+        layer_name=layer_name,
         questions=questions,
-        layer=layer_name,
         available_layers=AVAILABLE_LAYERS
     )
-
-@main.route('/submit-answers', methods=['POST'])
-def submit_answers():
-    # Get the layer name from the hidden form input
-    layer_name = request.form.get("layer_name", "layer1")
-    save_answers(request.form, layer_name=layer_name)
-    return redirect(url_for('main.form', layer_name=layer_name))
 
 @main.route('/add-question')
 def add_question():

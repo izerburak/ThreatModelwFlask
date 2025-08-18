@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "text": "What is the primary purpose and business goal of the system?",
+    "options": [
+      "Online commerce or ordering system",
+      "Internal company portal or dashboard",
+      "Data processing or analytics platform",
+      "Communication or messaging system"
+    ]
+  },
+  {
+    "id": "2",
+    "text": "What are the user roles and their geographic locations?",
+    "options": [
+      "Customers from a single country",
+      "International customers and admins",
+      "Only internal company users",
+      "Third-party partners or vendors"
+    ]
+  },
+  {
+    "id": "3",
+    "text": "Is the system accessible over the public internet? Are there any restrictions?",
+    "options": [
+      "Yes, fully public access",
+      "Public access with login required",
+      "Only internal/VPN-restricted access",
+      "Public with geo/IP-based filtering"
+    ]
+  },
+  {
+    "id": "4",
+    "text": "What external APIs or third-party services are used? Specify their purpose.",
+    "options": [
+      "Payment providers (e.g., Stripe, PayPal)",
+      "Mapping/location APIs (e.g., Google Maps)",
+      "Notification services (e.g., SMS, email)",
+      "Identity/authentication (e.g., OAuth, SSO)"
+    ]
+  },
+  {
+    "id": "5",
+    "text": "What types of data does the system process or store?",
+    "options": [
+      "Personally identifiable information (PII)",
+      "Financial/payment information",
+      "Health or sensitive medical data",
+      "Logs or behavioral analytics"
+    ]
+  },
+  {
+    "id": "6",
+    "text": "Who owns, develops, and maintains the system?",
+    "options": [
+      "In-house development and maintenance",
+      "Fully outsourced to a vendor",
+      "Mixed ownership (internal + external teams)",
+      "Unknown or legacy provider"
+    ]
+  },
+  {
+    "id": "7",
+    "text": "Are there legal or compliance frameworks applicable to the system?",
+    "options": [
+      "GDPR or KVKK",
+      "HIPAA",
+      "PCI-DSS",
+      "No specific compliance required"
+    ]
+  },
+  {
+    "id": "8",
+    "text": "Does the system interact with any actors or systems outside your organization?",
+    "options": [
+      "Yes, customers or end users",
+      "Business partners or third-party services",
+      "Government or regulatory APIs",
+      "No external interaction"
+    ]
+  }
+]
