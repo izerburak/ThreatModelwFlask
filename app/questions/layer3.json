@@ -1,0 +1,78 @@
+[
+  {
+    "id": "15",
+    "text": "What types of personal data are processed?",
+    "options": [
+      "Names, contact information",
+      "Financial information (credit cards, bank accounts)",
+      "Health/medical records",
+      "Biometric data",
+      "Location data",
+      "Behavioral/usage data",
+      "None",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "16",
+    "text": "What business-critical data is stored?",
+    "options": [
+      "Customer databases",
+      "Financial records",
+      "Intellectual property",
+      "Trade secrets",
+      "Strategic business information",
+      "Audit logs",
+      "Configuration data",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "17",
+    "text": "How would you classify the overall data sensitivity?",
+    "options": [
+      "Public (no harm if disclosed)",
+      "Internal (minor harm if disclosed)",
+      "Confidential (significant harm if disclosed)",
+      "Secret (severe harm if disclosed)"
+    ]
+  },
+  {
+    "id": "18",
+    "text": "Where is data primarily stored?",
+    "options": [
+      "Relational databases (MySQL, PostgreSQL, etc.)",
+      "NoSQL databases (MongoDB, Redis, etc.)",
+      "File systems (local, network shares)",
+      "Cloud storage (S3, Azure Blob, etc.)",
+      "Data warehouses",
+      "In-memory caches",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "19",
+    "text": "How does data flow between components?",
+    "options": [
+      "REST APIs",
+      "GraphQL APIs",
+      "Message queues (RabbitMQ, Kafka, etc.)",
+      "Direct database connections",
+      "File transfers (FTP, SFTP, etc.)",
+      "Real-time streams",
+      "Batch processing",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "20",
+    "text": "What is the data retention policy?",
+    "options": [
+      "No specific retention (kept indefinitely)",
+      "Short-term (days to weeks)",
+      "Medium-term (months)",
+      "Long-term (years)",
+      "Legal/regulatory requirements dictate retention"
+    ]
+  }
+]

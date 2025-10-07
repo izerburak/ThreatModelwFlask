@@ -1,0 +1,74 @@
+[
+  {
+    "id": "33",
+    "text": "What is the software development lifecycle (SDLC) approach?",
+    "options": [
+      "Waterfall",
+      "Agile/Scrum",
+      "DevOps/CI/CD",
+      "DevSecOps",
+      "Ad-hoc development",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "34",
+    "text": "How are code changes deployed?",
+    "options": [
+      "Manual deployment",
+      "Automated CI/CD pipelines",
+      "Blue/green deployments",
+      "Canary deployments",
+      "Rolling updates",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "35",
+    "text": "What is the patch management process?",
+    "options": [
+      "Automated patching",
+      "Regular scheduled maintenance windows",
+      "Ad-hoc patching when issues arise",
+      "No formal patch management",
+      "Third-party managed patching",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "36",
+    "text": "What is the backup strategy?",
+    "options": [
+      "Regular automated backups",
+      "Manual backup procedures",
+      "Cloud-based backup services",
+      "Replicated databases",
+      "No formal backup strategy",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "37",
+    "text": "What is the disaster recovery plan?",
+    "options": [
+      "Documented disaster recovery procedures",
+      "Hot standby systems",
+      "Cold backup systems",
+      "Cloud-based disaster recovery",
+      "No formal disaster recovery plan",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "38",
+    "text": "How are security incidents handled?",
+    "options": [
+      "Formal incident response plan",
+      "Incident response team",
+      "Third-party incident response service",
+      "Ad-hoc incident handling",
+      "No formal incident response",
+      "Other: ___"
+    ]
+  }
+]

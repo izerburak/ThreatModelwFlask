@@ -1,0 +1,80 @@
+[
+  {
+    "id": "27",
+    "text": "How do users authenticate?",
+    "options": [
+      "Username/password only",
+      "Multi-factor authentication (MFA)",
+      "Single sign-on (SSO)",
+      "Certificate-based authentication",
+      "Biometric authentication",
+      "OAuth/social login",
+      "API keys/tokens",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "28",
+    "text": "How is authorization managed?",
+    "options": [
+      "Role-based access control (RBAC)",
+      "Attribute-based access control (ABAC)",
+      "Access control lists (ACL)",
+      "Hardcoded permissions",
+      "No formal authorization model",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "29",
+    "text": "How is data protected in transit?",
+    "options": [
+      "TLS/HTTPS for all communications",
+      "TLS for external communications only",
+      "VPN for internal communications",
+      "No encryption in transit",
+      "End-to-end encryption",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "30",
+    "text": "How is data protected at rest?",
+    "options": [
+      "Database-level encryption",
+      "File system encryption",
+      "Application-level encryption",
+      "Key management service (HSM/KMS)",
+      "No encryption at rest",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "31",
+    "text": "What security monitoring is in place?",
+    "options": [
+      "Application logging",
+      "Security information and event management (SIEM)",
+      "Intrusion detection system (IDS)",
+      "Intrusion prevention system (IPS)",
+      "Web application firewall (WAF) logs",
+      "User behavior analytics",
+      "None",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "32",
+    "text": "Which regulatory frameworks apply?",
+    "options": [
+      "GDPR (General Data Protection Regulation)",
+      "HIPAA (Health Insurance Portability and Accountability Act)",
+      "PCI DSS (Payment Card Industry Data Security Standard)",
+      "SOX (Sarbanes-Oxley Act)",
+      "KVKK (Turkish Personal Data Protection Law)",
+      "ISO 27001",
+      "None",
+      "Other: ___"
+    ]
+  }
+]

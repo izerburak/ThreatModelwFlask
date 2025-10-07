@@ -1,0 +1,82 @@
+[
+  {
+    "id": "21",
+    "text": "What are the main application tiers?",
+    "options": [
+      "Web frontend (HTML/JS/React/Angular)",
+      "Mobile applications (iOS/Android)",
+      "Desktop applications",
+      "API gateway/reverse proxy",
+      "Application servers",
+      "Background job processors",
+      "Microservices",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "22",
+    "text": "Which programming languages/frameworks are used?",
+    "options": [
+      "JavaScript/Node.js",
+      "Python (Django/Flask)",
+      "Java (Spring/JSF)",
+      "C# (.NET)",
+      "PHP",
+      "Go",
+      "Ruby",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "23",
+    "text": "What is the deployment architecture?",
+    "options": [
+      "Monolithic application",
+      "Microservices architecture",
+      "Serverless functions",
+      "Container-based (Docker/Kubernetes)",
+      "Virtual machines",
+      "Hybrid approach"
+    ]
+  },
+  {
+    "id": "24",
+    "text": "Which infrastructure components are used?",
+    "options": [
+      "Load balancers",
+      "Web application firewalls (WAF)",
+      "Content delivery networks (CDN)",
+      "API gateways",
+      "Service mesh",
+      "Message brokers",
+      "Caching layers",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "25",
+    "text": "How are components interconnected?",
+    "options": [
+      "Direct HTTP/HTTPS calls",
+      "Service mesh (Istio, Linkerd)",
+      "Message queues",
+      "Event-driven architecture",
+      "Database connections",
+      "Shared file systems",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "26",
+    "text": "Which systems are single points of failure?",
+    "options": [
+      "Primary database",
+      "Authentication service",
+      "Payment processor",
+      "External API dependencies",
+      "Load balancer",
+      "None identified",
+      "Other: ___"
+    ]
+  }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "9",
+    "text": "What types of end users interact with the system?",
+    "options": [
+      "Employees (internal staff)",
+      "Customers (external users)",
+      "Partners/vendors",
+      "System administrators",
+      "Auditors/compliance officers",
+      "Anonymous/guest users",
+      "Other"
+    ]
+  },
+  {
+    "id": "10",
+    "text": "Which user roles have administrative privileges?",
+    "options": [
+      "System administrators",
+      "Database administrators",
+      "Application administrators",
+      "Security administrators",
+      "Business administrators",
+      "None (no admin roles)"
+    ]
+  },
+  {
+    "id": "11",
+    "text": "Are there automated actors (bots, scripts, APIs)?",
+    "options": [
+      "Internal automation/scripts",
+      "Partner API integrations",
+      "Third-party service calls",
+      "Public API consumers",
+      "Monitoring/health check systems",
+      "None"
+    ]
+  },
+  {
+    "id": "12",
+    "text": "Which external services does the system depend on?",
+    "options": [
+      "Authentication providers (LDAP, OAuth, SAML)",
+      "Payment processors",
+      "Email/SMS services",
+      "Cloud storage services",
+      "CDN/hosting services",
+      "Analytics/tracking services",
+      "Government/regulatory APIs",
+      "Other"
+    ]
+  },
+  {
+    "id": "13",
+    "text": "Which external systems consume data from this system?",
+    "options": [
+      "Reporting/BI systems",
+      "Partner systems",
+      "Regulatory reporting systems",
+      "Backup/archival systems",
+      "Monitoring/SIEM systems",
+      "None"
+    ]
+  },
+  {
+    "id": "14",
+    "text": "Which threat actors are most relevant to your business domain?",
+    "options": [
+      "Script kiddies (opportunistic)",
+      "Organized cybercriminals",
+      "Nation-state actors",
+      "Insider threats (malicious employees)",
+      "Competitors",
+      "Hacktivists",
+      "Disgruntled customers/users"
+    ]
+  }
+]

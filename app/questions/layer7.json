@@ -1,0 +1,63 @@
+[
+  {
+    "id": "39",
+    "text": "Which data flows cross the highest number of trust boundaries?",
+    "options": [
+      "User-to-application communication",
+      "Application-to-database communication",
+      "Inter-service communication (microservices)",
+      "External API integrations",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "40",
+    "text": "Which components have the largest attack surface based on external connectivity?",
+    "options": [
+      "Public web frontends",
+      "API gateways",
+      "External-facing services",
+      "Third-party integrations",
+      "Administrative interfaces",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "41",
+    "text": "Which threats are most likely given the identified threat actors and their capabilities?",
+    "options": [
+      "Credential theft or brute-force attacks",
+      "Data exfiltration or leakage",
+      "Malware injection or supply chain compromise",
+      "Denial-of-service attacks",
+      "Privilege escalation or lateral movement",
+      "Insider data misuse",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "42",
+    "text": "Which existing security controls are insufficient for the identified threat landscape?",
+    "options": [
+      "Authentication and identity controls",
+      "Authorization and access controls",
+      "Data protection mechanisms",
+      "Network segmentation or firewalls",
+      "Monitoring and alerting systems",
+      "Incident response capabilities",
+      "Other: ___"
+    ]
+  },
+  {
+    "id": "43",
+    "text": "What are the highest impact threats that lack adequate detection or prevention controls?",
+    "options": [
+      "Unencrypted data in transit or at rest",
+      "Weak administrative authentication",
+      "Unmonitored external API calls",
+      "Critical service availability risks",
+      "Unlogged privileged user activity",
+      "Other: ___"
+    ]
+  }
+]
