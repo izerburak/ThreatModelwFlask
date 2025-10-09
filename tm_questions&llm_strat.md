@@ -1,4 +1,4 @@
-# Comprehensive Threat Modeling Questions - All Layers (English Version)
+# Threat Modeling Questions
 
 ## Layer 1 – Scope & Context (Outer Boundary)
 *LLM Purpose: Define system boundaries and determine high-level DFD structure*
