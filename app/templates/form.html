@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-  <h3>Form - {{ layer_name|capitalize }}</h3>
+  <h3>{{ layer_name|capitalize }}</h3>
 
   <form method="post" class="mt-3">
 
@@ -9,9 +9,7 @@
         <label class="form-label fw-semibold">
           {{ loop.index }}. {{ q.text }}
         </label>
-
         {% if q.options %}
-          {# Çoktan seçmeli: checkbox (çoklu seçime uygun) #}
           {% for opt in q.options %}
             <div class="form-check">
               <input class="form-check-input"
@@ -25,12 +23,12 @@
             </div>
           {% endfor %}
         {% else %}
-          {# Açık uçlu metin #}
           <input class="form-control" name="q_{{ q.id }}" placeholder="Type your answer here">
         {% endif %}
       </div>
     {% endfor %}
 
     <button class="btn btn-primary" type="submit">Submit and Move to Next Layer</button>
+    <div class="mb-5"></div>
   </form>
 {% endblock %}
