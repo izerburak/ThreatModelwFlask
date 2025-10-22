@@ -1,6 +1,6 @@
 [
   {
-    "id": "15",
+    "id": "1",
     "text": "What types of personal data are processed?",
     "options": [
       "Names, contact information",
@@ -14,7 +14,7 @@
     ]
   },
   {
-    "id": "16",
+    "id": "2",
     "text": "What business-critical data is stored?",
     "options": [
       "Customer databases",
@@ -28,7 +28,7 @@
     ]
   },
   {
-    "id": "17",
+    "id": "3",
     "text": "How would you classify the overall data sensitivity?",
     "options": [
       "Public (no harm if disclosed)",
@@ -38,7 +38,7 @@
     ]
   },
   {
-    "id": "18",
+    "id": "4",
     "text": "Where is data primarily stored?",
     "options": [
       "Relational databases (MySQL, PostgreSQL, etc.)",
@@ -51,7 +51,7 @@
     ]
   },
   {
-    "id": "19",
+    "id": "5",
     "text": "How does data flow between components?",
     "options": [
       "REST APIs",
@@ -65,7 +65,7 @@
     ]
   },
   {
-    "id": "20",
+    "id": "6",
     "text": "What is the data retention policy?",
     "options": [
       "No specific retention (kept indefinitely)",

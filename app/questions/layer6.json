@@ -1,6 +1,6 @@
 [
   {
-    "id": "33",
+    "id": "1",
     "text": "What is the software development lifecycle (SDLC) approach?",
     "options": [
       "Waterfall",
@@ -12,7 +12,7 @@
     ]
   },
   {
-    "id": "34",
+    "id": "2",
     "text": "How are code changes deployed?",
     "options": [
       "Manual deployment",
@@ -24,7 +24,7 @@
     ]
   },
   {
-    "id": "35",
+    "id": "3",
     "text": "What is the patch management process?",
     "options": [
       "Automated patching",
@@ -36,7 +36,7 @@
     ]
   },
   {
-    "id": "36",
+    "id": "4",
     "text": "What is the backup strategy?",
     "options": [
       "Regular automated backups",
@@ -48,7 +48,7 @@
     ]
   },
   {
-    "id": "37",
+    "id": "5",
     "text": "What is the disaster recovery plan?",
     "options": [
       "Documented disaster recovery procedures",
@@ -60,7 +60,7 @@
     ]
   },
   {
-    "id": "38",
+    "id": "6",
     "text": "How are security incidents handled?",
     "options": [
       "Formal incident response plan",
