@@ -30,10 +30,10 @@
         <label class="form-label"><strong>Options</strong></label>
         <div id="optionsContainer">
             <div class="option-input-group d-flex align-items-center mb-2">
-                <input type="text" class="form-control" placeholder="Option 1">
+                <input type="text" class="form-control option-input" placeholder="Option 1">
             </div>
             <div class="option-input-group d-flex align-items-center mb-2">
-                <input type="text" class="form-control" placeholder="Option 2">
+                <input type="text" class="form-control option-input" placeholder="Option 2">
             </div>
         </div>
         <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addOptionBtn">+ Add Option</button>
@@ -41,13 +41,19 @@
 
     <!-- Submit -->
     <div class="text-end">
-        <button class="btn btn-success">Add Question</button>
+        <button id="submitBtn" type="button" class="btn btn-success">Add Question</button>
     </div>
+
+    <div id="statusMsg" class="mt-3"></div>
 </div>
 
 <script>
     const addOptionBtn = document.getElementById('addOptionBtn');
     const optionsContainer = document.getElementById('optionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const layerSelect = document.getElementById('layerSelect');
+    const questionText = document.getElementById('questionText');
+    const statusMsg = document.getElementById('statusMsg');
     let optionCount = 2;
 
     addOptionBtn.addEventListener('click', () => {
@@ -55,7 +61,7 @@
         const optionGroup = document.createElement('div');
         optionGroup.classList.add('option-input-group', 'd-flex', 'align-items-center', 'mb-2');
         optionGroup.innerHTML = `
-            <input type="text" class="form-control me-2" placeholder="Option ${optionCount}">
+            <input type="text" class="form-control option-input me-2" placeholder="Option ${optionCount}">
             <button type="button" class="btn btn-outline-danger btn-sm removeOptionBtn">−</button>
         `;
         optionsContainer.appendChild(optionGroup);
@@ -63,6 +69,55 @@
         optionGroup.querySelector('.removeOptionBtn').addEventListener('click', () => {
             optionGroup.remove();
         });
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        statusMsg.textContent = "";
+        const layer = layerSelect.value;
+        const text = questionText.value.trim();
+        if (!layer) {
+            statusMsg.textContent = "Please select a layer.";
+            statusMsg.className = "text-danger";
+            return;
+        }
+        if (!text) {
+            statusMsg.textContent = "Please enter question text.";
+            statusMsg.className = "text-danger";
+            return;
+        }
+        const options = Array.from(document.querySelectorAll('.option-input'))
+            .map(i => i.value.trim())
+            .filter(v => v.length > 0);
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Adding...";
+
+        try {
+            const res = await fetch("{{ url_for('main.add_question') }}", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({layer, text, options})
+            });
+            const j = await res.json();
+            if (res.ok && j.ok) {
+                statusMsg.className = "text-success";
+                statusMsg.textContent = "Question added.";
+                questionText.value = "";
+                document.querySelectorAll('.option-input').forEach((el, idx) => {
+                    if (idx >= 2) el.parentElement.remove();
+                    else el.value = "";
+                });
+            } else {
+                statusMsg.className = "text-danger";
+                statusMsg.textContent = j.error || "Failed to add question";
+            }
+        } catch (err) {
+            statusMsg.className = "text-danger";
+            statusMsg.textContent = err.message || "Network error";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Add Question";
+        }
     });
 </script>
 {% endblock %}

@@ -3,44 +3,6 @@ import json
 from datetime import datetime
 from flask import current_app
 
-# def save_answers(form_data, layer_name="layer1"):
-#     """
-#     form_data: request.form (ImmutableMultiDict)
-#     layer_name: 'layer1' .. 'layer6'
-#     Kayıt: app/responses/<layer_name>/response_YYYY-MM-DDTHH-MM-SS.json
-#     """
-#     answers = {}
-
-#     # form içindeki her alanı gez; layer_name hidden alanını atla
-#     for key in form_data.keys():
-#         if key == "layer_name":
-#             continue
-#         values = form_data.getlist(key)
-#         if not values:
-#             continue
-#         # Tek seçimleri string, çoklu seçimleri liste olarak yaz
-#         answers[key] = values[0] if len(values) == 1 else values
-
-#     # Uygulama kökünden klasörleri oluştur
-#     base_dir = current_app.root_path  # ..../app
-#     layer_dir = os.path.join(base_dir, "responses", layer_name)
-#     os.makedirs(layer_dir, exist_ok=True)
-
-#     # Zaman damgaları ve dosya adı
-#     ts_file = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-#     out_path = os.path.join(layer_dir, f"response_{ts_file}.json")
-
-#     payload = {
-#         "layer": layer_name,
-#         "timestamp": datetime.now().isoformat(timespec="seconds"),
-#         "answers": answers
-#     }
-
-#     with open(out_path, "w", encoding="utf-8") as f:
-#         json.dump(payload, f, indent=2, ensure_ascii=False)
-
-#     return out_path
-
 def save_answers(form_data, layer_name="layer1"):
     import os, json
     from datetime import datetime
@@ -48,7 +10,6 @@ def save_answers(form_data, layer_name="layer1"):
     answers = {}
     for key in form_data.keys():
         vals = form_data.getlist(key)
-        # 1’den fazla değer varsa liste bırak, tekse string’e indir
         if len(vals) == 0:
             answers[key] = None
         elif len(vals) == 1:
@@ -70,3 +31,53 @@ def save_answers(form_data, layer_name="layer1"):
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
+def append_question_to_layer(layer_name: str, question_text: str, options: list):
+    import json
+    from pathlib import Path
+    from flask import current_app
+
+    qdir = Path(current_app.root_path) / "questions"
+    qdir.mkdir(parents=True, exist_ok=True)
+    qpath = qdir / f"{layer_name}.json"
+
+    # Load or create default structure
+    if qpath.exists():
+        with qpath.open("r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+                # ensure it's dict with "questions"
+                if isinstance(data, list):
+                    data = {"questions": data}
+                elif not isinstance(data, dict) or "questions" not in data:
+                    data = {"questions": []}
+            except Exception:
+                data = {"questions": []}
+    else:
+        data = {"questions": []}
+
+    # Normalize questions list
+    questions = data.get("questions", [])
+    if not isinstance(questions, list):
+        questions = []
+
+    # Determine next numeric ID
+    max_id = 0
+    for q in questions:
+        try:
+            qid = int(q.get("id", 0))
+            if qid > max_id:
+                max_id = qid
+        except Exception:
+            continue
+    new_id = str(max_id + 1)
+
+    # Create and append new question
+    new_question = {"id": new_id, "text": question_text, "options": options}
+    questions.append(new_question)
+    data["questions"] = questions
+
+    # Write back in consistent format
+    with qpath.open("w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+    return str(qpath), new_question

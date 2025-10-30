@@ -1,9 +1,9 @@
 import os
 import json
-from flask import Blueprint, render_template, abort, request, redirect, url_for
-from app.utils.save_utils import save_answers
-from flask import Blueprint, render_template, redirect, url_for, request, abort, current_app
 from pathlib import Path
+import os
+from flask import Blueprint, render_template, abort, request, redirect, url_for, jsonify, current_app
+from app.utils.save_utils import save_answers, append_question_to_layer
 
 AVAILABLE_LAYERS = ["layer1", "layer2", "layer3", "layer4", "layer5", "layer6"]
 
@@ -60,8 +60,28 @@ def form(layer_name):
         available_layers=AVAILABLE_LAYERS
     )
 
-@main.route('/add-question')
+@main.route('/add-question', methods=["GET", "POST"])
 def add_question():
+    if request.method == "POST":
+        # JSON bekliyoruz (fetch ile gönderilecek)
+        if not request.is_json:
+            return jsonify({"ok": False, "error": "Expected JSON"}), 400
+        payload = request.get_json()
+        layer = payload.get("layer")
+        text = payload.get("text", "").strip()
+        options = payload.get("options", []) or []
+
+        if not layer or not text:
+            return jsonify({"ok": False, "error": "layer and text required"}), 400
+
+        try:
+            qpath, new_q = append_question_to_layer(layer, text, options)
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)}), 500
+
+        return jsonify({"ok": True, "path": qpath, "question": new_q})
+
+    # GET: render template
     return render_template("add_question.html", active_tab="add")
 
 @main.route('/dfd')
