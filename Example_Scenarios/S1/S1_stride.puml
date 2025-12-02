@@ -1,0 +1,19 @@
+@startuml
+title STRIDE Threat Analysis Table
+
+salt
+{
+{+
+"Element" | "S (Spoofing)" | "T (Tampering)" | "R (Repudiation)" | "I (Info Disclosure)" | "D (Denial of Service)" | "E (Privilege Escalation)"
+"API Gateway" | "Token hijacking" | "Command manipulation" | "Weak logs" | "Endpoint exposure" | "API DoS" | "ACL bypass"
+"MQTT Gateway" | "Fake device certs" | "False telemetry" | "" | "" | "MQTT flood" | ""
+"Auth Service" | "OAuth token replay" | "" | "Missing admin logs" | "" | "" | "Validation bypass"
+"Telemetry Processor" | "" | "Fake telemetry injection" | "" | "Sensor data leak" | "" | ""
+"Video Service" | "" | "Stream tampering" | "" | "Unauthorized viewing" | "Stream overload" | ""
+"Relational DB" | "Cred theft" | "Data tampering" | "" | "PII leak" | "DB exhaustion" | ""
+"Object Storage" | "" | "Object tampering" | "" | "Video/log disclosure" | "" | ""
+"CI/CD Pipeline" | "" | "Malicious firmware" | "Weak audit" | "" | "" | "Build agent escalation"
+}
+}
+
+@enduml

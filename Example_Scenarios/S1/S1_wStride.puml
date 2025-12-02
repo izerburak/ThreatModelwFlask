@@ -1,0 +1,98 @@
+@startuml
+title Smart Home IoT Management System - Threat Model DFD (STRIDE Annotated)
+
+' ---------------------------------------------------------
+' TRUST BOUNDARIES
+' ---------------------------------------------------------
+
+package "TB1 - Public Internet" {
+  actor EE1 as "End Users\n(Mobile/Web)"
+  actor EE2 as "IoT Devices\n(Sensors, Cameras)"
+}
+
+package "TB2 - Cloud Perimeter" {
+  component P1 as "API Gateway"
+  component P3 as "MQTT Device Gateway\n(Broker)"
+}
+
+package "TB3 - Internal Services Network" {
+  component P2 as "Authentication Service"
+  component P4 as "Telemetry Processor"
+  component P5 as "Video Streaming Service"
+  component P6 as "Rules Engine"
+  component P7 as "Device/Topology Manager"
+  component P8 as "Notification Service"
+  component P9 as "Security & Audit Service"
+}
+
+package "TB4 - Data Layer" {
+  database DS1 as "Relational DB"
+  database DS2 as "Time-Series Store"
+  collections DS3 as "Object Storage\n(Video, Logs)"
+  collections DS4 as "Cache Layer"
+}
+
+package "TB5 - CI/CD Pipeline" {
+  component CI as "CI/CD System"
+}
+
+' ---------------------------------------------------------
+' DATA FLOWS
+' ---------------------------------------------------------
+
+EE1 --> P1 : HTTPS Requests\nDF1
+EE1 --> P5 : Video Stream\nDF2
+EE2 --> P3 : MQTT Telemetry\nDF3
+P1 --> P2 : AuthN/AuthZ\nDF4
+P3 --> P4 : Normalized Telemetry\nDF5
+P4 --> DS2 : Telemetry Storage
+P4 --> P6 : Event Triggers\nDF7
+P1 --> DS1 : DB Ops (DF8)
+P5 --> DS3 : Video Storage\nDF6
+P9 --> DS3 : Audit Logs
+P9 --> DS1 : Security Events
+CI --> P1 : Deployment Artifacts
+CI --> P3 : Firmware Updates
+
+' ---------------------------------------------------------
+' STRIDE NOTES
+' ---------------------------------------------------------
+
+note right of P1
+  API Gateway STRIDE:
+  - S: Token hijacking
+  - T: Command tampering
+  - I: Sensitive endpoint exposure
+  - D: DoS
+  - E: ACL bypass
+end note
+
+note right of P3
+  MQTT Gateway STRIDE:
+  - S: Fake device certs
+  - T: False telemetry
+  - D: Flooding
+end note
+
+note right of P5
+  Video Service STRIDE:
+  - I: Unauthorized video access
+  - T: Video manipulation
+  - D: Stream overload
+end note
+
+note right of DS1
+  DB STRIDE:
+  - S: Credential theft
+  - T: Data tampering
+  - I: PII exposure
+  - D: DB saturation
+end note
+
+note right of CI
+  CI/CD STRIDE:
+  - T: Malicious firmware
+  - E: Privilege escalation
+end note
+
+@enduml

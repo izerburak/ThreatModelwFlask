@@ -1,0 +1,124 @@
+<table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse; width:100%; font-family:Arial, sans-serif;">
+<thead style="background:#f2f2f2; font-weight:bold; text-align:center;">
+<tr>
+    <th>System Element</th>
+    <th>S (Spoofing)</th>
+    <th>T (Tampering)</th>
+    <th>R (Repudiation)</th>
+    <th>I (Info Disclosure)</th>
+    <th>D (Denial of Service)</th>
+    <th>E (Privilege Escalation)</th>
+    <th>Impact × Likelihood</th>
+    <th>Risk Level</th>
+    <th>Mitigation</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>API Gateway</td>
+<td>Token hijacking</td>
+<td>Command manipulation</td>
+<td>Weak logs</td>
+<td>Endpoint exposure</td>
+<td>API DoS attack</td>
+<td>ACL bypass</td>
+<td>High × Medium</td>
+<td style="color:red; font-weight:bold;">High</td>
+<td>WAF, rate-limiting, strong auth, centralized logging</td>
+</tr>
+
+<tr>
+<td>MQTT Gateway</td>
+<td>Fake device certificates</td>
+<td>False telemetry injection</td>
+<td>—</td>
+<td>—</td>
+<td>MQTT flooding</td>
+<td>—</td>
+<td>High × Medium</td>
+<td style="color:red; font-weight:bold;">High</td>
+<td>mTLS, topic ACLs, message validation, MQTT rate limits</td>
+</tr>
+
+<tr>
+<td>Authentication Service</td>
+<td>OAuth token replay</td>
+<td>—</td>
+<td>Missing admin logs</td>
+<td>—</td>
+<td>—</td>
+<td>Validation bypass</td>
+<td>High × Low</td>
+<td style="color:orange; font-weight:bold;">Medium</td>
+<td>Token binding, MFA, hardened audit logs</td>
+</tr>
+
+<tr>
+<td>Telemetry Processor</td>
+<td>—</td>
+<td>Fake telemetry injection</td>
+<td>—</td>
+<td>Sensor data leakage</td>
+<td>—</td>
+<td>—</td>
+<td>Medium × Medium</td>
+<td style="color:orange; font-weight:bold;">Medium</td>
+<td>Schema validation, integrity checks, data encryption</td>
+</tr>
+
+<tr>
+<td>Video Service</td>
+<td>—</td>
+<td>Stream/video tampering</td>
+<td>—</td>
+<td>Unauthorized video access</td>
+<td>Stream overload</td>
+<td>—</td>
+<td>High × High</td>
+<td style="color:red; font-weight:bold;">High</td>
+<td>E2E encryption, access tokens, signed URLs, traffic shaping</td>
+</tr>
+
+<tr>
+<td>Relational DB</td>
+<td>Credential theft</td>
+<td>Data tampering</td>
+<td>—</td>
+<td>PII / metadata leak</td>
+<td>DB exhaustion</td>
+<td>—</td>
+<td>High × Medium</td>
+<td style="color:red; font-weight:bold;">High</td>
+<td>Encryption-at-rest, IAM hardening, query rate limits</td>
+</tr>
+
+<tr>
+<td>Object Storage</td>
+<td>—</td>
+<td>Object tampering</td>
+<td>—</td>
+<td>Video/log disclosure</td>
+<td>—</td>
+<td>—</td>
+<td>High × Low</td>
+<td style="color:orange; font-weight:bold;">Medium</td>
+<td>Bucket policies, versioning, signed uploads</td>
+</tr>
+
+<tr>
+<td>CI/CD Pipeline</td>
+<td>—</td>
+<td>Malicious firmware/image</td>
+<td>Weak audit logs</td>
+<td>—</td>
+<td>—</td>
+<td>Build agent escalation</td>
+<td>High × High</td>
+<td style="color:red; font-weight:bold;">High</td>
+<td>Signed builds, protected branches, SAST/DAST, isolated runners</td>
+</tr>
+
+</tbody>
+</table>
