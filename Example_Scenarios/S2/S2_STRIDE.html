@@ -1,0 +1,118 @@
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+  <thead>
+    <tr style="background-color: #f2f2f2; text-align: center;">
+      <th style="width: 14%;">DFD Element / Scenario</th>
+      <th style="width: 10%;">S (Spoofing)</th>
+      <th style="width: 10%;">T (Tampering)</th>
+      <th style="width: 10%;">R (Repudiation)</th>
+      <th style="width: 10%;">I (Information Disclosure)</th>
+      <th style="width: 10%;">D (Denial of Service)</th>
+      <th style="width: 10%;">E (Elevation of Privilege)</th>
+      <th style="width: 8%;">Impact × Likelihood</th>
+      <th style="width: 5%;">Risk Level</th>
+      <th style="width: 13%;">Mitigation</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <!-- Row 1 -->
+    <tr>
+      <td><b>Patient / Doctor login via API Gateway & Auth Service</b></td>
+      <td>Account takeover through stolen tokens or credential attacks.</td>
+      <td>Manipulation of tokens or auth parameters.</td>
+      <td>Session actions cannot be proven without proper logging.</td>
+      <td>Unauthorized access to medical records.</td>
+      <td>Login endpoint flooding causing access disruption.</td>
+      <td>Compromised accounts used to escalate privileges.</td>
+      <td>High × Medium–High</td>
+      <td><b>High</b></td>
+      <td>Mandatory MFA, secure token handling, rate limiting, anomaly detection.</td>
+    </tr>
+
+    <!-- Row 2 -->
+    <tr>
+      <td><b>Access to patient records & test results via DB-backed services</b></td>
+      <td>Impersonation of clinical staff to access records.</td>
+      <td>Unauthorized modification of health records.</td>
+      <td>Actions disputed if audit logs are incomplete.</td>
+      <td>PHI leakage via misconfigured queries or exports.</td>
+      <td>Heavy queries degrading DB availability.</td>
+      <td>Exploiting IDOR to access unauthorized records.</td>
+      <td>Very High × Medium</td>
+      <td><b>High</b></td>
+      <td>Fine-grained RBAC, least privilege, immutable audit logs.</td>
+    </tr>
+
+    <!-- Row 3 -->
+    <tr>
+      <td><b>Payment processing through Payment Orchestrator</b></td>
+      <td>Impersonation of payment callbacks.</td>
+      <td>Modification of payment amounts or statuses.</td>
+      <td>Disputing charges without audit trails.</td>
+      <td>Exposure of payment tokens or sensitive logs.</td>
+      <td>Card-testing or endpoint flooding.</td>
+      <td>Fraudulent refunds through compromised accounts.</td>
+      <td>High × Medium</td>
+      <td><b>High</b></td>
+      <td>Signed webhooks, mTLS, data encryption, reconciliation checks.</td>
+    </tr>
+
+    <!-- Row 4 -->
+    <tr>
+      <td><b>Messaging & notifications (in-app + Email/SMS)</b></td>
+      <td>Impersonation of message sender.</td>
+      <td>Alteration or deletion of message content.</td>
+      <td>Disputes without stored immutable receipts.</td>
+      <td>Leakage of sensitive conversations.</td>
+      <td>Bulk notification storms affecting service availability.</td>
+      <td>Unauthorized use of messaging infrastructure.</td>
+      <td>High × Medium</td>
+      <td><b>High</b></td>
+      <td>Signed messages, minimize PHI in SMS/email, rate limits, audit logs.</td>
+    </tr>
+
+    <!-- Row 5 -->
+    <tr>
+      <td><b>Lab System integrations</b></td>
+      <td>Submitting falsified results via impersonation.</td>
+      <td>Modification of test results in transit.</td>
+      <td>Missing origin traceability for lab data.</td>
+      <td>Exposure of lab reports on insecure channels.</td>
+      <td>Slow or unavailable lab endpoints.</td>
+      <td>Using integration credentials for lateral movement.</td>
+      <td>Very High × Low–Medium</td>
+      <td><b>High</b></td>
+      <td>Mutual TLS, signed payloads, strict logging, network segmentation.</td>
+    </tr>
+
+    <!-- Row 6 -->
+    <tr>
+      <td><b>CI/CD pipeline & deployments</b></td>
+      <td>Impersonation of build/deploy agents.</td>
+      <td>Injection of malicious configurations.</td>
+      <td>Inability to attribute changes.</td>
+      <td>Secrets leaked through logs.</td>
+      <td>Bad deployments causing outages.</td>
+      <td>Escalation to full production control.</td>
+      <td>Very High × Medium</td>
+      <td><b>High</b></td>
+      <td>RBAC for CI/CD, signed builds, secret rotation, audit monitoring.</td>
+    </tr>
+
+    <!-- Row 7 -->
+    <tr>
+      <td><b>API Gateway, WAF & backend availability</b></td>
+      <td>Spoofed sources bypass rate limits.</td>
+      <td>Modification of routing or WAF rules.</td>
+      <td>Operational changes untraceable.</td>
+      <td>Exposure of internal debug endpoints.</td>
+      <td>Volumetric and app-layer attacks.</td>
+      <td>Abuse of admin interfaces.</td>
+      <td>High × Medium–High</td>
+      <td><b>High</b></td>
+      <td>Redundancy, DDoS protection, strict change control, monitoring.</td>
+    </tr>
+
+  </tbody>
+</table>

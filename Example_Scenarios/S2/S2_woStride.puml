@@ -1,0 +1,177 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+' ===========================
+' Trust Boundary: Public Internet
+' ===========================
+package "Public Internet" {
+  actor Patient
+  actor Doctor
+  actor "Clinic Staff" as ClinicStaff
+}
+
+' ===========================
+' Trust Boundary: Third-Party Services
+' ===========================
+package "Third-Party Services" {
+  actor "Auth Provider (OAuth/SSO)" as AuthProvider
+  actor "Payment Processor" as PaymentProcessor
+  actor "Email / SMS Provider" as EmailSMS
+  actor "Regulatory / Reporting Systems" as RegSystems
+  actor "Monitoring / SIEM" as SIEM
+  actor "Lab Systems" as LabSystems
+}
+
+' ===========================
+' Trust Boundary: Cloud Edge / DMZ
+' ===========================
+package "Cloud Edge / DMZ" {
+  [CDN / WAF] as CDN_WAF
+  [API Gateway / Reverse Proxy] as APIGW
+}
+
+' ===========================
+' Trust Boundary: Application Services Network
+' ===========================
+package "Application Services Network" {
+  [Web Frontend SPA] as WebSPA
+  [Mobile Backend API] as MobileAPI
+
+  [Appointment Service] as ApptService
+  [Patient Management Service] as PatientService
+  [Doctor & Clinic Service] as DoctorService
+  [Test Results Service] as TestService
+  [Messaging Service] as MsgService
+  [Payment Orchestrator Service] as PayService
+  [Notification Service] as NotifService
+  [Authentication & Authorization Service] as AuthService
+
+  [Background Job Workers] as Workers
+  [Admin Console] as AdminConsole
+}
+
+' ===========================
+' Trust Boundary: Data Stores
+' ===========================
+package "Data Stores" {
+  database "Relational DB\n(Patients, Appointments,\nFinancial Records, Audit)" as RelDB
+  database "Object Storage\n(Reports, Invoices, Attachments)" as ObjStore
+  database "Cache / Session Store\n(Redis)" as Cache
+  database "Central Log / Audit Store" as AuditStore
+}
+
+' ===========================
+' Trust Boundary: Monitoring & Operations
+' ===========================
+package "Monitoring & Operations" {
+  [Logging & Metrics Collector] as LogCollector
+  [CI/CD Pipeline] as CICD
+}
+
+' ===========================
+' User & Client Flows
+' ===========================
+Patient --> CDN_WAF : HTTPS (Web/Mobile access)
+Doctor --> CDN_WAF : HTTPS (Web/Mobile access)
+ClinicStaff --> CDN_WAF : HTTPS (Web/Mobile access)
+
+CDN_WAF --> APIGW : Forward HTTPS traffic
+
+APIGW --> WebSPA : Serve SPA assets
+APIGW --> MobileAPI : Mobile API endpoints
+
+WebSPA --> APIGW : REST API calls\n(appointments, records, messages)
+MobileAPI --> APIGW : REST API calls\n(appointments, records, messages)
+
+' ===========================
+' Authentication & Session Flows
+' ===========================
+APIGW --> AuthService : Login / token validation
+AuthService --> RelDB : Read/write user\nidentities, tokens
+AuthService --> AuthProvider : SSO / federation requests
+AuthProvider --> AuthService : Tokens / assertions
+
+' Admin console authentication
+AdminConsole --> APIGW : Admin HTTP(S) calls
+APIGW --> AuthService : Admin auth requests
+
+' ===========================
+' Core Business Service Flows
+' ===========================
+APIGW --> ApptService : Appointment operations
+APIGW --> PatientService : Patient profile & history
+APIGW --> DoctorService : Doctor schedule & clinic config
+APIGW --> TestService : Test result queries
+APIGW --> MsgService : Secure messaging
+APIGW --> PayService : Payment initiation
+APIGW --> NotifService : Notification requests
+
+' ===========================
+' Service <-> Data Store Flows
+' ===========================
+ApptService --> RelDB : CRUD appointments
+PatientService --> RelDB : Patient records
+DoctorService --> RelDB : Doctor & clinic data
+TestService --> RelDB : Test results metadata
+MsgService --> RelDB : Message metadata
+PayService --> RelDB : Payment records
+NotifService --> RelDB : Notification logs
+AuthService --> RelDB : Auth data\n(credentials, tokens)
+
+ApptService --> Cache : Cached schedules / slots
+PatientService --> Cache : Cached patient views
+DoctorService --> Cache : Cached doctor data
+AuthService --> Cache : Sessions / tokens
+
+TestService --> ObjStore : Store / fetch\nlab reports, PDFs
+MsgService --> ObjStore : Attachments
+PayService --> ObjStore : Invoices, receipts
+
+RelDB --> AuditStore : Audit logs\n(critical actions)
+MsgService --> AuditStore : Message access logs
+AuthService --> AuditStore : Login / auth events
+ApptService --> AuditStore : Appointment changes
+
+' ===========================
+' Background Jobs & Integrations
+' ===========================
+Workers --> NotifService : Scheduled reminders
+Workers --> TestService : Lab result sync jobs
+Workers --> PayService : Settlement / reconciliation
+Workers --> RelDB : Batch archival\nand maintenance tasks
+
+NotifService --> EmailSMS : Email/SMS notifications
+PayService --> PaymentProcessor : Card token & payment API calls
+TestService --> LabSystems : Lab result retrieval / push
+
+Workers --> RegSystems : Regulatory\nreporting exports
+
+' ===========================
+' Monitoring & Operations Flows
+' ===========================
+WebSPA --> LogCollector : Client-side logs/metrics
+MobileAPI --> LogCollector : API metrics
+ApptService --> LogCollector : Service logs/metrics
+PatientService --> LogCollector : Service logs/metrics
+DoctorService --> LogCollector
+TestService --> LogCollector
+MsgService --> LogCollector
+PayService --> LogCollector
+NotifService --> LogCollector
+AuthService --> LogCollector
+Workers --> LogCollector
+
+LogCollector --> SIEM : Security events & alerts
+
+CICD --> ApptService : Deploy updated containers
+CICD --> PatientService
+CICD --> DoctorService
+CICD --> TestService
+CICD --> MsgService
+CICD --> PayService
+CICD --> NotifService
+CICD --> AuthService
+CICD --> Workers
+
+@enduml

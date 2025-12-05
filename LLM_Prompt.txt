@@ -1,0 +1,48 @@
+Using the inputs provided below, generate two separate deliverables.
+
+------------------------------------------------------------
+1) Threat Model Output (DFD-based)
+------------------------------------------------------------
+Requirements:
+- Produce a complete Data Flow Diagram (DFD) in PlantUML format.
+- Use only clean PlantUML component/actor/database/package syntax.
+- The DFD must include:
+  * External entities
+  * Processes
+  * Data stores
+  * Trust boundaries (as PlantUML packages)
+  * Data flows between all elements
+- The PlantUML diagram must NOT include any STRIDE notes, threat labels, or risk content.
+- After the PlantUML diagram, provide a short textual explanation of high-level threat surfaces (without STRIDE references).
+
+------------------------------------------------------------
+2) STRIDE Analysis (HTML Table Only)
+------------------------------------------------------------
+Requirements:
+- Output must be a single clean HTML <table>.
+- Include columns: S (Spoofing), T (Tampering), R (Repudiation), I (Information Disclosure), D (Denial of Service), E (Elevation of Privilege).
+- Include an “Impact × Likelihood” column.
+- Include a “Risk Level” column (Low / Medium / High).
+- Include a “Mitigation” column with recommended controls.
+- No diagrams, no PlantUML, no extra narrative text outside the HTML table.
+
+------------------------------------------------------------
+Inputs (provided below in each use case)
+------------------------------------------------------------
+Scenario Description:
+<INSERT SCENARIO HERE>
+
+System Components, Data Flows, Actors:
+<INSERT ARCHITECTURE DETAILS HERE>
+
+Questionnaire Responses (Layer 1–6):
+<INSERT RESPONSES HERE>
+
+------------------------------------------------------------
+Rules:
+------------------------------------------------------------
+- Deliverable (1) and (2) must be completely separated.
+- The DFD must be produced ONLY in PlantUML format.
+- STRIDE analysis must appear ONLY inside the HTML table.
+- No STRIDE information should appear inside the DFD PlantUML diagram.
+- Output must match a professional cybersecurity threat modeling report standard.
