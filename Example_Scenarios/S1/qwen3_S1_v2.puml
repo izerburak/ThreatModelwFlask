@@ -1,0 +1,60 @@
+@startuml
+' Layer 1: Scope & Context
+' Layer 2: Actors & External Entities
+' Layer 3: Data Stores & Flows
+' Layer 4: Components & Architecture
+' Layer 5: Controls & Trust Boundaries
+' Layer 6: Deployment & Accessibility
+' Layer 7: LLM Guidance (ignored for output)
+
+' Trust Boundaries
+package "External / Internet" {
+actor "User" as user
+actor "Partner System" as partner
+actor "OAuth Provider" as oauth
+actor "Email Service" as email
+actor "SMS Service" as sms
+actor "CDN" as cdn
+actor "Analytics Service" as analytics
+actor "SIEM" as siem
+}
+
+package "Cloud / Public Cloud" {
+component "Web Frontend" as web
+component "API Gateway" as api
+component "Microservices" as micro
+component "Background Jobs" as jobs
+component "Caching Layer" as cache
+component "Logging Service" as log
+}
+
+package "Internal Services / Private Subnet" {
+component "Database" as db
+component "Object Storage" as storage
+component "Audit Log" as audit
+}
+
+' Data Flows
+user -> web : HTTPS REST
+web -> api : HTTPS REST
+api -> micro : HTTPS REST
+micro -> db : SQL
+micro -> storage : REST
+micro -> audit : REST
+micro -> log : REST
+
+partner -> api : HTTPS REST
+api -> micro : HTTPS REST
+micro -> db : SQL
+
+oauth -> web : OAuth Token
+email -> web : Email
+sms -> web : SMS
+cdn -> web : HTTP
+analytics -> web : REST
+siem -> web : REST
+
+web -> cache : HTTP
+web -> log : HTTP
+
+@enduml

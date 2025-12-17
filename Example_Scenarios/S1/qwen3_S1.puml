@@ -1,0 +1,62 @@
+@startuml
+' Layer 1: Scope & Context
+' Layer 2: Actors & External Systems
+' Layer 3: Data Stores & Flow Patterns
+' Layer 4: Components & Architecture
+' Layer 5: Controls & Trust Boundaries
+' Layer 6: Deployment & Accessibility
+' Layer 7: LLM Guidance (ignored for output)
+
+' Trust Boundaries
+package "External / Internet" {
+actor "User" as user
+actor "OAuth Provider" as oauth
+actor "Email Service" as email
+actor "SMS Service" as sms
+actor "CDN" as cdn
+actor "Analytics" as analytics
+actor "SIEM" as siem
+actor "Push Notification Service" as push
+actor "Third-Party API" as thirdparty
+}
+
+package "Cloud / Public Cloud" {
+component "Web Frontend" as web
+component "API Gateway" as api
+component "Microservices" as micro
+component "Background Jobs" as jobs
+component "Caching Layer" as cache
+}
+
+package "Internal Services / Private Subnet" {
+component "Database" as db
+component "Audit Logs" as logs
+component "Message Broker" as broker
+}
+
+' Data Flows
+user -> web : HTTPS REST
+web -> api : HTTPS REST
+api -> micro : HTTPS REST
+micro -> db : SQL
+micro -> logs : Audit
+micro -> broker : MQTT
+micro -> email : SMTP
+micro -> sms : SMS
+micro -> push : HTTP
+web -> cdn : HTTP
+web -> analytics : HTTP
+web -> siem : HTTP
+api -> thirdparty : HTTPS REST
+micro -> thirdparty : HTTPS REST
+
+' External Services
+oauth -> web : OAuth Token
+email -> web : Email Notification
+sms -> web : SMS Notification
+push -> web : Push Notification
+cdn -> web : Static Assets
+analytics -> web : Analytics Data
+siem -> web : Security Alerts
+
+@enduml
