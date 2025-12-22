@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "id": "9",
     "text": "What types of end users interact with the system?",
     "options": [
       "Employees (internal staff)",
@@ -13,7 +13,7 @@
     ]
   },
   {
-    "id": "2",
+    "id": "10",
     "text": "Which user roles have administrative privileges?",
     "options": [
       "System administrators",
@@ -25,7 +25,7 @@
     ]
   },
   {
-    "id": "3",
+    "id": "11",
     "text": "Are there automated actors (bots, scripts, APIs)?",
     "options": [
       "Internal automation/scripts",
@@ -37,7 +37,7 @@
     ]
   },
   {
-    "id": "4",
+    "id": "12",
     "text": "Which external services does the system depend on?",
     "options": [
       "Authentication providers (LDAP, OAuth, SAML)",
@@ -51,7 +51,7 @@
     ]
   },
   {
-    "id": "5",
+    "id": "13",
     "text": "Which external systems consume data from this system?",
     "options": [
       "Reporting/BI systems",
@@ -63,7 +63,7 @@
     ]
   },
   {
-    "id": "6",
+    "id": "14",
     "text": "Which threat actors are most relevant to your business domain?",
     "options": [
       "Script kiddies (opportunistic)",

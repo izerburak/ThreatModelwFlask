@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "id": "20",
     "text": "What are the main application tiers?",
     "options": [
       "Web frontend (HTML/JS/React/Angular)",
@@ -14,7 +14,7 @@
     ]
   },
   {
-    "id": "2",
+    "id": "21",
     "text": "Which programming languages/frameworks are used?",
     "options": [
       "JavaScript/Node.js",
@@ -28,7 +28,7 @@
     ]
   },
   {
-    "id": "3",
+    "id": "22",
     "text": "What is the deployment architecture?",
     "options": [
       "Monolithic application",
@@ -40,7 +40,7 @@
     ]
   },
   {
-    "id": "4",
+    "id": "23",
     "text": "Which infrastructure components are used?",
     "options": [
       "Load balancers",
@@ -54,7 +54,7 @@
     ]
   },
   {
-    "id": "5",
+    "id": "24",
     "text": "How are components interconnected?",
     "options": [
       "Direct HTTP/HTTPS calls",
@@ -67,7 +67,7 @@
     ]
   },
   {
-    "id": "6",
+    "id": "25",
     "text": "Which systems are single points of failure?",
     "options": [
       "Primary database",

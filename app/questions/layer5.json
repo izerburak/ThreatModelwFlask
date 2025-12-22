@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "id": "26",
     "text": "How do users authenticate?",
     "options": [
       "Username/password only",
@@ -14,7 +14,7 @@
     ]
   },
   {
-    "id": "2",
+    "id": "27",
     "text": "How is authorization managed?",
     "options": [
       "Role-based access control (RBAC)",
@@ -26,7 +26,7 @@
     ]
   },
   {
-    "id": "3",
+    "id": "28",
     "text": "How is data protected in transit?",
     "options": [
       "TLS/HTTPS for all communications",
@@ -38,7 +38,7 @@
     ]
   },
   {
-    "id": "4",
+    "id": "29",
     "text": "How is data protected at rest?",
     "options": [
       "Database-level encryption",
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "id": "5",
+    "id": "30",
     "text": "What security monitoring is in place?",
     "options": [
       "Application logging",
@@ -64,7 +64,7 @@
     ]
   },
   {
-    "id": "6",
+    "id": "31",
     "text": "Which regulatory frameworks apply?",
     "options": [
       "GDPR (General Data Protection Regulation)",

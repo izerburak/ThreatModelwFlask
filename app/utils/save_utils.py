@@ -6,7 +6,9 @@ from flask import current_app
 def save_answers(form_data, layer_name="layer1"):
     import os, json
     from datetime import datetime
+    from pathlib import Path
 
+    # Collect form data
     answers = {}
     for key in form_data.keys():
         vals = form_data.getlist(key)
@@ -17,19 +19,50 @@ def save_answers(form_data, layer_name="layer1"):
         else:
             answers[key] = vals
 
-    result = {
-        "timestamp": datetime.now().isoformat(),
-        "layer": layer_name,
-        "answers": answers,
-    }
-
-    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
     os.makedirs("responses", exist_ok=True)
-    filename = f"{layer_name}_answers_{timestamp_str}.json"
-    filepath = os.path.join("responses", filename)
-
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
+    
+    # For each survey, one file - create new file in layer1, append in others
+    if layer_name == "layer1":
+        # New survey starting - create new file
+        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"survey_{timestamp_str}.json"
+        filepath = os.path.join("responses", filename)
+        
+        # Only save answers
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(answers, f, ensure_ascii=False, indent=2)
+        
+        return filepath
+    else:
+        # Add answers to the current survey - find the latest file
+        response_dir = Path("responses")
+        json_files = sorted(response_dir.glob("survey_*.json"), key=os.path.getmtime, reverse=True)
+        
+        if json_files:
+            filepath = json_files[0]
+            
+            # Read the current survey file
+            with open(filepath, "r", encoding="utf-8") as f:
+                survey_data = json.load(f)
+            
+            # Add new answers (update the existing answers)
+            survey_data.update(answers)
+            
+            # Update the survey file
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(survey_data, f, ensure_ascii=False, indent=2)
+            
+            return filepath
+        else:
+            # If no survey file is found, create a new one (for security)
+            timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"survey_{timestamp_str}.json"
+            filepath = os.path.join("responses", filename)
+            
+            with open(filepath, "w", encoding="utf-8") as f:
+                json.dump(answers, f, ensure_ascii=False, indent=2)
+            
+            return filepath
 
 def append_question_to_layer(layer_name: str, question_text: str, options: list):
     import json

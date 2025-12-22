@@ -1,34 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
-  <h3>{{ layer_name|capitalize }}</h3>
+<h3>{{ layer_name|capitalize }}</h3>
 
-  <form method="post" class="mt-3">
+<form method="post" class="mt-3">
 
-    {% for q in questions %}
-      <div class="mb-4">
-        <label class="form-label fw-semibold">
-          {{ loop.index }}. {{ q.text }}
-        </label>
-        {% if q.options %}
-          {% for opt in q.options %}
-            <div class="form-check">
-              <input class="form-check-input"
-                     type="checkbox"
-                     id="q_{{ q.id }}_{{ loop.index }}"
-                     name="q_{{ q.id }}"
-                     value="{{ opt }}">
-              <label class="form-check-label" for="q_{{ q.id }}_{{ loop.index }}">
-                {{ opt }}
-              </label>
-            </div>
-          {% endfor %}
-        {% else %}
-          <input class="form-control" name="q_{{ q.id }}" placeholder="Type your answer here">
-        {% endif %}
-      </div>
+  {% for q in questions %}
+  <div class="mb-4">
+    <label class="form-label fw-semibold">
+      {{ loop.index }}. {{ q.text }}
+    </label>
+    {% if q.options %}
+    {% for opt in q.options %}
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="q_{{ q.id }}_{{ loop.index }}" name="q_{{ q.id }}"
+        value="{{ opt }}">
+      <label class="form-check-label" for="q_{{ q.id }}_{{ loop.index }}">
+        {{ opt }}
+      </label>
+    </div>
     {% endfor %}
+    <div class="mt-2">
+      <label class="form-label" for="q_{{ q.id }}">Other:</label>
+      <input class="form-control" type="text" id="q_{{ q.id }}" name="q_{{ q.id }}"
+        placeholder="Please type your answer here">
+    </div>
+    {% else %}
+    <input class="form-control" name="q_{{ q.id }}" placeholder="Please type your answer here">
+    {% endif %}
+  </div>
+  {% endfor %}
 
-    <button class="btn btn-primary" type="submit">Submit and Move to Next Layer</button>
-    <div class="mb-5"></div>
-  </form>
+  <button class="btn btn-primary" type="submit">Submit and Move to Next Layer</button>
+  <div class="mb-5"></div>
+</form>
 {% endblock %}
