@@ -1,0 +1,22 @@
+Possible Research Questions
+
+Q1.
+To what extent can a layered, questionnaire-driven framework combined with a Large Language Model support semi-automated threat modeling during the early stages of system design?
+
+Q2.
+Can Large Language Models generate structurally valid and security-relevant Data Flow Diagrams (DFDs) based solely on structured, non-code system descriptions?
+
+Q3.
+How consistent and repeatable are LLM-generated threat modeling outputs when the same system is described using the same structured questionnaire?
+
+Q4.
+How effectively can an LLM-assisted threat modeling approach identify potential security threats (e.g., STRIDE categories) without access to implementation-level details?
+
+Q5.
+To what degree does a structured, LLM-guided questionnaire reduce dependency on security expertise in the threat modeling process?
+
+Q6.
+Which aspects of threat modeling (e.g., trust boundaries, data flows, threat categorization) benefit most from LLM assistance, and which still require human expert intervention?
+
+Q7.
+What are the limitations and risks of using Large Language Models for automated or semi-automated threat modeling in security-sensitive system designs?
