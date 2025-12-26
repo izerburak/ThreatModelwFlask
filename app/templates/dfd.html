@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h3 class="mb-4">📊 DFD Drawing - Threat Model Generation</h3>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Select Survey Response</h5>
+                <p class="text-muted">
+                    Choose a survey response file to generate the threat model and DFD diagram.
+                </p>
+
+                <form method="post" class="mt-4">
+                    <div class="mb-4">
+                        <label for="responseFile" class="form-label fw-semibold">
+                            Survey Response File
+                        </label>
+                        <select class="form-select form-select-lg" id="responseFile" name="response_file" required>
+                            <option value="" selected disabled>-- Select a response file --</option>
+                            {% for file in response_files %}
+                            <option value="{{ file }}">{{ file }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Select from previously saved survey responses in the responses folder.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            🚀 Generate Threat Model & DFD
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4" role="alert">
+            <strong>ℹ️ How it works:</strong>
+            <ul class="mb-0 mt-2">
+                <li>Select a survey response file from the dropdown</li>
+                <li>Click the button to generate the threat model</li>
+                <li>The system will analyze the responses and create a DFD diagram</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

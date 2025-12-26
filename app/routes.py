@@ -84,9 +84,32 @@ def add_question():
     # GET: render template
     return render_template("add_question.html", active_tab="add")
 
-@main.route('/dfd')
+@main.route('/dfd', methods=["GET", "POST"])
 def dfd():
-    return render_template("dfd.html", active_tab="dfd")
+    # Get the responses directory path
+    responses_dir = Path(current_app.root_path).parent / "responses"
+    
+    # Get all JSON files from responses directory
+    response_files = []
+    if responses_dir.exists():
+        response_files = sorted([f.name for f in responses_dir.glob("*.json")])
+    
+    if request.method == "POST":
+        selected_file = request.form.get("response_file")
+        # TODO: Process the selected file and generate threat model
+        # For now, just pass it back to show selection
+        return render_template(
+            "dfd.html", 
+            active_tab="dfd",
+            response_files=response_files,
+            selected_file=selected_file
+        )
+    
+    return render_template(
+        "dfd.html", 
+        active_tab="dfd",
+        response_files=response_files
+    )
 
 @main.route('/risk')
 def risk():
