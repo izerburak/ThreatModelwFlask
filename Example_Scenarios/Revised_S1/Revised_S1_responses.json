@@ -1,0 +1,137 @@
+{
+  "scenario": "Scenario 1 – Customer Support Web App with AI Chatbot",
+  "question_count": 66,
+  "answers": {
+    "q_1": "Provide a public-facing customer support portal where users can create/manage support tickets and get help via an AI chatbot (ticket status + FAQs).",
+    "q_2": "Both external users (customers) and internal users (support agents/admins).",
+    "q_3": [
+      "Anonymous users (read-only landing/FAQ)",
+      "Registered users (customers)",
+      "Support agents (staff)",
+      "Admins/moderators (ticket moderation & configuration)"
+    ],
+    "q_4": "Yes. The web app is publicly accessible over the internet.",
+    "q_5": "Yes: development, staging, and production (at minimum).",
+    "q_6": "Single region initially (can be extended to multi-region for DR/latency later).",
+    "q_7": [
+      "Privacy/PII requirements (e.g., GDPR/KVKK if applicable)",
+      "General security controls (ISO 27001-aligned practices if used)"
+    ],
+    "q_8": [
+      "End-user device security (browser/OS)",
+      "Third-party LLM provider infrastructure (if using a managed API) beyond contractual/shared-responsibility controls",
+      "Corporate network security of support staff endpoints"
+    ],
+    "q_9": [
+      "Customers/end users",
+      "Support agents",
+      "Administrators/moderators",
+      "Security/operations staff (monitoring/IR)"
+    ],
+    "q_10": [
+      "Automated uptime/monitoring checks",
+      "Email notification jobs (automated)",
+      "Bot/abuse traffic from the public internet"
+    ],
+    "q_11": [
+      "Identity provider (if SSO/OAuth) or email-based auth service",
+      "Email/SMS delivery provider for notifications/OTP (if used)",
+      "Object storage/CDN for attachments",
+      "LLM provider or internal LLM service",
+      "Logging/monitoring/SIEM"
+    ],
+    "q_12": [
+      "LLM API (if external)",
+      "Email/SMS API (notifications)",
+      "Virus/malware scanning API/service for uploads (optional but recommended)"
+    ],
+    "q_13": "Yes. Common third-party JS libraries are loaded (frontend framework, UI components, analytics if enabled). These should be minimized and integrity-pinned where possible.",
+    "q_14": "Optional. Support staff may use a centralized IdP/SSO; customers may use local accounts or social/OAuth login.",
+    "q_15": "Yes. The LLM feature and storage for uploads/logs are trusted with potentially sensitive ticket content; access must be constrained and audited.",
+    "q_16": "5–7 major assets: web frontend, API backend, auth service/IdP integration, ticket database, object storage for attachments, chatbot/LLM service, logging/monitoring stack (plus optional background worker).",
+    "q_17": [
+      "Containers (Docker/Kubernetes) or VMs for frontend/API",
+      "Managed database service (or self-hosted DB)",
+      "Optional serverless for background jobs/webhooks"
+    ],
+    "q_18": "Separate API backend (REST) consumed by the web frontend (and potentially by future clients).",
+    "q_19": "Yes. Background workers/job queue for email notifications, attachment processing (e.g., virus scan), and async chatbot logging tasks.",
+    "q_20": "Yes. Dedicated authentication/authorization layer (JWT issuer/validator) and RBAC policy enforcement.",
+    "q_21": "Yes. Typically a reverse proxy/API gateway/WAF in front of the web/API to terminate TLS, enforce rate limits, and provide basic protections.",
+    "q_22": "Yes. Public edge (CDN/WAF) → private application network (API/workers) → private data network (DB/object storage).",
+    "q_23": "No. Assets are dedicated to this application (not shared with unrelated teams), except for shared centralized logging/monitoring if used org-wide.",
+    "q_24": "User traffic enters via HTTPS from browsers to a CDN/WAF/reverse proxy, then to the web frontend and API gateway/backend.",
+    "q_25": [
+      "Browser ↔ Web frontend (static assets)",
+      "Browser ↔ REST API (tickets, comments, status, auth)",
+      "API ↔ Database (ticket records, user/role data, chat history metadata)",
+      "API/Worker ↔ Object storage (file attachments)",
+      "API ↔ LLM service (chat requests with user message + limited ticket metadata)",
+      "API/Worker ↔ Logging/monitoring (audit, security logs)"
+    ],
+    "q_26": "Yes. Trust boundaries: (1) Public Internet/Users, (2) Edge (CDN/WAF), (3) Application tier (API/workers), (4) Data tier (DB/object storage), (5) LLM subsystem/provider.",
+    "q_27": "Yes. Public → private transitions occur at the edge to app tier, and app tier → data tier/LLM service.",
+    "q_28": "Yes. Asynchronous flows for notifications, attachment scanning, and chat/audit logging.",
+    "q_29": "Yes. Ticket content may include PII; internal ticket notes may be sensitive; attachments may contain sensitive documents.",
+    "q_30": "Yes. TLS/HTTPS in transit for all external traffic; mTLS or TLS for internal service-to-service where possible.",
+    "q_31": "No. All component-to-component calls require authentication/authorization (including service identities); only static public web content is unauthenticated.",
+    "q_32": [
+      "User accounts and credentials (hashed)",
+      "Ticket content (PII/business info)",
+      "Internal staff notes (sensitive)",
+      "Attachments (user-uploaded files)",
+      "Chat transcripts/history for audit/debugging",
+      "Audit logs and security logs"
+    ],
+    "q_33": [
+      "PostgreSQL or MySQL (relational DB) for tickets/users/roles/chat metadata"
+    ],
+    "q_34": "Yes. Separate stores may be used: relational DB for core data, object storage for attachments, and log store (SIEM/ELK) for logs.",
+    "q_35": "Yes. Attachments are stored in object storage (e.g., S3-compatible) with private access and time-limited signed URLs for downloads.",
+    "q_36": "Yes. Encryption at rest enabled for DB and object storage; keys managed via KMS/secret manager where available.",
+    "q_37": "Yes. Automated backups for databases and object storage lifecycle/versioning where appropriate; tested restore procedures.",
+    "q_38": [
+      "DBA/Platform admins (least privilege)",
+      "Support admins (limited query tools)",
+      "Security/IR (read-only audit/log access)"
+    ],
+    "q_39": "Yes. User-generated ticket messages and chat prompts are stored and re-used (e.g., for context in future chatbot turns and for audit); this is a key risk area for prompt injection and data leakage.",
+    "q_40": "Backend: e.g., Flask/FastAPI (Python) or Node.js/Express (any is feasible). For this scenario assume a REST backend with JWT auth.",
+    "q_41": "Frontend: browser-based SPA (e.g., React) or server-rendered templates; assume React for a modern portal.",
+    "q_42": "Default security features are enabled but customized: CSRF protections (if cookies used), secure headers, CORS policy, and input validation hardened for uploads and chatbot.",
+    "q_43": "JWT-based auth for APIs (access tokens; refresh tokens if needed). Support staff may use SSO; customers use password/OAuth. Tokens stored securely (HttpOnly cookies preferred over localStorage).",
+    "q_44": "RBAC enforced on every endpoint: customer-only access to their own tickets; staff access scoped to assigned queues; admin-only moderation/config endpoints.",
+    "q_45": "Centralized authorization middleware/policy layer (not scattered) + shared helper libraries for permission checks.",
+    "q_46": "Yes. Server-side validation and sanitization on all inputs (ticket text, filenames, MIME types), plus output encoding to prevent XSS.",
+    "q_47": "Yes. File uploads: size/type restrictions, malware scanning, store outside web root, randomized object keys, strip active content where possible, and deliver via signed URLs.",
+    "q_48": "Yes. Secrets via environment variables + secret manager/KMS; no secrets in code or client-side bundles.",
+    "q_49": [
+      "REST APIs (JSON) for tickets/comments/status/auth)"
+    ],
+    "q_50": "Publicly reachable but mostly restricted to authenticated users; some endpoints (signup/login/FAQ) are public.",
+    "q_51": "JWT (Bearer token) with short-lived access tokens; optional mTLS/service tokens for internal calls.",
+    "q_52": "Yes. Rate limiting on public endpoints (login, chatbot, ticket creation) and per-user/per-IP quotas; stronger limits for anonymous traffic.",
+    "q_53": "Yes. Versioned (e.g., /api/v1/...) to manage changes safely.",
+    "q_54": "Yes. Admin-only endpoints for moderation (delete/lock tickets, manage categories, view internal notes), plus staff-only endpoints for assignment/escalation.",
+    "q_55": "Yes. Requests are logged with correlation IDs; security-relevant events (auth failures, privilege checks, upload actions, chatbot calls) are monitored and alerted.",
+    "q_56": "Yes. Input schemas enforced via validation (OpenAPI/JSON Schema), rejecting unknown fields and applying strict type/length constraints.",
+    "q_57": "Embedded chatbot in the web UI; backend calls an LLM service to answer FAQs and ticket-status questions.",
+    "q_58": [
+      "Authenticated customers (for ticket-specific status)",
+      "Support agents (for internal assistance, if enabled)",
+      "Admins (configuration/testing)"
+    ],
+    "q_59": [
+      "Free-text user messages",
+      "Limited ticket metadata (ticket ID, status, timestamps, assigned queue)",
+      "Curated FAQ/knowledge snippets (retrieved content)"
+    ],
+    "q_60": "Yes, limited and scoped: it can access only the requesting user’s ticket metadata; it must NOT receive internal staff-only notes by default.",
+    "q_61": "Yes. Chat history is stored for audit/debugging with retention limits and access controls.",
+    "q_62": "No direct actions by default. It does not execute tools that change ticket state; any actions (e.g., “close ticket”) require explicit user confirmation + server-side authorization and should be implemented as deterministic API calls, not free-form LLM actions.",
+    "q_63": "Yes. Prompt-injection safeguards: strong system prompt, strict allowlist of fields passed to the model, input/output filtering, and separate “internal notes” channel never exposed to the model. Use retrieval with guarded context and refusal policies.",
+    "q_64": "Yes. Output is validated/filtered: prevent leaking internal notes, redact sensitive fields, block unsafe HTML/links, and apply “least detail” responses for status queries.",
+    "q_65": "Either is possible. For stronger control, host internally (local model) or use a managed provider with contractual controls; assume external provider with strict data handling + no-training + regional processing where possible.",
+    "q_66": "Yes. Prompts/system templates are treated as sensitive assets; stored server-side only, access-limited, and audited (to reduce prompt leakage and jailbreak discovery)."
+  }
+}
