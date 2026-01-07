@@ -1,0 +1,44 @@
+@startuml
+package External {
+  actor Employee
+  actor Administrator
+  actor Auditor
+}
+
+package ThirdParties {
+  component ExternalService_Auth
+  component ExternalService_Email
+}
+
+package Cloud {
+  package InternalNetwork {
+    component WebFrontend
+    component ApplicationServer
+    component BackgroundWorker
+    component AuthService
+
+    database PrimaryDatabase
+    database AuditLogStore
+  }
+}
+
+Employee -> WebFrontend : HTTPS
+Administrator -> WebFrontend : HTTPS
+Auditor -> WebFrontend : HTTPS
+
+WebFrontend -> ApplicationServer : HTTPS REST
+ApplicationServer -> AuthService : Auth Token (JWT/OAuth)
+
+AuthService -> ExternalService_Auth : SSO/OAuth
+ApplicationServer -> ExternalService_Email : Email API
+BackgroundWorker -> ExternalService_Email : Email API
+
+ApplicationServer -> PrimaryDatabase : SQL (Tickets/Users/Chat)
+PrimaryDatabase -> ApplicationServer : SQL Results
+
+BackgroundWorker -> PrimaryDatabase : SQL (Jobs/Notifications)
+PrimaryDatabase -> BackgroundWorker : SQL Results
+
+ApplicationServer -> AuditLogStore : Audit/Security Logs
+BackgroundWorker -> AuditLogStore : Audit/Security Logs
+@enduml
