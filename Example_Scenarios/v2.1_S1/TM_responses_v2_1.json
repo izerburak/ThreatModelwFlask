@@ -1,0 +1,525 @@
+{
+  "scenario": "Scenario 1 – Customer Support Web App with AI Chatbot",
+  "source_questions_file": "TM_questions_v2.1.md",
+  "format": "question_then_answer",
+  "items": [
+    {
+      "question_number": 1,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "What is the primary purpose of the system being modeled?",
+      "answer": "Provide a public customer-support web app where customers create/manage support tickets and get assistance via an embedded AI chatbot."
+    },
+    {
+      "question_number": 2,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "What business problem or user need does this system address?",
+      "answer": "Reduce support workload and response time by enabling self-service (FAQs, ticket status) and structured ticket workflows for customers and agents."
+    },
+    {
+      "question_number": 3,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "Who are the intended users or user roles of the system?",
+      "answer": "Registered customers/end users; support agents; support supervisors/admin moderators; system administrators/DevOps; (optional) auditors/compliance viewers."
+    },
+    {
+      "question_number": 4,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "Is the system publicly accessible or restricted to a private network?",
+      "answer": "Publicly accessible on the internet for customers (login required for ticket actions); agent/admin consoles are restricted by authentication + RBAC."
+    },
+    {
+      "question_number": 5,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "What environments does the system operate in (e.g., production, staging, development)?",
+      "answer": "Production (internet-facing); staging/UAT; development/local; CI/test environments for API and LLM prompt testing."
+    },
+    {
+      "question_number": 6,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "Are there any explicit assumptions made about the system’s operating environment?",
+      "answer": "Assume users access via modern browsers; TLS is available end-to-end; identity store is reachable; cloud services used are properly configured; LLM provider is reachable with acceptable latency."
+    },
+    {
+      "question_number": 7,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "What assets (data, services, capabilities) are considered most critical to protect?",
+      "answer": "Ticket data (content, attachments, metadata); user and agent identities/roles; JWT signing keys; internal ticket notes; audit logs/chat history; availability of ticketing APIs; integrity of moderation actions."
+    },
+    {
+      "question_number": 8,
+      "layer": "Layer1",
+      "layer_title": "System Scope & Context",
+      "question": "What parts of the system are explicitly out of scope for this threat model?",
+      "answer": "Non-web channels (phone/email), internal corporate IAM outside this app, endpoint security of user devices, and physical security of infrastructure; detailed SOC processes beyond logging/alerting."
+    },
+    {
+      "question_number": 9,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Does the system rely on third-party services or external platforms?",
+      "answer": "Yes: LLM provider/API; email/SMS notification service; cloud object storage for attachments; monitoring/logging platform; possibly CDN/WAF."
+    },
+    {
+      "question_number": 10,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Are cloud services (IaaS, PaaS, SaaS) used as part of the system?",
+      "answer": "Yes: likely uses cloud hosting (PaaS/IaaS) for web/API, managed database, and object storage; managed secrets service may be used."
+    },
+    {
+      "question_number": 11,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Are external identity providers or authentication services used?",
+      "answer": "Not required by the scenario; default is first-party auth. Optionally could integrate an external IdP/SSO for support agents."
+    },
+    {
+      "question_number": 12,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Does the system consume external APIs or data sources?",
+      "answer": "Yes: LLM API; potentially captcha/anti-bot, payment/support tooling, and email delivery APIs."
+    },
+    {
+      "question_number": 13,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Are third-party SDKs, libraries, or plugins integrated into the system?",
+      "answer": "Yes: web framework libraries, JWT libraries, file upload/parsing libraries, chat UI SDK, observability agents, and any LLM client SDK."
+    },
+    {
+      "question_number": 14,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Are there trust assumptions made about any external dependency?",
+      "answer": "Trust LLM provider to handle prompts securely per contract; trust cloud storage durability; trust email/SMS provider to deliver messages; assume third‑party SDKs are maintained and not malicious."
+    },
+    {
+      "question_number": 15,
+      "layer": "Layer2",
+      "layer_title": "External Dependencies & Integrations",
+      "question": "Could failure or compromise of an external dependency impact system security?",
+      "answer": "Yes: compromise/outage of LLM provider can leak prompts or impact availability; compromise of object storage can leak attachments; identity/notification failures can enable account takeover or disrupt workflows."
+    },
+    {
+      "question_number": 16,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "What types of data are collected, processed, or stored by the system?",
+      "answer": "Account data (profiles, roles); ticket content (subject/body/status); comments; internal notes; attachments (files); chatbot conversations; logs/telemetry; JWT/refresh token metadata."
+    },
+    {
+      "question_number": 17,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Does the system process personal, sensitive, or regulated data?",
+      "answer": "Potentially yes: PII in tickets (names, emails, phone numbers), possibly regulated data if users submit it (e.g., health/finance) depending on business domain."
+    },
+    {
+      "question_number": 18,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "How does data enter the system (user input, APIs, files, sensors)?",
+      "answer": "Via browser forms (ticket creation, comments, chat); REST API calls; file uploads for attachments."
+    },
+    {
+      "question_number": 19,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "How does data leave the system or get shared externally?",
+      "answer": "Ticket updates shown to users/agents; notifications via email/SMS; limited ticket metadata sent to the LLM provider; logs exported to monitoring/SIEM."
+    },
+    {
+      "question_number": 20,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Are there internal data flows between system components or services?",
+      "answer": "Yes: frontend → API gateway/backend; backend → database; backend → object storage; backend → notification service; chat service → LLM provider; logging pipeline."
+    },
+    {
+      "question_number": 21,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Are data flows authenticated and authorized between internal components?",
+      "answer": "Yes: service-to-service calls use authentication (mTLS or service tokens) and authorization (service identities/roles) in addition to user-level auth."
+    },
+    {
+      "question_number": 22,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Are any data transformations performed within the system?",
+      "answer": "Yes: input validation/sanitization; file scanning/normalization; extraction of limited ticket metadata for LLM context; redaction of sensitive fields; formatting to API/DTO schemas."
+    },
+    {
+      "question_number": 23,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Are data flows documented or visualized (e.g., DFDs)?",
+      "answer": "Not yet in this scenario text; should be documented with a DFD showing trust boundaries (browser, API, DB, storage, LLM provider)."
+    },
+    {
+      "question_number": 24,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Do API endpoints operate on user-owned objects identified by IDs (e.g., ticketId, orderId, documentId), and how is ownership enforced at the design level?",
+      "answer": "Yes: endpoints operate on ticketId/commentId/attachmentId. Ownership enforced by server-side authorization checks: ticket must belong to requesting user or user must have support role; never trust client-provided IDs."
+    },
+    {
+      "question_number": 25,
+      "layer": "Layer3",
+      "layer_title": "Data & Object Flow",
+      "question": "Are API responses designed to expose different object fields based on caller role or context (field-level authorization), or is a single generic object returned?",
+      "answer": "Responses should be role-aware: customers see only customer-safe fields; agents see operational fields; internal notes and moderation metadata only for privileged roles (field-level authorization / separate DTOs)."
+    },
+    {
+      "question_number": 26,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Where are the trust boundaries within the system?",
+      "answer": "Key boundaries: public internet/browser ↔ web app; web tier ↔ API tier; API ↔ database; API ↔ object storage; API ↔ LLM provider; admin/agent console ↔ admin endpoints; logging/monitoring boundary."
+    },
+    {
+      "question_number": 27,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "How are trust boundaries enforced between system components?",
+      "answer": "Enforced via network segmentation/security groups, API gateway/WAF rules, strong authentication (JWT) + RBAC/ABAC at the API, least-privilege service accounts, and encryption in transit."
+    },
+    {
+      "question_number": 28,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Do any components communicate across trust boundaries without authentication?",
+      "answer": "No by design: any cross-boundary communication requires authentication (user JWT or service identity). Public endpoints are limited and still authenticated for sensitive actions."
+    },
+    {
+      "question_number": 29,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Are there multiple privilege levels within the system architecture?",
+      "answer": "Yes: anonymous visitor (read-only public pages); authenticated customer; support agent; support supervisor/moderator; system admin/service accounts."
+    },
+    {
+      "question_number": 30,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "How is user identity propagated across system components?",
+      "answer": "Identity propagated via JWT claims (sub, role, tenant/org, scopes) plus server-side lookup for authoritative role/permissions; service identity used for internal calls."
+    },
+    {
+      "question_number": 31,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Are sensitive operations restricted to specific trust zones?",
+      "answer": "Yes: moderation, internal notes, user management, and attachment access are restricted to privileged roles and/or internal networks/zero-trust policies."
+    },
+    {
+      "question_number": 32,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Are communications across trust boundaries encrypted?",
+      "answer": "Yes: TLS for browser↔app and API calls; TLS/mTLS for service-to-service where feasible; encrypt connections to DB/storage/LLM API."
+    },
+    {
+      "question_number": 33,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Are there any implicit trust assumptions between internal services?",
+      "answer": "Potential implicit trust risks: assuming internal services are safe once inside network; assuming JWT claims are always valid without server-side checks; assuming LLM output is safe. These should be minimized."
+    },
+    {
+      "question_number": 34,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "Are authorization decisions centralized (policy-based) or implemented individually within each service or endpoint?",
+      "answer": "Prefer centralized policy-based authorization (e.g., middleware/OPA/policy engine) with consistent enforcement, while keeping endpoint-level checks for object ownership."
+    },
+    {
+      "question_number": 35,
+      "layer": "Layer4",
+      "layer_title": "Trust Boundaries & Authorization Logic",
+      "question": "What happens if an authorization or identity service becomes unavailable—does the system fail closed or fail open?",
+      "answer": "Fail closed: if auth/authorization service is unavailable, deny access to protected resources and stop state-changing operations; allow only non-sensitive static content."
+    },
+    {
+      "question_number": 36,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "What core business logic does the application implement?",
+      "answer": "Ticket lifecycle management (create, read, update, comment, close/reopen), attachment handling, agent assignment, moderation, and chatbot Q&A for status/FAQs."
+    },
+    {
+      "question_number": 37,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Are there workflows that change system state or user privileges?",
+      "answer": "Yes: ticket status transitions, assignment, escalation, and moderation actions can change state and sometimes visibility; role changes for agents/admins are privileged workflows."
+    },
+    {
+      "question_number": 38,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Can users influence application logic through input or configuration?",
+      "answer": "Yes: via user input in tickets/comments/chat; potential configuration through profile settings. Inputs must be validated and not interpreted as commands."
+    },
+    {
+      "question_number": 39,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Are there safeguards against repeated or automated actions?",
+      "answer": "Yes: rate limiting, CAPTCHA on signup/login if needed, throttling per user/IP, anti-automation for ticket creation, and abuse detection for chat usage."
+    },
+    {
+      "question_number": 40,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Is sensitive data encrypted at rest?",
+      "answer": "Yes: sensitive data (tickets, internal notes, chat logs) should be encrypted at rest in DB/storage; keys managed by KMS; protect JWT signing keys/secrets."
+    },
+    {
+      "question_number": 41,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Are backups created, and do they contain sensitive data?",
+      "answer": "Yes: backups of DB and object storage snapshots; they contain sensitive data and must be encrypted, access-controlled, and retention-managed."
+    },
+    {
+      "question_number": 42,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Can users access or infer data belonging to other users?",
+      "answer": "Risk exists (IDOR/BOLA). Mitigation: strict object-level authorization, non-guessable IDs where appropriate, deny-by-default, and audit for cross-tenant access."
+    },
+    {
+      "question_number": 43,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Is user-generated content stored and reused within the system?",
+      "answer": "Yes: ticket text, comments, and chat history are user-generated and reused for display, search, analytics, and possibly LLM context; must handle XSS and prompt injection."
+    },
+    {
+      "question_number": 44,
+      "layer": "Layer5",
+      "layer_title": "Application Logic & Abuse Scenarios",
+      "question": "Are there sensitive business flows (e.g., ticket status changes, refunds, approvals) that could be abused through API automation or repeated calls?",
+      "answer": "Yes: ticket status changes/closures, moderation, and assignment can be abused via API automation; implement idempotency, workflow rules, rate limits, and anomaly detection."
+    },
+    {
+      "question_number": 45,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "How are users authenticated to the system?",
+      "answer": "Users authenticate with username/email + password (optionally MFA). Support agents may use stronger auth or SSO; sessions represented by JWT/refresh tokens."
+    },
+    {
+      "question_number": 46,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "Are sessions stateful or stateless?",
+      "answer": "Stateless for APIs using JWT access tokens; may also use stateful refresh-token storage and server-side session tracking for revocation."
+    },
+    {
+      "question_number": 47,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "How are authentication tokens or credentials stored and protected?",
+      "answer": "Tokens stored in secure HTTP-only cookies or secure storage; protect refresh tokens with rotation; JWT signing keys in secrets manager/HSM; avoid localStorage for tokens."
+    },
+    {
+      "question_number": 48,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "What authentication mechanisms are used (e.g., passwords, OAuth, JWT)?",
+      "answer": "JWT for API auth; passwords for initial login; optional OAuth/OIDC for agent SSO; MFA recommended for privileged roles."
+    },
+    {
+      "question_number": 49,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "Are authorization checks enforced consistently across the application?",
+      "answer": "Yes: enforced consistently via shared middleware + centralized policy; include object-level authorization for ticket/attachment access."
+    },
+    {
+      "question_number": 50,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "Is there separation between user-facing and administrative functionality?",
+      "answer": "Yes: separate user-facing UI/APIs vs agent/admin consoles; admin endpoints isolated by route, scopes, and possibly network restrictions."
+    },
+    {
+      "question_number": 51,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "Are security checks centralized or scattered across the codebase?",
+      "answer": "Centralized wherever possible (authN/authZ middleware, policy engine). Avoid scattered ad-hoc checks that cause gaps."
+    },
+    {
+      "question_number": 52,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "Does the system allow file uploads or user-supplied content?",
+      "answer": "Yes: ticket attachments. Enforce file type/size limits, malware scanning, content-disposition safe downloads, storage isolation per tenant, and no direct execution."
+    },
+    {
+      "question_number": 53,
+      "layer": "Layer6",
+      "layer_title": "Authentication, Authorization & Session Management",
+      "question": "Are privileged operations audited or logged?",
+      "answer": "Yes: log privileged actions (moderation, role changes, data exports, attachment downloads, internal note access) with tamper-resistant audit logs."
+    },
+    {
+      "question_number": 54,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Does the system expose public or internal APIs?",
+      "answer": "Yes: public REST APIs for ticket operations; internal APIs/services for moderation, attachment processing, LLM proxy, and logging."
+    },
+    {
+      "question_number": 55,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are APIs versioned and documented?",
+      "answer": "Yes: version via URI or headers (e.g., /api/v1); documented with OpenAPI; include deprecation policy."
+    },
+    {
+      "question_number": 56,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "How are API clients authenticated?",
+      "answer": "API clients authenticate with JWT (access token) and possibly client credentials for internal services; admin clients require elevated scopes/roles."
+    },
+    {
+      "question_number": 57,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are rate limits enforced on API usage?",
+      "answer": "Yes: enforce per-IP and per-user rate limits on public endpoints and on chat/LLM calls; separate stricter limits for expensive operations."
+    },
+    {
+      "question_number": 58,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are deprecated or legacy API versions still accessible?",
+      "answer": "Ideally no; if older versions exist, restrict and sunset them quickly; keep only current versions accessible."
+    },
+    {
+      "question_number": 59,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are API requests and responses logged or monitored?",
+      "answer": "Yes: log requests/responses metadata (not sensitive payloads), auth events, error rates; monitor for abuse, anomalies, and BOLA attempts."
+    },
+    {
+      "question_number": 60,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are there admin-only or high-privilege API endpoints?",
+      "answer": "Yes: ticket moderation, internal notes, user/role admin, data export, and abuse management endpoints are admin-only."
+    },
+    {
+      "question_number": 61,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are API schemas or contracts validated at runtime?",
+      "answer": "Yes: validate request schemas at runtime (JSON schema/OpenAPI validation), enforce strict content types, and reject unknown fields to reduce injection surface."
+    },
+    {
+      "question_number": 62,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Does the system integrate with a Large Language Model (LLM)?",
+      "answer": "Yes: embedded AI chatbot integrated into the web app."
+    },
+    {
+      "question_number": 63,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "What user inputs are forwarded to the LLM?",
+      "answer": "User chat messages; user identifiers/session context; limited ticket metadata (ticketId, status, timestamps, public summary) and FAQ context."
+    },
+    {
+      "question_number": 64,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Does the LLM receive system or internal context data?",
+      "answer": "Yes, limited: only customer-visible ticket metadata and curated FAQ/KB content. Must exclude internal notes, agent-only fields, secrets, and system prompts."
+    },
+    {
+      "question_number": 65,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Is chat history or prompt data stored persistently?",
+      "answer": "Yes: chat history stored persistently for audit/debugging with retention limits and access controls; consider redaction of sensitive data."
+    },
+    {
+      "question_number": 66,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Can the LLM access internal APIs, tools, or databases?",
+      "answer": "No by design: LLM should not have direct database access. If status lookups are needed, use a controlled backend function/tool with strict authorization and minimal data returned."
+    },
+    {
+      "question_number": 67,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Can the LLM trigger actions or workflows beyond simple text generation?",
+      "answer": "Primarily text generation; may trigger safe, backend-mediated read-only actions (e.g., fetch ticket status) but should not directly change state."
+    },
+    {
+      "question_number": 68,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Are controls in place to prevent prompt injection attacks?",
+      "answer": "Yes: use prompt hardening, input isolation (separate user content), allowlist tools/functions, refuse/ignore instructions to reveal secrets, and minimize context shared."
+    },
+    {
+      "question_number": 69,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Is LLM output validated or filtered before being used or displayed?",
+      "answer": "Yes: validate and filter output for sensitive data leakage, hallucinations, and unsafe links; apply HTML escaping; add disclaimers and confidence/grounding checks."
+    },
+    {
+      "question_number": 70,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Does the LLM output directly trigger actions or decisions without explicit human validation?",
+      "answer": "No: any state-changing action requires explicit user confirmation and server-side authorization; LLM output alone cannot execute actions."
+    },
+    {
+      "question_number": 71,
+      "layer": "Layer7",
+      "layer_title": "API & LLM Integration Boundaries",
+      "question": "Can the LLM invoke tools, APIs, or workflows that have broader permissions than the original user request context?",
+      "answer": "No: tool permissions must be scoped to the user’s context (least privilege), with per-request authorization and audited access; never give the LLM broader access than the user."
+    },
+    {
+      "question_number": 72,
+      "layer": "Layer8",
+      "layer_title": "Operational & Resource Controls",
+      "question": "Is the LLM hosted internally or provided by a third-party service?",
+      "answer": "Assume third-party LLM service (typical). If self-hosted, treat it as an internal service with dedicated isolation and monitoring; either way define data residency/contract controls."
+    },
+    {
+      "question_number": 73,
+      "layer": "Layer8",
+      "layer_title": "Operational & Resource Controls",
+      "question": "Are prompts, templates, or model configurations treated as sensitive assets?",
+      "answer": "Yes: prompts, system instructions, KB snippets, and moderation rules are sensitive because they can reveal defenses and internal processes; store securely with access control."
+    },
+    {
+      "question_number": 74,
+      "layer": "Layer8",
+      "layer_title": "Operational & Resource Controls",
+      "question": "Are there explicit limits on LLM usage (tokens, request rate, cost) to prevent denial-of-service or cost exhaustion attacks?",
+      "answer": "Yes: enforce token/request quotas per user/org, global budgets, circuit breakers, and backoff to prevent DoS and cost exhaustion; monitor spend and anomalous spikes."
+    }
+  ]
+}
