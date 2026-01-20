@@ -1,0 +1,51 @@
+@startuml
+!define PROTECTED_DB Database(PrimaryDatabase)
+!define PUBLIC_DB Database(FileStore)
+!define LOG Database(AuditLogStore)
+!define CHAT_HISTORY Database(PromptHistoryStore)
+!define WEB Frontend(WebFrontend)
+!define API Backend(BackendAPI)
+!define AUTH AuthService(AuthService)
+!define LLM Gateway(LLMGateway)
+!define ADMIN Portal(AdminPortal)
+!define BACKGROUND Worker(BackgroundWorker)
+
+package External
+  Actor(User)
+  Actor(Administrator)
+  Actor(ExternalService_IdP)
+  Actor(ExternalService_Email)
+  Actor(ExternalService_LLM)
+  Actor(ExternalService_APIClient)
+
+package InternalNetwork
+  Component(AUTH)
+  Component(WEB)
+  Component(API)
+  Component(LLMGateway)
+  Component(ADMINPortal)
+  Component(BackgroundWorker)
+
+package Cloud
+  Database(PROTECTED_DB)
+  Database(PUBLIC_DB)
+  Database(LOG)
+  Database(CHAT_HISTORY)
+
+WEB -> API : ->
+API -> PROTECTED_DB : write
+API -> PUBLIC_DB : write
+API -> LOG : write
+API -> CHAT_HISTORY : write
+
+API <-- LLMGateway : ->
+LLMGateway <-- EXTERNAL_LLM : ->
+
+AUTH <-- User : ->
+AUTH <-- Administrator : ->
+
+ADMINPortal <-- Administrator : ->
+
+BackgroundWorker <-- API : ->
+
+@enduml

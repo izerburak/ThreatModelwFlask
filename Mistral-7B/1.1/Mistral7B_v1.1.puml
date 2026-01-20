@@ -1,0 +1,45 @@
+@startuml
+
+package External {
+  Actor User
+  Actor Administrator
+  Actor ExternalService_IdP
+  Actor ExternalService_Email
+  Actor ExternalService_LLM
+  Actor ExternalService_APIClient
+}
+
+package InternalNetwork {
+  Component WebFrontend
+  Component BackendAPI
+  Component AuthService
+  Component LLMGateway
+  Component AdminPortal
+  Component BackgroundWorker
+}
+
+package Cloud {
+  Database PrimaryDatabase
+  Database FileStore
+  Database AuditLogStore
+  Database PromptHistoryStore
+}
+
+WebFrontend -> BackendAPI
+BackendAPI -> PrimaryDatabase
+BackendAPI -> FileStore
+BackendAPI -> AuditLogStore
+BackendAPI -> PromptHistoryStore
+BackendAPI -> LLMGateway
+LLMGateway -> ExternalService_LLM
+
+Administrator -> AdminPortal
+Administrator -> BackendAPI
+
+User -> WebFrontend
+
+ExternalService_IdP -> BackendAPI
+ExternalService_Email -> BackendAPI
+ExternalService_APIClient -> BackendAPI
+
+@enduml
