@@ -1,0 +1,41 @@
+SCENARIO DESCRIPTION
+Customer Support Web Application with AI Chatbot
+--------------------------------------------------
+This scenario represents a public-facing customer support web application that allows users to create and manage support tickets while interacting with an AI-powered chatbot for assistance. The system is designed to support both end users and internal support staff through a role-based and API-driven architecture.
+The application consists of three primary security domains: web application security, API security, and LLM security.
+
+WEB APPLICATION OVERVIEW
+-------------------------
+The web application is accessed through a browser-based frontend that is publicly available on the internet. Users must authenticate in order to access ticket-related functionality. The system supports multiple user roles, including regular customers, support agents, and administrators.
+Authenticated users can create support tickets, view ticket status, upload file attachments, and interact with the embedded AI chatbot. Support agents have elevated privileges that allow them to update tickets, add internal notes, and manage user communications. Administrators have access to moderation and system-level management features.
+File upload functionality allows users to attach documents or images to support tickets, introducing additional attack surface related to input handling and storage.
+
+API ARCHITECTURE
+---------------------
+All core application functionality is exposed through REST-based backend APIs. These APIs handle ticket creation, status updates, comments, user authentication, and role validation.
+Authentication is enforced using JSON Web Tokens (JWT), and authorization decisions are made server-side based on user roles. Certain endpoints are restricted to administrators only, such as ticket moderation and system configuration actions.
+Public-facing APIs implement rate limiting to reduce abuse and automated attacks. The API layer acts as the central control plane of the system and is relied upon by both the web frontend and the AI chatbot.
+
+LLM / AI CHATBOT INTEGRATION
+------------------------------
+The application includes an embedded AI chatbot that assists users by answering frequently asked questions and providing information about ticket status. The chatbot processes user messages and is provided with limited ticket metadata to generate responses.
+The LLM does not have unrestricted access to backend systems. It operates within a constrained context that includes user input, selected ticket attributes, and stored chat history. Chat logs are retained for auditing and debugging purposes.
+The chatbot must ensure that internal support notes, administrative data, and sensitive system information are not exposed in responses.
+
+SECURITY AND RISK CONSIDERATIONS
+---------------------------------
+This scenario introduces both traditional and AI-specific security risks. From a web and API perspective, risks include authentication abuse, authorization bypass, malicious file uploads, and API misuse.
+From an LLM perspective, key risk areas include prompt injection through user messages, indirect leakage of internal ticket data, and confusion between user-visible and internal-only information. Since the LLM processes untrusted user input that influences response generation, it introduces a new trust boundary not present in traditional systems.
+
+TRUST BOUNDARIES
+------------------
+The system includes multiple trust boundaries:
+Between the user’s browser and the web application
+Between the web application and backend APIs
+Between backend services and the LLM
+Between LLM-generated output and the end user
+Each boundary represents a point where assumptions about trust, data integrity, and authorization must be carefully enforced.
+
+SCENARIO SUMMARY
+---------------------
+This scenario models a modern customer support platform that combines classical web and API security concerns with emerging LLM-related risks. It provides a realistic and comprehensive context for threat modeling, particularly for analyzing prompt injection, data exposure, and role-based access control in AI-augmented systems.
