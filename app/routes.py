@@ -2,8 +2,8 @@ import os
 import json
 from pathlib import Path
 import os
-from flask import Blueprint, render_template, abort, request, redirect, url_for, jsonify, current_app
-from app.utils.save_utils import save_answers, append_question_to_layer
+from flask import Blueprint, render_template, abort, request, redirect, url_for, jsonify, current_app, flash
+from app.utils.save_utils import save_answers, append_question_to_layer, save_layer8_answers
 
 AVAILABLE_LAYERS = ["layer1", "layer2", "layer3", "layer4", "layer5", "layer6"]
 
@@ -114,3 +114,37 @@ def dfd():
 @main.route('/risk')
 def risk():
     return render_template("risk.html", active_tab="risk")
+
+# ---------------------------------------------------------------------------
+# LLM Sec  – Layer 8 questionnaire (LLM-specific threat surface mapping)
+# Future steps: DFD generation, OWASP LLM threat derivation, Garak execution
+# ---------------------------------------------------------------------------
+@main.route('/llm-sec', methods=["GET", "POST"])
+def llm_sec():
+    # Load Layer 8 questions from the dedicated JSON file
+    questions_path = Path(current_app.root_path) / "questions" / "layer8.json"
+
+    if not questions_path.exists():
+        abort(404, description="layer8.json not found.")
+
+    with questions_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Support both a bare list and a {"questions": [...]} wrapper, same as the
+    # existing form route, so the format can evolve without breaking this route.
+    if isinstance(data, dict) and "questions" in data:
+        questions = data["questions"]
+    else:
+        questions = data
+
+    if request.method == "POST":
+        # Persist the answers to responses/layer8_answers_<timestamp>.json
+        save_layer8_answers(request.form)
+        flash("LLM Sec answers saved successfully!", "success")
+        return redirect(url_for("main.llm_sec"))
+
+    return render_template(
+        "llm_sec.html",
+        active_tab="llm_sec",
+        questions=questions,
+    )

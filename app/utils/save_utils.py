@@ -114,3 +114,52 @@ def append_question_to_layer(layer_name: str, question_text: str, options: list)
         json.dump(data, f, ensure_ascii=False, indent=2)
 
     return str(qpath), new_question
+
+
+def save_layer8_answers(form_data):
+    """Save Layer 8 (LLM Security) questionnaire answers to a dedicated file.
+
+    Naming convention: responses/layer8_answers_YYYYMMDD_HHMMSS.json
+    This keeps LLM Sec responses separate from the multi-layer survey files
+    (survey_*.json) and from the per-layer files (layer1_answers_*.json, etc.)
+    so each can evolve independently.
+
+    The saved JSON includes:
+      - "layer"     : always "layer8" (for easy filtering in future steps)
+      - "timestamp" : ISO-8601 datetime of submission
+      - "q_<id>"   : selected answer(s) for each question (string or list)
+    """
+    import os
+    import json
+    from datetime import datetime
+    from pathlib import Path
+
+    # Collect all form values; multi-checkbox fields become lists, single
+    # values stay as plain strings, missing ones are stored as None.
+    answers = {}
+    for key in form_data.keys():
+        vals = form_data.getlist(key)
+        if len(vals) == 0:
+            answers[key] = None
+        elif len(vals) == 1:
+            answers[key] = vals[0]
+        else:
+            answers[key] = vals
+
+    # Build the full response record with metadata so the file is self-describing
+    record = {
+        "layer": "layer8",
+        "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    record.update(answers)  # merge question answers into the record
+
+    # Write to responses/ directory (create it if it doesn't exist yet)
+    os.makedirs("responses", exist_ok=True)
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"layer8_answers_{timestamp_str}.json"
+    filepath = os.path.join("responses", filename)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(record, f, ensure_ascii=False, indent=2)
+
+    return filepath

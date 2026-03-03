@@ -1,0 +1,113 @@
+[
+    {
+        "id": "43",
+        "text": "Who can directly interact with the LLM system?",
+        "options": [
+            "Anonymous public internet users",
+            "Authenticated public users",
+            "Internal employees only",
+            "Administrators only",
+            "Local system processes only"
+        ]
+    },
+    {
+        "id": "44",
+        "text": "Through which interfaces is the LLM accessible?",
+        "options": [
+            "Web-based chat interface",
+            "REST API endpoint",
+            "Internal service-to-service calls",
+            "CLI or local scripts",
+            "Third-party integration"
+        ]
+    },
+    {
+        "id": "45",
+        "text": "What types of external or untrusted content can be ingested by the LLM?",
+        "options": [
+            "User text input only",
+            "File uploads (PDF, DOCX, TXT, etc.)",
+            "Web URLs or browsing content",
+            "Email or ticket system data",
+            "Public document repositories"
+        ]
+    },
+    {
+        "id": "46",
+        "text": "Which data sources are connected to the LLM via retrieval or RAG mechanisms?",
+        "options": [
+            "Internal documentation repositories",
+            "Customer ticket databases",
+            "Public web data",
+            "User-uploaded documents",
+            "Structured databases"
+        ]
+    },
+    {
+        "id": "47",
+        "text": "Which sensitive data categories are accessible to the LLM?",
+        "options": [
+            "Personally identifiable information (PII)",
+            "API keys or credentials",
+            "Internal operational documents",
+            "Customer support records",
+            "No sensitive data"
+        ]
+    },
+    {
+        "id": "48",
+        "text": "What types of actions can the LLM trigger or influence?",
+        "options": [
+            "Creating or modifying tickets",
+            "Sending emails or notifications",
+            "Resetting user credentials",
+            "Executing backend workflows",
+            "No direct actions (advisory only)"
+        ]
+    },
+    {
+        "id": "49",
+        "text": "Where is LLM output rendered or consumed?",
+        "options": [
+            "HTML-based web interface",
+            "Markdown-rendered interface",
+            "Email systems",
+            "Logging or monitoring systems",
+            "Automated downstream systems"
+        ]
+    },
+    {
+        "id": "50",
+        "text": "Which components expose the largest LLM-related attack surface?",
+        "options": [
+            "Public chat frontend",
+            "API gateway",
+            "RAG or vector database layer",
+            "Tool or action execution service",
+            "Administrative interface"
+        ]
+    },
+    {
+        "id": "51",
+        "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+        "options": [
+            "Prompt injection or instruction override",
+            "Sensitive data leakage",
+            "Unauthorized tool or action execution",
+            "Model or data poisoning",
+            "Denial-of-service via resource exhaustion",
+            "Misinformation or hallucinated outputs"
+        ]
+    },
+    {
+        "id": "52",
+        "text": "Which operational weaknesses increase LLM-related security risks?",
+        "options": [
+            "Lack of rate limiting or token limits",
+            "Insufficient logging or monitoring",
+            "Weak role-based access control",
+            "Unverified third-party model sources",
+            "Lack of human approval for actions"
+        ]
+    }
+]
