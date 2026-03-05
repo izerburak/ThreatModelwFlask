@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h3 class="mb-4">⚠️ Risk Analysis</h3>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Select System Response for Analysis</h5>
+                <p class="text-muted">
+                    Choose a JSON response file to analyze for potential threats using the local LLM.
+                </p>
+
+                <form method="post" class="mt-4">
+                    <div class="mb-4">
+                        <label for="responseFile" class="form-label fw-semibold">
+                            Survey Response File (JSON)
+                        </label>
+                        <select class="form-select form-select-lg" id="responseFile" name="response_file" required>
+                            <option value="" selected disabled>-- Select a response file --</option>
+                            {% for file in response_files %}
+                            <option value="{{ file }}">{{ file }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Select from previously saved survey responses in the responses folder.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            🔍 Run Risk Analysis
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4" role="alert">
+            <strong>ℹ️ How it works:</strong>
+            <ul class="mb-0 mt-2">
+                <li>Select a survey response JSON file from the dropdown.</li>
+                <li>Click the button to send the answers to the local LLM.</li>
+                <li>The LLM will analyze the input and output potential threats based on the specific context.</li>
+            </ul>
+        </div>
+
+        {% if selected_file %}
+        <div class="mt-4">
+            <h4>Analysis Results for <code>{{ selected_file }}</code></h4>
+            <div class="alert alert-warning">
+                <p><strong>Note:</strong> The local LLM integration is not yet fully implemented. This is a placeholder
+                    for where the results will appear.</p>
+                <div class="spinner-border spinner-border-sm text-warning" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <i>Analyzing threats... (Simulation)</i>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

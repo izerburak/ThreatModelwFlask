@@ -119,39 +119,55 @@ def append_question_to_layer(layer_name: str, question_text: str, options: list)
 def save_layer8_answers(form_data):
     """Save Layer 8 (LLM Security) questionnaire answers to a dedicated file.
 
-    Naming convention: responses/layer8_answers_YYYYMMDD_HHMMSS.json
-    This keeps LLM Sec responses separate from the multi-layer survey files
-    (survey_*.json) and from the per-layer files (layer1_answers_*.json, etc.)
-    so each can evolve independently.
-
-    The saved JSON includes:
-      - "layer"     : always "layer8" (for easy filtering in future steps)
-      - "timestamp" : ISO-8601 datetime of submission
-      - "q_<id>"   : selected answer(s) for each question (string or list)
+    The saved JSON adheres to the llmsec.v1 canonical format:
+    {
+      "schema_version": "llmsec.v1",
+      "project_id": "PROJECT_ID_HERE",
+      "system_id": "SYSTEM_ID_HERE",
+      "timestamp_utc": "...",
+      "answers": [ { "question_id": "...", "answer": "..." } ]
+    }
     """
     import os
     import json
-    from datetime import datetime
-    from pathlib import Path
+    from datetime import datetime, timezone
 
+    answers_list = []
     # Collect all form values; multi-checkbox fields become lists, single
     # values stay as plain strings, missing ones are stored as None.
-    answers = {}
     for key in form_data.keys():
-        vals = form_data.getlist(key)
-        if len(vals) == 0:
-            answers[key] = None
-        elif len(vals) == 1:
-            answers[key] = vals[0]
-        else:
-            answers[key] = vals
+        if key.startswith("q_"):
+            q_id = key[2:]  # Remove the 'q_' prefix to get just 'LLMSEC-XX'
+            
+            vals = form_data.getlist(key)
+            # Check if any values are actually provided, ignore empty string for Others if no checkboxes are checked
+            # Actually, standardizing on vals list
+            cleaned_vals = [v for v in vals if v.strip() != ""]
+            
+            if len(cleaned_vals) == 0:
+                answer_val = None
+            elif len(cleaned_vals) == 1:
+                answer_val = cleaned_vals[0]
+            else:
+                answer_val = cleaned_vals
 
-    # Build the full response record with metadata so the file is self-describing
+            # For 'Other', sometimes it comes as a text input which might be empty
+            # Overwrite None or append correctly.
+            # In HTML, checkboxes and text inputs with same name will combine into a list.
+            if answer_val is not None:
+                answers_list.append({
+                    "question_id": q_id,
+                    "answer": answer_val
+                })
+
+    # Build the full response record with metadata
     record = {
-        "layer": "layer8",
-        "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+        "schema_version": "llmsec.v1",
+        "project_id": "DEFAULT_PROJECT",
+        "system_id": "DEFAULT_SYSTEM",
+        "timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "answers": answers_list
     }
-    record.update(answers)  # merge question answers into the record
 
     # Write to responses/ directory (create it if it doesn't exist yet)
     os.makedirs("responses", exist_ok=True)

@@ -1,0 +1,10 @@
+LLM01 Prompt Injection → LLMSEC-04, LLMSEC-05, LLMSEC-16, LLMSEC-24
+LLM02 Sensitive Information Disclosure → LLMSEC-05, LLMSEC-06, LLMSEC-13, LLMSEC-18
+LLM03 Supply Chain Vulnerabilities → LLMSEC-14, LLMSEC-22
+LLM04 Data and Model Poisoning → LLMSEC-04, LLMSEC-05, LLMSEC-22
+LLM05 Improper Output Handling → LLMSEC-08, LLMSEC-09, LLMSEC-17
+LLM06 Excessive Agency → LLMSEC-07, LLMSEC-08
+LLM07 System Prompt Leakage → LLMSEC-15, LLMSEC-24
+LLM08 Vector and Embedding Weaknesses → LLMSEC-05, LLMSEC-23
+LLM09 Misinformation / Overreliance → LLMSEC-09, LLMSEC-17
+LLM10 Unbounded Consumption → LLMSEC-02, LLMSEC-03, LLMSEC-20

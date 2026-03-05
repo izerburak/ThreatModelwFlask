@@ -32,17 +32,17 @@ def form(layer_name):
     with questions_path.open("r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # JSON kökü liste veya {"questions": [...]} olabilir; ikisini de destekle
+    # JSON root can be a list or {"questions": [...]}; support both
     if isinstance(data, dict) and "questions" in data:
         questions = data["questions"]
     else:
         questions = data
 
     if request.method == "POST":
-        # Cevapları kaydet (send edilen name'ler q_<id> veya q_<id>[] olacak)
+        # Save answers (sent names will be q_<id> or q_<id>[])
         save_answers(request.form, layer_name=layer_name)
 
-        # Sonraki layer'a geçiş (isteğe bağlı)
+        # Proceed to the next layer (optional)
         try:
             current_index = AVAILABLE_LAYERS.index(layer_name)
             if current_index + 1 < len(AVAILABLE_LAYERS):
@@ -63,7 +63,7 @@ def form(layer_name):
 @main.route('/add-question', methods=["GET", "POST"])
 def add_question():
     if request.method == "POST":
-        # JSON bekliyoruz (fetch ile gönderilecek)
+        # Expecting JSON (to be sent via fetch)
         if not request.is_json:
             return jsonify({"ok": False, "error": "Expected JSON"}), 400
         payload = request.get_json()
@@ -111,9 +111,31 @@ def dfd():
         response_files=response_files
     )
 
-@main.route('/risk')
+@main.route('/risk', methods=["GET", "POST"])
 def risk():
-    return render_template("risk.html", active_tab="risk")
+    # Get the responses directory path
+    responses_dir = Path(current_app.root_path).parent / "responses"
+    
+    # Get all JSON files from responses directory
+    response_files = []
+    if responses_dir.exists():
+        response_files = sorted([f.name for f in responses_dir.glob("*.json")])
+    
+    if request.method == "POST":
+        selected_file = request.form.get("response_file")
+        # TODO: Process the selected file and generate threat model with local LLM
+        return render_template(
+            "risk.html", 
+            active_tab="risk",
+            response_files=response_files,
+            selected_file=selected_file
+        )
+    
+    return render_template(
+        "risk.html", 
+        active_tab="risk",
+        response_files=response_files
+    )
 
 # ---------------------------------------------------------------------------
 # LLM Sec  – Layer 8 questionnaire (LLM-specific threat surface mapping)

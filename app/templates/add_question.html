@@ -16,6 +16,7 @@
             <option value="layer5">Layer 5 – Security Controls</option>
             <option value="layer6">Layer 6 – Operations</option>
             <option value="layer7">Layer 7 – Threat Hypotheses</option>
+            <option value="layer8">Layer 8 – LLM Security</option>
         </select>
     </div>
 
@@ -95,8 +96,8 @@
         try {
             const res = await fetch("{{ url_for('main.add_question') }}", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({layer, text, options})
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ layer, text, options })
             });
             const j = await res.json();
             if (res.ok && j.ok) {
