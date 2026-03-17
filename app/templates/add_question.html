@@ -4,48 +4,51 @@
 <div class="container mt-4">
     <h3 class="mb-4">➕ Add New Question</h3>
 
-    <!-- Layer selection -->
-    <div class="mb-3">
-        <label for="layerSelect" class="form-label"><strong>Select Layer</strong></label>
-        <select class="form-select" id="layerSelect">
-            <option value="">-- Choose a layer --</option>
-            <option value="layer1">Layer 1 – Scope & Context</option>
-            <option value="layer2">Layer 2 – Actors & Entities</option>
-            <option value="layer3">Layer 3 – Data Assets</option>
-            <option value="layer4">Layer 4 – Architecture</option>
-            <option value="layer5">Layer 5 – Security Controls</option>
-            <option value="layer6">Layer 6 – Operations</option>
-            <option value="layer7">Layer 7 – Threat Hypotheses</option>
-            <option value="layer8">Layer 8 – LLM Security</option>
-        </select>
-    </div>
-
-    <!-- Question text -->
-    <div class="mb-3">
-        <label for="questionText" class="form-label"><strong>Question Text</strong></label>
-        <textarea id="questionText" class="form-control" rows="3" placeholder="Enter your question here..."></textarea>
-    </div>
-
-    <!-- Options -->
-    <div class="mb-3">
-        <label class="form-label"><strong>Options</strong></label>
-        <div id="optionsContainer">
-            <div class="option-input-group d-flex align-items-center mb-2">
-                <input type="text" class="form-control option-input" placeholder="Option 1">
-            </div>
-            <div class="option-input-group d-flex align-items-center mb-2">
-                <input type="text" class="form-control option-input" placeholder="Option 2">
-            </div>
+    <div class="card shadow-sm mb-5">
+        <div class="card-header">
+            <h5 class="mb-0">Question Details</h5>
         </div>
-        <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addOptionBtn">+ Add Option</button>
-    </div>
+        <div class="card-body">
+            <!-- Layer selection -->
+            <div class="mb-4">
+                <label for="layerSelect" class="form-label"><strong>Select Layer</strong></label>
+                <select class="form-select" id="layerSelect">
+                    <option value="">-- Choose a layer --</option>
+                    <option value="layer1">Layer 1 – LLM System Architecture & Data Flow Discovery</option>
+                    <option value="layer2">Layer 2 – LLM Security Controls & Risk Assessment</option>
+                </select>
+            </div>
 
-    <!-- Submit -->
-    <div class="text-end">
-        <button id="submitBtn" type="button" class="btn btn-success">Add Question</button>
-    </div>
+            <!-- Question text -->
+            <div class="mb-4">
+                <label for="questionText" class="form-label"><strong>Question Text</strong></label>
+                <textarea id="questionText" class="form-control" rows="3"
+                    placeholder="Enter your question here..."></textarea>
+            </div>
 
-    <div id="statusMsg" class="mt-3"></div>
+            <!-- Options -->
+            <div class="mb-4">
+                <label class="form-label"><strong>Options</strong></label>
+                <div id="optionsContainer">
+                    <div class="option-input-group d-flex align-items-center mb-2">
+                        <input type="text" class="form-control option-input" placeholder="Option 1">
+                    </div>
+                    <div class="option-input-group d-flex align-items-center mb-2">
+                        <input type="text" class="form-control option-input" placeholder="Option 2">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addOptionBtn">+ Add
+                    Option</button>
+            </div>
+
+            <!-- Submit -->
+            <div class="text-end border-top pt-4 mt-2">
+                <button id="submitBtn" type="button" class="btn btn-primary px-4">Add Question &rarr;</button>
+            </div>
+
+            <div id="statusMsg" class="mt-3"></div>
+        </div>
+    </div>
 </div>
 
 <script>

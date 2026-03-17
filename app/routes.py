@@ -143,30 +143,70 @@ def risk():
 # ---------------------------------------------------------------------------
 @main.route('/llm-sec', methods=["GET", "POST"])
 def llm_sec():
-    # Load Layer 8 questions from the dedicated JSON file
-    questions_path = Path(current_app.root_path) / "questions" / "layer8.json"
+    q_dir = Path(current_app.root_path) / "questions"
 
-    if not questions_path.exists():
-        abort(404, description="layer8.json not found.")
+    if request.method == "GET":
+        # Step 1: Render Layer 1
+        layer = "layer1"
+        q_path = q_dir / f"{layer}.json"
+        
+        if not q_path.exists():
+            abort(404, description=f"{layer}.json not found.")
 
-    with questions_path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
+        with q_path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+            questions = data["questions"] if isinstance(data, dict) and "questions" in data else data
 
-    # Support both a bare list and a {"questions": [...]} wrapper, same as the
-    # existing form route, so the format can evolve without breaking this route.
-    if isinstance(data, dict) and "questions" in data:
-        questions = data["questions"]
-    else:
-        questions = data
+        layer_data = {
+            "name": "Layer 1 - LLM System Architecture & Data Flow Discovery",
+            "layer_id": layer,
+            "questions": questions
+        }
 
-    if request.method == "POST":
-        # Persist the answers to responses/layer8_answers_<timestamp>.json
+        return render_template(
+            "llm_sec.html",
+            active_tab="llm_sec",
+            layer_data=layer_data,
+            step=1,
+            hidden_fields={}
+        )
+
+    # Handle POST
+    step = int(request.form.get("current_step", 1))
+
+    if step == 1:
+        # Step 2: Receive Layer 1 data, render Layer 2
+        hidden_fields = {}
+        for key in request.form.keys():
+            if key.startswith("q_"):
+                hidden_fields[key] = request.form.getlist(key)
+
+        layer = "layer2"
+        q_path = q_dir / f"{layer}.json"
+        
+        if not q_path.exists():
+            abort(404, description=f"{layer}.json not found.")
+
+        with q_path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+            questions = data["questions"] if isinstance(data, dict) and "questions" in data else data
+
+        layer_data = {
+            "name": "Layer 2 - LLM Security Controls & Risk Assessment",
+            "layer_id": layer,
+            "questions": questions
+        }
+
+        return render_template(
+            "llm_sec.html",
+            active_tab="llm_sec",
+            layer_data=layer_data,
+            step=2,
+            hidden_fields=hidden_fields
+        )
+
+    elif step == 2:
+        # Step 3: Receive Layer 1+2 data, save
         save_layer8_answers(request.form)
         flash("LLM Sec answers saved successfully!", "success")
         return redirect(url_for("main.llm_sec"))
-
-    return render_template(
-        "llm_sec.html",
-        active_tab="llm_sec",
-        questions=questions,
-    )
