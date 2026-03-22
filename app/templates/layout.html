@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Threat Modeling Tool</title>
+    <title>LLM Sentinel</title>
     <!-- Modern Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -303,7 +303,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold text-white d-flex align-items-center gap-2"
                 href="{{ url_for('main.home') }}">
-                🛡️ Threat Modeler
+                LLM Sentinel
             </a>
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav">
@@ -313,23 +313,23 @@
                 <ul class="navbar-nav ms-auto gap-2">
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'home' %}active{% endif %}"
-                            href="{{ url_for('main.home') }}">🏠 Home</a>
+                            href="{{ url_for('main.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'llm_sec' %}active{% endif %}"
-                            href="{{ url_for('main.llm_sec') }}">🤖 LLM Sec</a>
+                            href="{{ url_for('main.llm_sec') }}">LLM Sec</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'add' %}active{% endif %}"
-                            href="{{ url_for('main.add_question') }}">➕ Add Question</a>
+                            href="{{ url_for('main.add_question') }}">Add Question</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'dfd' %}active{% endif %}"
-                            href="{{ url_for('main.dfd') }}">📊 DFD</a>
+                            href="{{ url_for('main.dfd') }}">DFD</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'risk' %}active{% endif %}"
-                            href="{{ url_for('main.risk') }}">⚠️ Risk Analysis</a>
+                            href="{{ url_for('main.risk') }}">Risk Analysis</a>
                     </li>
                 </ul>
             </div>

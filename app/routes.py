@@ -1,26 +1,54 @@
-import os
 import json
 from pathlib import Path
-import os
-from flask import Blueprint, render_template, abort, request, redirect, url_for, jsonify, current_app, flash
-from app.utils.save_utils import save_answers, append_question_to_layer, save_layer8_answers
+
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+
+from app.utils.questionnaire_flow import (
+    extract_answer,
+    get_first_question_id,
+    get_next_question,
+    get_question_by_id,
+    load_questions,
+    split_answer_for_display,
+)
+from app.utils.save_utils import (
+    append_question_to_layer,
+    save_adaptive_llm_sec_answers,
+    save_answers,
+)
+
 
 AVAILABLE_LAYERS = ["layer1", "layer2", "layer3", "layer4", "layer5", "layer6"]
+LLM_SEC_SESSION_KEY = "llm_sec_flow"
 
-main = Blueprint('main', __name__)
+main = Blueprint("main", __name__)
 
-@main.route('/')
+
+@main.route("/")
 def home():
     return render_template("home.html", active_tab="home")
+
 
 @main.route("/favicon.ico")
 def favicon():
     return ("", 204)
 
+
 @main.route("/form")
 def form_redirect():
-    # Always go to /form/layer1
-    return redirect(url_for("main.form", layer_name="layer1"), code=302)
+    return redirect(url_for("main.llm_sec"), code=302)
+
 
 @main.route("/form/<layer_name>", methods=["GET", "POST"])
 def form(layer_name):
@@ -32,17 +60,14 @@ def form(layer_name):
     with questions_path.open("r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # JSON root can be a list or {"questions": [...]}; support both
     if isinstance(data, dict) and "questions" in data:
         questions = data["questions"]
     else:
         questions = data
 
     if request.method == "POST":
-        # Save answers (sent names will be q_<id> or q_<id>[])
         save_answers(request.form, layer_name=layer_name)
 
-        # Proceed to the next layer (optional)
         try:
             current_index = AVAILABLE_LAYERS.index(layer_name)
             if current_index + 1 < len(AVAILABLE_LAYERS):
@@ -50,6 +75,7 @@ def form(layer_name):
                 return redirect(url_for("main.form", layer_name=next_layer))
         except ValueError:
             pass
+
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -57,15 +83,16 @@ def form(layer_name):
         active_tab="form",
         layer_name=layer_name,
         questions=questions,
-        available_layers=AVAILABLE_LAYERS
+        available_layers=AVAILABLE_LAYERS,
     )
 
-@main.route('/add-question', methods=["GET", "POST"])
+
+@main.route("/add-question", methods=["GET", "POST"])
 def add_question():
     if request.method == "POST":
-        # Expecting JSON (to be sent via fetch)
         if not request.is_json:
             return jsonify({"ok": False, "error": "Expected JSON"}), 400
+
         payload = request.get_json()
         layer = payload.get("layer")
         text = payload.get("text", "").strip()
@@ -81,132 +108,169 @@ def add_question():
 
         return jsonify({"ok": True, "path": qpath, "question": new_q})
 
-    # GET: render template
     return render_template("add_question.html", active_tab="add")
 
-@main.route('/dfd', methods=["GET", "POST"])
+
+@main.route("/dfd", methods=["GET", "POST"])
 def dfd():
-    # Get the responses directory path
     responses_dir = Path(current_app.root_path).parent / "responses"
-    
-    # Get all JSON files from responses directory
     response_files = []
+
     if responses_dir.exists():
         response_files = sorted([f.name for f in responses_dir.glob("*.json")])
-    
+
     if request.method == "POST":
         selected_file = request.form.get("response_file")
-        # TODO: Process the selected file and generate threat model
-        # For now, just pass it back to show selection
         return render_template(
-            "dfd.html", 
+            "dfd.html",
             active_tab="dfd",
             response_files=response_files,
-            selected_file=selected_file
+            selected_file=selected_file,
         )
-    
+
     return render_template(
-        "dfd.html", 
+        "dfd.html",
         active_tab="dfd",
-        response_files=response_files
+        response_files=response_files,
     )
 
-@main.route('/risk', methods=["GET", "POST"])
+
+@main.route("/risk", methods=["GET", "POST"])
 def risk():
-    # Get the responses directory path
     responses_dir = Path(current_app.root_path).parent / "responses"
-    
-    # Get all JSON files from responses directory
     response_files = []
+
     if responses_dir.exists():
         response_files = sorted([f.name for f in responses_dir.glob("*.json")])
-    
+
     if request.method == "POST":
         selected_file = request.form.get("response_file")
-        # TODO: Process the selected file and generate threat model with local LLM
         return render_template(
-            "risk.html", 
+            "risk.html",
             active_tab="risk",
             response_files=response_files,
-            selected_file=selected_file
+            selected_file=selected_file,
         )
-    
+
     return render_template(
-        "risk.html", 
+        "risk.html",
         active_tab="risk",
-        response_files=response_files
+        response_files=response_files,
     )
 
-# ---------------------------------------------------------------------------
-# LLM Sec  – Layer 8 questionnaire (LLM-specific threat surface mapping)
-# Future steps: DFD generation, OWASP LLM threat derivation, Garak execution
-# ---------------------------------------------------------------------------
-@main.route('/llm-sec', methods=["GET", "POST"])
+
+@main.route("/llm-sec", methods=["GET", "POST"])
 def llm_sec():
-    q_dir = Path(current_app.root_path) / "questions"
+    question_catalog = load_questions(current_app.root_path)
 
-    if request.method == "GET":
-        # Step 1: Render Layer 1
-        layer = "layer1"
-        q_path = q_dir / f"{layer}.json"
-        
-        if not q_path.exists():
-            abort(404, description=f"{layer}.json not found.")
+    if request.args.get("restart") == "1":
+        session.pop(LLM_SEC_SESSION_KEY, None)
 
-        with q_path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-            questions = data["questions"] if isinstance(data, dict) and "questions" in data else data
+    flow_state = _get_llm_sec_flow_state()
 
-        layer_data = {
-            "name": "Layer 1 - LLM System Architecture & Data Flow Discovery",
-            "layer_id": layer,
-            "questions": questions
-        }
+    if request.method == "POST":
+        current_flow_id = request.form.get("current_flow_id") or flow_state["current_flow_id"]
+        current_question = get_question_by_id(current_app.root_path, current_flow_id)
 
-        return render_template(
-            "llm_sec.html",
-            active_tab="llm_sec",
-            layer_data=layer_data,
-            step=1,
-            hidden_fields={}
-        )
+        if current_question is None:
+            abort(400, description="Invalid questionnaire state.")
 
-    # Handle POST
-    step = int(request.form.get("current_step", 1))
+        flow_state["answers"][current_flow_id] = extract_answer(request.form, current_question)
 
-    if step == 1:
-        # Step 2: Receive Layer 1 data, render Layer 2
-        hidden_fields = {}
-        for key in request.form.keys():
-            if key.startswith("q_"):
-                hidden_fields[key] = request.form.getlist(key)
+        action = request.form.get("action", "next")
 
-        layer = "layer2"
-        q_path = q_dir / f"{layer}.json"
-        
-        if not q_path.exists():
-            abort(404, description=f"{layer}.json not found.")
+        if action == "back":
+            flow_state["current_flow_id"] = _get_previous_flow_id(flow_state["history"], current_flow_id)
+        else:
+            _truncate_history_after(flow_state["history"], current_flow_id)
+            _trim_answers_to_history(flow_state)
+            next_flow_id = get_next_question(current_flow_id, flow_state["answers"])
 
-        with q_path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-            questions = data["questions"] if isinstance(data, dict) and "questions" in data else data
+            if next_flow_id is None:
+                save_adaptive_llm_sec_answers(
+                    flow_state["answers"],
+                    question_catalog,
+                )
+                session.pop(LLM_SEC_SESSION_KEY, None)
+                flash("LLM Security Assessment saved successfully.", "success")
+                return redirect(url_for("main.llm_sec"))
 
-        layer_data = {
-            "name": "Layer 2 - LLM Security Controls & Risk Assessment",
-            "layer_id": layer,
-            "questions": questions
-        }
+            if next_flow_id not in flow_state["history"]:
+                flow_state["history"].append(next_flow_id)
 
-        return render_template(
-            "llm_sec.html",
-            active_tab="llm_sec",
-            layer_data=layer_data,
-            step=2,
-            hidden_fields=hidden_fields
-        )
+            flow_state["current_flow_id"] = next_flow_id
 
-    elif step == 2:
-        # Step 3: Receive Layer 1+2 data, save
-        save_layer8_answers(request.form)
-        flash("LLM Sec answers saved successfully!", "success")
+        _save_llm_sec_flow_state(flow_state)
         return redirect(url_for("main.llm_sec"))
+
+    current_flow_id = flow_state["current_flow_id"]
+    current_question = get_question_by_id(current_app.root_path, current_flow_id)
+
+    if current_question is None:
+        abort(500, description="Unable to load the current question.")
+
+    selected_answers, other_answer = split_answer_for_display(
+        current_question,
+        flow_state["answers"].get(current_flow_id),
+    )
+
+    return render_template(
+        "llm_sec.html",
+        active_tab="llm_sec",
+        current_question=current_question,
+        current_flow_id=current_flow_id,
+        current_answer=flow_state["answers"].get(current_flow_id),
+        selected_answers=selected_answers,
+        other_answer=other_answer,
+        can_go_back=len(flow_state["history"]) > 1,
+        is_last_question=get_next_question(current_flow_id, flow_state["answers"]) is None,
+        total_questions=len(question_catalog),
+        answered_count=len([answer for answer in flow_state["answers"].values() if answer not in (None, "", [])]),
+    )
+
+
+def _get_llm_sec_flow_state():
+    state = session.get(LLM_SEC_SESSION_KEY)
+    if state:
+        return state
+
+    initial_flow_id = get_first_question_id()
+    state = {
+        "current_flow_id": initial_flow_id,
+        "history": [initial_flow_id],
+        "answers": {},
+    }
+    session[LLM_SEC_SESSION_KEY] = state
+    return state
+
+
+def _save_llm_sec_flow_state(state):
+    session[LLM_SEC_SESSION_KEY] = state
+    session.modified = True
+
+
+def _get_previous_flow_id(history, current_flow_id):
+    if current_flow_id not in history:
+        return history[-1]
+
+    current_index = history.index(current_flow_id)
+    if current_index == 0:
+        return current_flow_id
+
+    return history[current_index - 1]
+
+
+def _truncate_history_after(history, current_flow_id):
+    if current_flow_id not in history:
+        history.append(current_flow_id)
+        return
+
+    current_index = history.index(current_flow_id)
+    del history[current_index + 1:]
+
+
+def _trim_answers_to_history(flow_state):
+    valid_question_ids = set(flow_state["history"])
+    for question_id in list(flow_state["answers"].keys()):
+        if question_id not in valid_question_ids:
+            del flow_state["answers"][question_id]

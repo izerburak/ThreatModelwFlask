@@ -1,0 +1,100 @@
+[
+  { "id": 1, "layer": 1, "text": "What is the primary purpose of the LLM in this system?", "type": "single",
+    "options": ["Customer support assistant","Developer documentation assistant","Internal productivity assistant","Automated data analysis or summarization","Agent or workflow automation component","Experimental or research feature"] },
+
+  { "id": 2, "layer": 1, "text": "Who can directly interact with the LLM system?", "type": "multi",
+    "options": ["Anonymous public internet users","Authenticated public users","Internal employees only","Administrators only","Local system processes only"] },
+
+  { "id": 3, "layer": 1, "text": "Through which interfaces is the LLM accessible?", "type": "multi",
+    "options": ["Web-based chat interface","REST API endpoint","Internal service-to-service calls","CLI or local scripts","Third-party integrations"] },
+
+  { "id": 4, "layer": 1, "text": "Does the LLM process sensitive or business-critical data?", "type": "multi",
+    "options": ["Personally identifiable information (PII)","Authentication data (passwords, tokens, API keys)","Financial or payment-related data","Internal business documents","Customer records or support conversations","Intellectual property or trade secrets","Security logs or monitoring data","No sensitive or business-critical data"] },
+
+  { "id": 5, "layer": 1, "text": "What are the primary sources of input data for the LLM?", "type": "multi",
+    "options": ["Direct user prompts","Uploaded files","Retrieved documents (RAG)","External APIs","Scheduled data ingestion pipelines"] },
+
+  { "id": 6, "layer": 1, "text": "What types of external or untrusted content can be ingested by the LLM?", "type": "multi",
+    "options": ["User text input only","File uploads (PDF, DOCX, TXT, etc.)","Web URLs or browsing content","Email or ticket system data","Public document repositories","No untrusted external content"] },
+
+  { "id": 7, "layer": 1, "text": "What processing steps occur before user input reaches the LLM?", "type": "multi",
+    "options": ["Input validation or filtering","Prompt templating layer","Retrieval augmentation (RAG)","Moderation or safety filter","No intermediate processing"] },
+
+  { "id": 8, "layer": 1, "text": "Which data sources are connected to the LLM via retrieval or RAG mechanisms?", "type": "multi",
+    "options": ["Internal documentation repositories","Customer support databases","Public web data","User uploaded documents","Structured internal databases","No retrieval or RAG is used"] },
+
+  { "id": 9, "layer": 1, "text": "Does the system store conversation history or memory for the LLM?", "type": "single",
+    "options": ["No conversation memory","Short-term session memory","Persistent user conversation history","Shared organizational knowledge memory","Vector memory storage"] },
+
+  { "id": 10, "layer": 1, "text": "Is there an orchestration layer coordinating LLM interactions?", "type": "single",
+    "options": ["No orchestration layer","Simple application wrapper","Prompt orchestration framework","Agent-based orchestration","Multi-model routing system"] },
+
+  { "id": 11, "layer": 1, "text": "Does the LLM have access to internal services or tools?", "type": "multi",
+    "options": ["Internal APIs","Databases","File storage systems","Workflow automation tools","No system access"] },
+
+  { "id": 12, "layer": 1, "text": "Which data storage systems are accessible to the LLM pipeline?", "type": "multi",
+    "options": ["Relational databases","Vector databases","File storage systems","Document management systems","No direct data store access"] },
+
+  { "id": 13, "layer": 1, "text": "Can the LLM initiate calls to external services or APIs?", "type": "single",
+    "options": ["No, the LLM cannot call any external services","Yes, only internal enterprise APIs","Yes, third-party APIs","Yes, external SaaS platforms","Yes, automation or workflow engines"] },
+
+  { "id": 14, "layer": 1, "text": "What types of actions can the LLM trigger or influence?", "type": "multi",
+    "options": ["No actions (advisory only responses)","Generating recommendations","Creating or modifying tickets","Sending emails or notifications","Updating database records","Resetting user credentials","Executing backend workflows","Triggering external system actions"] },
+
+  { "id": 15, "layer": 1, "text": "Where is the LLM hosted?", "type": "single",
+    "options": ["Local/self-hosted model","Private cloud deployment","Third-party LLM API provider","Hybrid (local + external models)"] },
+
+  { "id": 16, "layer": 1, "text": "Which trust boundaries does user input cross before reaching the LLM?", "type": "multi",
+    "options": ["Public internet to application server","Application server to internal services","Internal network to protected data stores","Third-party services to internal systems","Cross-region or cross-cloud boundaries","No significant trust boundaries identified"] },
+
+  { "id": 17, "layer": 2, "text": "How are users authenticated before interacting with the LLM?", "type": "single",
+    "options": ["No authentication","Username/password","SSO","API keys/tokens","Internal network auth"] },
+
+  { "id": 18, "layer": 2, "text": "How is authorization enforced for LLM access?", "type": "single",
+    "options": ["No access control","RBAC","ABAC","ACL","Manual approval"] },
+
+  { "id": 19, "layer": 2, "text": "Is role-based filtering applied to retrieved documents or data?", "type": "single",
+    "options": ["No filtering","Basic role filtering","Fine-grained permissions","Data masking","Not applicable"] },
+
+  { "id": 20, "layer": 2, "text": "Are safeguards implemented against prompt injection attacks?", "type": "single",
+    "options": ["No protections","Basic filtering","Prompt sanitization","Context isolation","Security middleware"] },
+
+  { "id": 21, "layer": 2, "text": "Is LLM output validated before being used by other systems?", "type": "single",
+    "options": ["No validation","Basic filtering","Structured validation","Human approval","Not used downstream"] },
+
+  { "id": 22, "layer": 2, "text": "Are safeguards implemented to prevent sensitive data leakage?", "type": "single",
+    "options": ["No safeguards","Keyword filtering","Data classification","Output redaction","Human review"] },
+
+  { "id": 23, "layer": 2, "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?", "type": "single",
+    "options": ["No limits","Role-based","Data-based","Task-based","Combined"] },
+
+  { "id": 24, "layer": 2, "text": "How are LLM interactions logged and monitored?", "type": "single",
+    "options": ["No logging","Basic logs","Centralized logs","SIEM","Prompt auditing"] },
+
+  { "id": 25, "layer": 2, "text": "Are rate limits or abuse protections applied to the LLM interface?", "type": "single",
+    "options": ["None","Basic rate limit","Token limits","User quotas","Adaptive detection"] },
+
+  { "id": 26, "layer": 2, "text": "How are external models or dependencies validated?", "type": "single",
+    "options": ["No validation","Vendor trust","Version pinning","Security review","Supply-chain monitoring"] },
+
+  { "id": 27, "layer": 2, "text": "Are embeddings or vector databases protected against unauthorized access?", "type": "single",
+    "options": ["No protection","Network restriction","Auth controls","Encryption","Not applicable"] },
+
+  { "id": 28, "layer": 2, "text": "Can the LLM affect real-world state or business processes without human approval?", "type": "single",
+    "options": ["No","Low-risk only","Approval required","Some automated","Fully autonomous"] },
+
+  { "id": 29, "layer": 2, "text": "Does the system rely on LLM responses for automated decision making?", "type": "single",
+    "options": ["No","Advisory","Approval required","Semi-automated","Fully automated"] },
+
+  { "id": 30, "layer": 2, "text": "How are LLM prompts or system instructions managed?", "type": "single",
+    "options": ["Hardcoded","Config files","Prompt templates","Dynamic generation","Unknown"] },
+
+  { "id": 31, "layer": 2, "text": "Can users influence system prompts or instructions indirectly?", "type": "single",
+    "options": ["Yes via prompts","Yes via documents","Yes via RAG","No","Unknown"] },
+
+  { "id": 32, "layer": 2, "text": "What output formats are produced by the LLM?", "type": "multi",
+    "options": ["Plain text","JSON","Code","Config files","Executable commands"] },
+
+  { "id": 33, "layer": 2, "text": "Where is LLM output rendered or consumed?", "type": "multi",
+    "options": ["Web UI","Markdown UI","Email","Logs","Automated systems"] }
+]

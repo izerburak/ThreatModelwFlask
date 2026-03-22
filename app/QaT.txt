@@ -1,0 +1,78 @@
+[START]
+└── Q1. What is the primary purpose of the LLM in this system?
+    └── Q2. Who can directly interact with the LLM system?
+
+        ├── If public or external users exist:
+        │   └── Q3. Through which interfaces is the LLM accessible?
+        │       └── Q31. Are rate limits or abuse protections applied to the LLM interface?
+        │
+        └── Else:
+            └── Q3. Through which interfaces is the LLM accessible?
+
+                └── Q4. Does the LLM process sensitive or business-critical data?
+                    └── Q5. What are the primary sources of input data for the LLM?
+
+                        └── Q6. What types of external or untrusted content can be ingested by the LLM?
+
+                            ├── If untrusted content exists:
+                            │   └── Q7. What processing steps occur before user input reaches the LLM?
+                            │       └── Q8. Are safeguards implemented against prompt injection attacks?
+                            │
+                            └── Else:
+                                └── (Skip Q8)
+
+                                    └── Q9. Which data sources are connected to the LLM via retrieval or RAG mechanisms?
+
+                                        ├── If RAG is used:
+                                        │   ├── Q10. Is role-based filtering applied to retrieved documents or data?
+                                        │   └── Q11. Are embeddings or vector databases protected against unauthorized access?
+                                        │
+                                        └── Else:
+                                            └── (Skip Q10, Q11)
+
+                                                └── Q12. Does the system store conversation history or memory for the LLM?
+
+                                                    ├── If persistent or shared memory exists:
+                                                    │   └── Q13. Are safeguards implemented to prevent sensitive data leakage?
+                                                    │
+                                                    └── Else:
+                                                        └── (Continue)
+
+                                                            └── Q14. Is there an orchestration layer coordinating LLM interactions?
+
+                                                                ├── If orchestration / agent / routing exists:
+                                                                │   └── Q15. Does the system use multiple LLM models for different tasks?
+                                                                │
+                                                                └── Else:
+                                                                    └── (Continue)
+
+                                                                        └── Q16. Does the LLM have access to internal services or tools?
+
+                                                                            ├── If NO system/tool access:
+                                                                            │   └── Go to Q24
+                                                                            │
+                                                                            └── If YES:
+                                                                                └── Q17. Which data storage systems are accessible to the LLM pipeline?
+                                                                                    └── Q18. Can the LLM initiate calls to external services or APIs?
+                                                                                        └── Q19. What types of actions can the LLM trigger or influence?
+
+                                                                                            ├── If actions exist (not advisory only):
+                                                                                            │   ├── Q20. Is LLM output validated before being used by other systems?
+                                                                                            │   ├── Q21. Is the LLM's behavior limited by user role, data scope, or task permissions?
+                                                                                            │   ├── Q22. Can the LLM affect real-world state or business processes without human approval?
+                                                                                            │   └── Q23. Does the system rely on LLM responses for automated decision making?
+                                                                                            │
+                                                                                            └── Else:
+                                                                                                └── (Skip Q21–Q23 or mark low priority)
+
+                                                                                                    └── Q24. Where is the LLM hosted?
+                                                                                                        └── Q25. How are external models or dependencies validated?
+                                                                                                            └── Q26. How are LLM prompts or system instructions managed?
+                                                                                                                └── Q27. Can users influence system prompts or instructions indirectly?
+                                                                                                                    └── Q28. What output formats are produced by the LLM?
+                                                                                                                        └── Q29. Where is LLM output rendered or consumed?
+                                                                                                                            └── Q30. How are LLM interactions logged and monitored?
+                                                                                                                                └── Q32. Which misuse scenarios are most plausible for this LLM deployment?
+                                                                                                                                    └── Q33. What operational weaknesses could increase LLM-related security risks?
+
+                                                                                                                                        └── [END]
