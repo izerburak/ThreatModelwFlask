@@ -25,11 +25,9 @@ from app.utils.questionnaire_flow import (
 from app.utils.save_utils import (
     append_question_to_layer,
     save_adaptive_llm_sec_answers,
-    save_answers,
 )
 
 
-AVAILABLE_LAYERS = ["layer1", "layer2", "layer3", "layer4", "layer5", "layer6"]
 LLM_SEC_SESSION_KEY = "llm_sec_flow"
 
 main = Blueprint("main", __name__)
@@ -43,48 +41,6 @@ def home():
 @main.route("/favicon.ico")
 def favicon():
     return ("", 204)
-
-
-@main.route("/form")
-def form_redirect():
-    return redirect(url_for("main.llm_sec"), code=302)
-
-
-@main.route("/form/<layer_name>", methods=["GET", "POST"])
-def form(layer_name):
-    questions_path = Path(current_app.root_path) / "questions" / f"{layer_name}.json"
-
-    if not questions_path.exists():
-        abort(404, description=f"Question file for {layer_name} not found.")
-
-    with questions_path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    if isinstance(data, dict) and "questions" in data:
-        questions = data["questions"]
-    else:
-        questions = data
-
-    if request.method == "POST":
-        save_answers(request.form, layer_name=layer_name)
-
-        try:
-            current_index = AVAILABLE_LAYERS.index(layer_name)
-            if current_index + 1 < len(AVAILABLE_LAYERS):
-                next_layer = AVAILABLE_LAYERS[current_index + 1]
-                return redirect(url_for("main.form", layer_name=next_layer))
-        except ValueError:
-            pass
-
-        return redirect(url_for("main.home"))
-
-    return render_template(
-        "form.html",
-        active_tab="form",
-        layer_name=layer_name,
-        questions=questions,
-        available_layers=AVAILABLE_LAYERS,
-    )
 
 
 @main.route("/add-question", methods=["GET", "POST"])

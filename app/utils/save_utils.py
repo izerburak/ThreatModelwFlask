@@ -3,66 +3,7 @@ import json
 from datetime import datetime
 from flask import current_app
 
-def save_answers(form_data, layer_name="layer1"):
-    import os, json
-    from datetime import datetime
-    from pathlib import Path
 
-    # Collect form data
-    answers = {}
-    for key in form_data.keys():
-        vals = form_data.getlist(key)
-        if len(vals) == 0:
-            answers[key] = None
-        elif len(vals) == 1:
-            answers[key] = vals[0]
-        else:
-            answers[key] = vals
-
-    os.makedirs("responses", exist_ok=True)
-    
-    # For each survey, one file - create new file in layer1, append in others
-    if layer_name == "layer1":
-        # New survey starting - create new file
-        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"survey_{timestamp_str}.json"
-        filepath = os.path.join("responses", filename)
-        
-        # Only save answers
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(answers, f, ensure_ascii=False, indent=2)
-        
-        return filepath
-    else:
-        # Add answers to the current survey - find the latest file
-        response_dir = Path("responses")
-        json_files = sorted(response_dir.glob("survey_*.json"), key=os.path.getmtime, reverse=True)
-        
-        if json_files:
-            filepath = json_files[0]
-            
-            # Read the current survey file
-            with open(filepath, "r", encoding="utf-8") as f:
-                survey_data = json.load(f)
-            
-            # Add new answers (update the existing answers)
-            survey_data.update(answers)
-            
-            # Update the survey file
-            with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(survey_data, f, ensure_ascii=False, indent=2)
-            
-            return filepath
-        else:
-            # If no survey file is found, create a new one (for security)
-            timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"survey_{timestamp_str}.json"
-            filepath = os.path.join("responses", filename)
-            
-            with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(answers, f, ensure_ascii=False, indent=2)
-            
-            return filepath
 
 def append_question_to_layer(layer_name: str, question_text: str, options: list):
     import json
@@ -116,69 +57,7 @@ def append_question_to_layer(layer_name: str, question_text: str, options: list)
     return str(qpath), new_question
 
 
-def save_layer8_answers(form_data):
-    """Save Layer 8 (LLM Security) questionnaire answers to a dedicated file.
 
-    The saved JSON adheres to the llmsec.v1 canonical format:
-    {
-      "schema_version": "llmsec.v1",
-      "project_id": "PROJECT_ID_HERE",
-      "system_id": "SYSTEM_ID_HERE",
-      "timestamp_utc": "...",
-      "answers": [ { "question_id": "...", "answer": "..." } ]
-    }
-    """
-    import os
-    import json
-    from datetime import datetime, timezone
-
-    answers_list = []
-    # Collect all form values; multi-checkbox fields become lists, single
-    # values stay as plain strings, missing ones are stored as None.
-    for key in form_data.keys():
-        if key.startswith("q_"):
-            q_id = key[2:]  # Remove the 'q_' prefix to get just 'LLMSEC-XX'
-            
-            vals = form_data.getlist(key)
-            # Check if any values are actually provided, ignore empty string for Others if no checkboxes are checked
-            # Actually, standardizing on vals list
-            cleaned_vals = [v for v in vals if v.strip() != ""]
-            
-            if len(cleaned_vals) == 0:
-                answer_val = None
-            elif len(cleaned_vals) == 1:
-                answer_val = cleaned_vals[0]
-            else:
-                answer_val = cleaned_vals
-
-            # For 'Other', sometimes it comes as a text input which might be empty
-            # Overwrite None or append correctly.
-            # In HTML, checkboxes and text inputs with same name will combine into a list.
-            if answer_val is not None:
-                answers_list.append({
-                    "question_id": q_id,
-                    "answer": answer_val
-                })
-
-    # Build the full response record with metadata
-    record = {
-        "schema_version": "llmsec.v1",
-        "project_id": "DEFAULT_PROJECT",
-        "system_id": "DEFAULT_SYSTEM",
-        "timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "answers": answers_list
-    }
-
-    # Write to responses/ directory (create it if it doesn't exist yet)
-    os.makedirs("responses", exist_ok=True)
-    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"layer8_answers_{timestamp_str}.json"
-    filepath = os.path.join("responses", filename)
-
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(record, f, ensure_ascii=False, indent=2)
-
-    return filepath
 
 
 def save_adaptive_llm_sec_answers(answer_map, question_catalog):

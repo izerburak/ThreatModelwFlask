@@ -1,100 +1,951 @@
 [
-  { "id": 1, "layer": 1, "text": "What is the primary purpose of the LLM in this system?", "type": "single",
-    "options": ["Customer support assistant","Developer documentation assistant","Internal productivity assistant","Automated data analysis or summarization","Agent or workflow automation component","Experimental or research feature"] },
-
-  { "id": 2, "layer": 1, "text": "Who can directly interact with the LLM system?", "type": "multi",
-    "options": ["Anonymous public internet users","Authenticated public users","Internal employees only","Administrators only","Local system processes only"] },
-
-  { "id": 3, "layer": 1, "text": "Through which interfaces is the LLM accessible?", "type": "multi",
-    "options": ["Web-based chat interface","REST API endpoint","Internal service-to-service calls","CLI or local scripts","Third-party integrations"] },
-
-  { "id": 4, "layer": 1, "text": "Does the LLM process sensitive or business-critical data?", "type": "multi",
-    "options": ["Personally identifiable information (PII)","Authentication data (passwords, tokens, API keys)","Financial or payment-related data","Internal business documents","Customer records or support conversations","Intellectual property or trade secrets","Security logs or monitoring data","No sensitive or business-critical data"] },
-
-  { "id": 5, "layer": 1, "text": "What are the primary sources of input data for the LLM?", "type": "multi",
-    "options": ["Direct user prompts","Uploaded files","Retrieved documents (RAG)","External APIs","Scheduled data ingestion pipelines"] },
-
-  { "id": 6, "layer": 1, "text": "What types of external or untrusted content can be ingested by the LLM?", "type": "multi",
-    "options": ["User text input only","File uploads (PDF, DOCX, TXT, etc.)","Web URLs or browsing content","Email or ticket system data","Public document repositories","No untrusted external content"] },
-
-  { "id": 7, "layer": 1, "text": "What processing steps occur before user input reaches the LLM?", "type": "multi",
-    "options": ["Input validation or filtering","Prompt templating layer","Retrieval augmentation (RAG)","Moderation or safety filter","No intermediate processing"] },
-
-  { "id": 8, "layer": 1, "text": "Which data sources are connected to the LLM via retrieval or RAG mechanisms?", "type": "multi",
-    "options": ["Internal documentation repositories","Customer support databases","Public web data","User uploaded documents","Structured internal databases","No retrieval or RAG is used"] },
-
-  { "id": 9, "layer": 1, "text": "Does the system store conversation history or memory for the LLM?", "type": "single",
-    "options": ["No conversation memory","Short-term session memory","Persistent user conversation history","Shared organizational knowledge memory","Vector memory storage"] },
-
-  { "id": 10, "layer": 1, "text": "Is there an orchestration layer coordinating LLM interactions?", "type": "single",
-    "options": ["No orchestration layer","Simple application wrapper","Prompt orchestration framework","Agent-based orchestration","Multi-model routing system"] },
-
-  { "id": 11, "layer": 1, "text": "Does the LLM have access to internal services or tools?", "type": "multi",
-    "options": ["Internal APIs","Databases","File storage systems","Workflow automation tools","No system access"] },
-
-  { "id": 12, "layer": 1, "text": "Which data storage systems are accessible to the LLM pipeline?", "type": "multi",
-    "options": ["Relational databases","Vector databases","File storage systems","Document management systems","No direct data store access"] },
-
-  { "id": 13, "layer": 1, "text": "Can the LLM initiate calls to external services or APIs?", "type": "single",
-    "options": ["No, the LLM cannot call any external services","Yes, only internal enterprise APIs","Yes, third-party APIs","Yes, external SaaS platforms","Yes, automation or workflow engines"] },
-
-  { "id": 14, "layer": 1, "text": "What types of actions can the LLM trigger or influence?", "type": "multi",
-    "options": ["No actions (advisory only responses)","Generating recommendations","Creating or modifying tickets","Sending emails or notifications","Updating database records","Resetting user credentials","Executing backend workflows","Triggering external system actions"] },
-
-  { "id": 15, "layer": 1, "text": "Where is the LLM hosted?", "type": "single",
-    "options": ["Local/self-hosted model","Private cloud deployment","Third-party LLM API provider","Hybrid (local + external models)"] },
-
-  { "id": 16, "layer": 1, "text": "Which trust boundaries does user input cross before reaching the LLM?", "type": "multi",
-    "options": ["Public internet to application server","Application server to internal services","Internal network to protected data stores","Third-party services to internal systems","Cross-region or cross-cloud boundaries","No significant trust boundaries identified"] },
-
-  { "id": 17, "layer": 2, "text": "How are users authenticated before interacting with the LLM?", "type": "single",
-    "options": ["No authentication","Username/password","SSO","API keys/tokens","Internal network auth"] },
-
-  { "id": 18, "layer": 2, "text": "How is authorization enforced for LLM access?", "type": "single",
-    "options": ["No access control","RBAC","ABAC","ACL","Manual approval"] },
-
-  { "id": 19, "layer": 2, "text": "Is role-based filtering applied to retrieved documents or data?", "type": "single",
-    "options": ["No filtering","Basic role filtering","Fine-grained permissions","Data masking","Not applicable"] },
-
-  { "id": 20, "layer": 2, "text": "Are safeguards implemented against prompt injection attacks?", "type": "single",
-    "options": ["No protections","Basic filtering","Prompt sanitization","Context isolation","Security middleware"] },
-
-  { "id": 21, "layer": 2, "text": "Is LLM output validated before being used by other systems?", "type": "single",
-    "options": ["No validation","Basic filtering","Structured validation","Human approval","Not used downstream"] },
-
-  { "id": 22, "layer": 2, "text": "Are safeguards implemented to prevent sensitive data leakage?", "type": "single",
-    "options": ["No safeguards","Keyword filtering","Data classification","Output redaction","Human review"] },
-
-  { "id": 23, "layer": 2, "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?", "type": "single",
-    "options": ["No limits","Role-based","Data-based","Task-based","Combined"] },
-
-  { "id": 24, "layer": 2, "text": "How are LLM interactions logged and monitored?", "type": "single",
-    "options": ["No logging","Basic logs","Centralized logs","SIEM","Prompt auditing"] },
-
-  { "id": 25, "layer": 2, "text": "Are rate limits or abuse protections applied to the LLM interface?", "type": "single",
-    "options": ["None","Basic rate limit","Token limits","User quotas","Adaptive detection"] },
-
-  { "id": 26, "layer": 2, "text": "How are external models or dependencies validated?", "type": "single",
-    "options": ["No validation","Vendor trust","Version pinning","Security review","Supply-chain monitoring"] },
-
-  { "id": 27, "layer": 2, "text": "Are embeddings or vector databases protected against unauthorized access?", "type": "single",
-    "options": ["No protection","Network restriction","Auth controls","Encryption","Not applicable"] },
-
-  { "id": 28, "layer": 2, "text": "Can the LLM affect real-world state or business processes without human approval?", "type": "single",
-    "options": ["No","Low-risk only","Approval required","Some automated","Fully autonomous"] },
-
-  { "id": 29, "layer": 2, "text": "Does the system rely on LLM responses for automated decision making?", "type": "single",
-    "options": ["No","Advisory","Approval required","Semi-automated","Fully automated"] },
-
-  { "id": 30, "layer": 2, "text": "How are LLM prompts or system instructions managed?", "type": "single",
-    "options": ["Hardcoded","Config files","Prompt templates","Dynamic generation","Unknown"] },
-
-  { "id": 31, "layer": 2, "text": "Can users influence system prompts or instructions indirectly?", "type": "single",
-    "options": ["Yes via prompts","Yes via documents","Yes via RAG","No","Unknown"] },
-
-  { "id": 32, "layer": 2, "text": "What output formats are produced by the LLM?", "type": "multi",
-    "options": ["Plain text","JSON","Code","Config files","Executable commands"] },
-
-  { "id": 33, "layer": 2, "text": "Where is LLM output rendered or consumed?", "type": "multi",
-    "options": ["Web UI","Markdown UI","Email","Logs","Automated systems"] }
+  {
+    "id": 1,
+    "text": "What is the primary purpose of the LLM in this system?",
+    "type": "single",
+    "options": [
+      "Customer support assistant",
+      "Developer documentation assistant",
+      "Internal productivity assistant",
+      "Automated data analysis or summarization",
+      "Agent or workflow automation component",
+      "Experimental or research feature"
+    ],
+    "dfd_impact": [
+      "process"
+    ],
+    "risk_context": [
+      "misuse",
+      "overreliance"
+    ],
+    "mitigation_context": [
+      "use_case_definition",
+      "scope_limitation"
+    ]
+  },
+  {
+    "id": 2,
+    "text": "Who can directly interact with the LLM system?",
+    "type": "multi",
+    "options": [
+      "Anonymous public internet users",
+      "Authenticated public users",
+      "Internal employees only",
+      "Administrators only",
+      "Local system processes only"
+    ],
+    "dfd_impact": [
+      "actor",
+      "trust_boundary",
+      "data_flow"
+    ],
+    "risk_context": [
+      "attack_surface",
+      "prompt_injection",
+      "unauthorized_access"
+    ],
+    "mitigation_context": [
+      "authentication",
+      "rate_limiting",
+      "input_validation"
+    ]
+  },
+  {
+    "id": 3,
+    "text": "Through which interfaces is the LLM accessible?",
+    "type": "multi",
+    "options": [
+      "Web-based chat interface",
+      "REST API endpoint",
+      "Internal service-to-service calls",
+      "CLI or local scripts",
+      "Third-party integration"
+    ],
+    "dfd_impact": [
+      "process",
+      "external_entity",
+      "data_flow"
+    ],
+    "risk_context": [
+      "api_exposure",
+      "integration_risk"
+    ],
+    "mitigation_context": [
+      "api_gateway",
+      "authentication",
+      "input_validation"
+    ]
+  },
+  {
+    "id": 4,
+    "text": "Does the LLM process sensitive or business-critical data?",
+    "type": "single",
+    "options": [
+      "Yes",
+      "No",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "data_leakage",
+      "privacy"
+    ],
+    "mitigation_context": [
+      "data_masking",
+      "access_control",
+      "encryption"
+    ]
+  },
+  {
+    "id": 5,
+    "text": "What are the primary sources of input data for the LLM?",
+    "type": "multi",
+    "options": [
+      "Direct user prompts",
+      "Uploaded files",
+      "Retrieved internal documents",
+      "External web content",
+      "API or database records"
+    ],
+    "dfd_impact": [
+      "external_entity",
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "untrusted_input",
+      "data_poisoning"
+    ],
+    "mitigation_context": [
+      "input_validation",
+      "source_validation"
+    ]
+  },
+  {
+    "id": 6,
+    "text": "What types of external or untrusted content can be ingested by the LLM?",
+    "type": "multi",
+    "options": [
+      "User text input only",
+      "File uploads",
+      "Web URLs",
+      "Email or ticket data",
+      "Public repositories"
+    ],
+    "dfd_impact": [
+      "external_entity",
+      "data_flow"
+    ],
+    "risk_context": [
+      "prompt_injection",
+      "malicious_content"
+    ],
+    "mitigation_context": [
+      "content_filtering",
+      "sandboxing"
+    ]
+  },
+  {
+    "id": 7,
+    "text": "What processing steps occur before user input reaches the LLM?",
+    "type": "multi",
+    "options": [
+      "No preprocessing",
+      "Input filtering",
+      "Prompt templating",
+      "RAG augmentation",
+      "Routing/classification"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "insufficient_filtering"
+    ],
+    "mitigation_context": [
+      "input_sanitization",
+      "validation"
+    ]
+  },
+  {
+    "id": 8,
+    "text": "Which data sources are connected via RAG?",
+    "type": "multi",
+    "options": [
+      "Internal knowledge base",
+      "Documentation",
+      "Customer data",
+      "Source code",
+      "No RAG"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "data_leakage",
+      "vector_poisoning"
+    ],
+    "mitigation_context": [
+      "access_control",
+      "embedding_security"
+    ]
+  },
+  {
+    "id": 9,
+    "text": "Which internal services can call the LLM?",
+    "type": "multi",
+    "options": [
+      "Frontend",
+      "Backend API",
+      "Auth service",
+      "Monitoring service",
+      "None"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "privilege_escalation"
+    ],
+    "mitigation_context": [
+      "service_auth",
+      "network_segmentation"
+    ]
+  },
+  {
+    "id": 10,
+    "text": "Does the system store conversation history?",
+    "type": "single",
+    "options": [
+      "No",
+      "Session only",
+      "Per user",
+      "Global",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "data_retention",
+      "privacy"
+    ],
+    "mitigation_context": [
+      "data_minimization",
+      "encryption"
+    ]
+  },
+  {
+    "id": 11,
+    "text": "Is there an orchestration layer?",
+    "type": "single",
+    "options": [
+      "None",
+      "Basic logic",
+      "Framework",
+      "Agent workflow",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "complexity_risk"
+    ],
+    "mitigation_context": [
+      "control_flow_validation"
+    ]
+  },
+  {
+    "id": 12,
+    "text": "Does the LLM have access to tools?",
+    "type": "multi",
+    "options": [
+      "Search",
+      "Database",
+      "Internal APIs",
+      "Admin tools",
+      "None"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_store",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "excessive_agency",
+      "data_exfiltration"
+    ],
+    "mitigation_context": [
+      "least_privilege",
+      "tool_sandboxing",
+      "audit_logging"
+    ]
+  },
+  {
+    "id": 13,
+    "text": "Which storage systems are accessible?",
+    "type": "multi",
+    "options": [
+      "Vector DB",
+      "SQL/NoSQL",
+      "File storage",
+      "Cloud storage",
+      "None"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "data_exposure"
+    ],
+    "mitigation_context": [
+      "access_control",
+      "encryption"
+    ]
+  },
+  {
+    "id": 14,
+    "text": "Can the LLM call external APIs?",
+    "type": "single",
+    "options": [
+      "No",
+      "Directly",
+      "Via backend",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "external_entity",
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "data_exfiltration"
+    ],
+    "mitigation_context": [
+      "api_control",
+      "egress_filtering"
+    ]
+  },
+  {
+    "id": 15,
+    "text": "What actions can the LLM trigger?",
+    "type": "multi",
+    "options": [
+      "Generate text responses only",
+      "Create or update tickets/records",
+      "Send emails or notifications",
+      "Execute workflows or transactions",
+      "Modify system configurations"
+    ],
+    "dfd_impact": [
+      "process",
+      "external_entity",
+      "data_flow"
+    ],
+    "risk_context": [
+      "unauthorized_actions"
+    ],
+    "mitigation_context": [
+      "approval_flow",
+      "logging"
+    ]
+  },
+  {
+    "id": 16,
+    "text": "Can the LLM affect real-world state or business processes without human approval?",
+    "type": "single",
+    "options": [
+      "No, human approval is always required",
+      "Yes, in low-risk actions only",
+      "Yes, in business-critical actions",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "excessive_agency"
+    ],
+    "mitigation_context": [
+      "human_in_the_loop"
+    ]
+  },
+  {
+    "id": 17,
+    "text": "Where is the LLM hosted?",
+    "type": "single",
+    "options": [
+      "Third-party cloud API",
+      "Self-hosted on internal infrastructure",
+      "Hosted by external vendor in private environment",
+      "Hybrid deployment",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "supply_chain"
+    ],
+    "mitigation_context": [
+      "vendor_assessment"
+    ]
+  },
+  {
+    "id": 18,
+    "text": "Does the system use multiple LLM models for different tasks?",
+    "type": "single",
+    "options": [
+      "No, a single model is used",
+      "Yes, different models for separate tasks",
+      "Yes, fallback or routing between models",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "model_inconsistency"
+    ],
+    "mitigation_context": [
+      "model_validation"
+    ]
+  },
+  {
+    "id": 19,
+    "text": "How are LLM prompts or system instructions managed?",
+    "type": "single",
+    "options": [
+      "Hardcoded in application logic",
+      "Stored in configuration files",
+      "Managed through database or admin panel",
+      "Dynamically generated at runtime",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "prompt_leakage"
+    ],
+    "mitigation_context": [
+      "prompt_isolation"
+    ]
+  },
+  {
+    "id": 20,
+    "text": "Can users influence system prompts or instructions indirectly?",
+    "type": "single",
+    "options": [
+      "No",
+      "Yes, through retrieved documents or memory",
+      "Yes, through tool outputs or metadata",
+      "Yes, through prompt templates or variables",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "prompt_injection"
+    ],
+    "mitigation_context": [
+      "instruction_hierarchy"
+    ]
+  },
+  {
+    "id": 21,
+    "text": "What output formats are produced by the LLM?",
+    "type": "multi",
+    "options": [
+      "Plain text only",
+      "Markdown or rich text",
+      "Structured JSON",
+      "Code or scripts",
+      "HTML or rendered content"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "output_injection"
+    ],
+    "mitigation_context": [
+      "output_validation"
+    ]
+  },
+  {
+    "id": 22,
+    "text": "Where is LLM output rendered or consumed?",
+    "type": "multi",
+    "options": [
+      "User-facing web interface",
+      "Internal admin dashboard",
+      "API response consumed by other systems",
+      "Email, messaging, or notification channel",
+      "Directly used in backend automation"
+    ],
+    "dfd_impact": [
+      "process",
+      "external_entity",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "execution_risk",
+      "unsafe_output"
+    ],
+    "mitigation_context": [
+      "context_sanitization",
+      "output_validation"
+    ]
+  },
+  {
+    "id": 23,
+    "text": "Which trust boundaries does user input cross before reaching the LLM?",
+    "type": "multi",
+    "options": [
+      "Public internet to web application",
+      "Web application to internal API",
+      "Internal API to model service",
+      "Cross-tenant or cross-user context boundary",
+      "No significant trust boundary"
+    ],
+    "dfd_impact": [
+      "trust_boundary",
+      "data_flow",
+      "process"
+    ],
+    "risk_context": [
+      "boundary_crossing",
+      "multi_tenancy_risk"
+    ],
+    "mitigation_context": [
+      "segmentation",
+      "isolation",
+      "access_control"
+    ]
+  },
+  {
+    "id": 24,
+    "text": "Which sensitive data categories are accessible to the LLM?",
+    "type": "multi",
+    "options": [
+      "Personally identifiable information (PII)",
+      "API keys or credentials",
+      "Internal operational documents",
+      "Customer support records",
+      "No sensitive data"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "data_leakage",
+      "credential_exposure"
+    ],
+    "mitigation_context": [
+      "data_classification",
+      "masking",
+      "least_privilege"
+    ]
+  },
+  {
+    "id": 25,
+    "text": "How are users authenticated before interacting with the LLM?",
+    "type": "single",
+    "options": [
+      "No authentication required",
+      "Username/password login",
+      "Single sign-on (SSO)",
+      "API keys or tokens",
+      "Internal network authentication"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "unauthorized_access"
+    ],
+    "mitigation_context": [
+      "strong_authentication",
+      "session_control"
+    ]
+  },
+  {
+    "id": 26,
+    "text": "How is authorization enforced for LLM access?",
+    "type": "single",
+    "options": [
+      "No authorization controls",
+      "Role-based access control (RBAC)",
+      "Attribute- or policy-based controls",
+      "Hardcoded application logic",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "privilege_escalation",
+      "excessive_access"
+    ],
+    "mitigation_context": [
+      "rbac",
+      "policy_enforcement",
+      "least_privilege"
+    ]
+  },
+  {
+    "id": 27,
+    "text": "Is role-based filtering applied to retrieved documents or data?",
+    "type": "single",
+    "options": [
+      "Yes, consistently enforced",
+      "Partially enforced",
+      "No filtering applied",
+      "Not applicable",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "data_exposure",
+      "retrieval_leakage"
+    ],
+    "mitigation_context": [
+      "access_filtering",
+      "document_scoping"
+    ]
+  },
+  {
+    "id": 28,
+    "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?",
+    "type": "single",
+    "options": [
+      "Yes, strongly limited",
+      "Partially limited",
+      "No, same behavior for all users",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "over_permission",
+      "unsafe_behavior"
+    ],
+    "mitigation_context": [
+      "policy_enforcement",
+      "task_scoping"
+    ]
+  },
+  {
+    "id": 29,
+    "text": "Which components expose the largest LLM-related attack surface?",
+    "type": "multi",
+    "options": [
+      "Public chat interface",
+      "RAG or document ingestion pipeline",
+      "Tool-calling or agent framework",
+      "Admin or internal operator interface",
+      "Model hosting or API integration layer"
+    ],
+    "dfd_impact": [
+      "process",
+      "external_entity",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "entry_point_risk",
+      "attack_surface"
+    ],
+    "mitigation_context": [
+      "hardening",
+      "surface_reduction",
+      "monitoring"
+    ]
+  },
+  {
+    "id": 30,
+    "text": "Are safeguards implemented against prompt injection attacks?",
+    "type": "single",
+    "options": [
+      "No safeguards",
+      "Basic input filtering only",
+      "Context isolation and instruction hierarchy controls",
+      "Prompt injection detection or scanning",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "prompt_injection"
+    ],
+    "mitigation_context": [
+      "input_filtering",
+      "isolation",
+      "prompt_scanning"
+    ]
+  },
+  {
+    "id": 31,
+    "text": "Is LLM output validated before being used by other systems?",
+    "type": "single",
+    "options": [
+      "Not validated",
+      "Manual review only",
+      "Rule-based or schema validation",
+      "Human-in-the-loop plus technical validation",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "unsafe_output",
+      "output_handling_risk"
+    ],
+    "mitigation_context": [
+      "validation",
+      "schema_enforcement",
+      "human_review"
+    ]
+  },
+  {
+    "id": 32,
+    "text": "Are safeguards implemented to prevent sensitive data leakage?",
+    "type": "single",
+    "options": [
+      "No safeguards",
+      "Basic redaction or masking",
+      "Access controls and scoped retrieval",
+      "DLP or content inspection mechanisms",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "data_store"
+    ],
+    "risk_context": [
+      "data_leakage"
+    ],
+    "mitigation_context": [
+      "dlp",
+      "masking",
+      "scoped_retrieval"
+    ]
+  },
+  {
+    "id": 33,
+    "text": "How are LLM interactions logged and monitored?",
+    "type": "single",
+    "options": [
+      "No logging or monitoring",
+      "Basic application logs only",
+      "Prompt/response logging with monitoring",
+      "Security monitoring with alerts",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "lack_of_visibility",
+      "incident_detection_gap"
+    ],
+    "mitigation_context": [
+      "monitoring",
+      "audit_logging",
+      "alerting"
+    ]
+  },
+  {
+    "id": 34,
+    "text": "Are rate limits or abuse protections applied to the LLM interface?",
+    "type": "single",
+    "options": [
+      "No protections",
+      "Basic request throttling",
+      "User/account-based rate limiting",
+      "Rate limits plus abuse/anomaly detection",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "dos",
+      "abuse"
+    ],
+    "mitigation_context": [
+      "rate_limiting",
+      "anomaly_detection"
+    ]
+  },
+  {
+    "id": 35,
+    "text": "How are external models or dependencies validated?",
+    "type": "single",
+    "options": [
+      "No validation process",
+      "Manual trust in vendor/source",
+      "Version pinning and review",
+      "Security review and supply chain controls",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "supply_chain"
+    ],
+    "mitigation_context": [
+      "dependency_review",
+      "version_pinning",
+      "security_assessment"
+    ]
+  },
+  {
+    "id": 36,
+    "text": "Are embeddings or vector databases protected against unauthorized access?",
+    "type": "single",
+    "options": [
+      "Yes, strongly protected",
+      "Partially protected",
+      "No dedicated protection",
+      "Not applicable",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "embedding_attack",
+      "retrieval_exposure"
+    ],
+    "mitigation_context": [
+      "access_control",
+      "network_isolation",
+      "encryption"
+    ]
+  },
+  {
+    "id": 37,
+    "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+    "type": "multi",
+    "options": [
+      "Prompt injection to override instructions",
+      "Sensitive data extraction",
+      "Unauthorized action triggering",
+      "Misinformation or unsafe recommendations",
+      "Denial of service or excessive usage"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "misuse",
+      "abuse_case_identification"
+    ],
+    "mitigation_context": [
+      "monitoring",
+      "policy_controls",
+      "scenario_testing"
+    ]
+  },
+  {
+    "id": 38,
+    "text": "What operational weaknesses could increase LLM-related security risks?",
+    "type": "multi",
+    "options": [
+      "Lack of security ownership",
+      "Insufficient monitoring",
+      "Poor prompt/change management",
+      "Weak access control hygiene",
+      "No incident response process for LLM misuse"
+    ],
+    "dfd_impact": [
+      "process"
+    ],
+    "risk_context": [
+      "operational_risk",
+      "governance_gap"
+    ],
+    "mitigation_context": [
+      "governance",
+      "change_management",
+      "incident_response"
+    ]
+  },
+  {
+    "id": 39,
+    "text": "Does the system rely on LLM responses for automated decision making?",
+    "type": "single",
+    "options": [
+      "No, informational use only",
+      "Yes, low-impact decisions",
+      "Yes, moderate-impact decisions",
+      "Yes, high-impact or business-critical decisions",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow"
+    ],
+    "risk_context": [
+      "overreliance",
+      "decision_risk"
+    ],
+    "mitigation_context": [
+      "human_review",
+      "decision_thresholds",
+      "fallback_controls"
+    ]
+  }
 ]
