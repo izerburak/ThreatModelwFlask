@@ -9,4 +9,5 @@ def parse_qat(filepath):
         print(f"{i+1:02d} [{indent:02d}] {line.strip()}")
 
 if __name__ == "__main__":
-    parse_qat(r"c:\Users\user\Desktop\ThreatModelwFlask\TM-Questions\QaT.txt")
+    repo_root = Path(__file__).resolve().parent
+    parse_qat(repo_root / "TM-Questions" / "QaT.txt")

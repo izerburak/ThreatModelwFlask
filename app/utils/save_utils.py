@@ -98,8 +98,8 @@ def save_adaptive_llm_sec_answers(answer_map, question_catalog):
     }
 
     os.makedirs("responses", exist_ok=True)
-    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"llmsec_adaptive_{timestamp_str}.json"
+    timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"llmsec_{timestamp_str}.json"
     filepath = os.path.join("responses", filename)
 
     with open(filepath, "w", encoding="utf-8") as f:

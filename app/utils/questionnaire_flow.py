@@ -101,33 +101,8 @@ def get_next_question(current_question_id, answers, root_path=None):
             if node['type'] == 'question':
                 return node['id']
         return None
-        
-    last_unconditional_qid = None
-    last_if_result = False
-    last_node_seen = None
-    
-    # Simulate traversal from the start to find what logically comes AFTER current_question_id
-    # We must traverse the tree and ONLY yield nodes that evaluate to TRUE.
-    # We record all TRUE nodes in a list, then find current_question_id, and return the one after it.
-    
-    valid_path = []
-    
-    for node in qat_tree:
-        if node['type'] == 'question':
-            if 'condition' not in node:
-                last_unconditional_qid = node['id']
-                valid_path.append(node['id'])
-            else:
-                if node['is_else']:
-                    res = not last_if_result
-                else:
-                    res = evaluate_condition(node['condition'], last_unconditional_qid, answers)
-                
-                if res:
-                    valid_path.append(node['id'])
-                    
-        elif node['type'] == 'condition_def':
-            last_if_result = evaluate_condition(node['condition'], last_unconditional_qid, answers)
+
+    valid_path = _build_valid_question_path(qat_tree, answers)
 
     # Now valid_path contains the exact sequence of questions the user SHOULD see
     # given their current answers.
@@ -139,6 +114,35 @@ def get_next_question(current_question_id, answers, root_path=None):
         pass
         
     return None
+
+
+def _build_valid_question_path(qat_tree, answers):
+    last_unconditional_qid = None
+    last_if_result = False
+    valid_path = []
+    seen_question_ids = set()
+
+    # Build the active questionnaire path for the current answers while ensuring
+    # that each question appears at most once in a run, even if the QaT flow
+    # references the same question ID multiple times across branches.
+    for node in qat_tree:
+        if node['type'] == 'question':
+            if 'condition' not in node:
+                last_unconditional_qid = node['id']
+                include_question = True
+            elif node['is_else']:
+                include_question = not last_if_result
+            else:
+                include_question = evaluate_condition(node['condition'], last_unconditional_qid, answers)
+
+            if include_question and node['id'] not in seen_question_ids:
+                valid_path.append(node['id'])
+                seen_question_ids.add(node['id'])
+
+        elif node['type'] == 'condition_def':
+            last_if_result = evaluate_condition(node['condition'], last_unconditional_qid, answers)
+
+    return valid_path
 
 
 def get_question_by_id(root_path, question_id):

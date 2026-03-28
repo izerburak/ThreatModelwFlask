@@ -2,10 +2,11 @@ import sys
 import importlib.util
 from pathlib import Path
 
-root_path = r"c:\Users\user\Desktop\ThreatModelwFlask\app"
+repo_root = Path(__file__).resolve().parent
+root_path = repo_root
 
 # Load module directly
-module_path = r"c:\Users\user\Desktop\ThreatModelwFlask\app\utils\questionnaire_flow.py"
+module_path = repo_root / "app" / "utils" / "questionnaire_flow.py"
 spec = importlib.util.spec_from_file_location("questionnaire_flow", module_path)
 qflow = importlib.util.module_from_spec(spec)
 sys.modules["questionnaire_flow"] = qflow
