@@ -1,0 +1,127 @@
+FLOW:
+  - Q1
+  - Q2
+
+BRANCHES:
+  - when:
+      question: Q2
+      any_of:
+        - "Anonymous public internet users"
+        - "Authenticated public users"
+    ask:
+      - Q3
+      - Q25
+      - Q26
+      - Q34
+    else_ask:
+      - Q3
+      - Q25
+      - Q26
+
+  - ask:
+      - Q4
+
+  - when:
+      question: Q4
+      equals: "Yes"
+    ask:
+      - Q24
+
+  - ask:
+      - Q5
+      - Q6
+
+  - when:
+      question: Q6
+      any_of:
+        - "User text input only"
+        - "File uploads"
+        - "Web URLs"
+        - "Email or ticket data"
+        - "Public repositories"
+    ask:
+      - Q7
+      - Q30
+    else_ask:
+      - Q7
+
+  - ask:
+      - Q8
+
+  - when:
+      question: Q8
+      not_includes: "No RAG"
+    ask:
+      - Q27
+      - Q36
+      - Q20
+      - Q32
+
+  - ask:
+      - Q9
+      - Q10
+
+  - when:
+      question: Q10
+      not_equals: "No"
+    ask:
+      - Q32
+
+  - ask:
+      - Q11
+
+  - when:
+      question: Q11
+      not_any_of:
+        - "None"
+        - "Unknown"
+    ask:
+      - Q18
+
+  - ask:
+      - Q12
+
+  - when:
+      question: Q12
+      not_includes: "None"
+    ask:
+      - Q13
+      - Q14
+      - Q15
+
+  - when:
+      question: Q15
+      any_of:
+        - "Create or update tickets/records"
+        - "Send emails or notifications"
+        - "Execute workflows or transactions"
+        - "Modify system configurations"
+    ask:
+      - Q31
+      - Q28
+      - Q16
+      - Q39
+
+  - ask:
+      - Q17
+      - Q35
+      - Q19
+      - Q20
+      - Q21
+      - Q22
+
+  - when:
+      question: Q22
+      any_of:
+        - "API response consumed by other systems"
+        - "Directly used in backend automation"
+        - "Email, messaging, or notification channel"
+    ask:
+      - Q31
+
+  - ask:
+      - Q23
+      - Q29
+      - Q33
+      - Q37
+      - Q38

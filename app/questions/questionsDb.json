@@ -947,5 +947,209 @@
       "decision_thresholds",
       "fallback_controls"
     ]
+  },
+  {
+    "id": 40,
+    "text": "Is the system single-tenant or multi-tenant?",
+    "type": "single",
+    "options": [
+      "Single-tenant system",
+      "Multi-tenant with strong isolation",
+      "Multi-tenant with weak or unclear isolation",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "trust_boundary",
+      "data_flow",
+      "data_store"
+    ],
+    "risk_context": [
+      "multi_tenancy_risk",
+      "data_leakage"
+    ],
+    "mitigation_context": [
+      "tenant_isolation",
+      "data_segmentation"
+    ]
+  },
+  {
+    "id": 41,
+    "text": "How is user identity propagated across system components (LLM, tools, retrieval)?",
+    "type": "single",
+    "options": [
+      "No identity propagation",
+      "Shared system identity only",
+      "User identity partially propagated",
+      "User identity consistently enforced end-to-end",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "authorization_gap",
+      "privilege_escalation"
+    ],
+    "mitigation_context": [
+      "identity_propagation",
+      "access_control",
+      "token_scoping"
+    ]
+  },
+  {
+    "id": 42,
+    "text": "Who can modify prompts, policies, or retrieval sources?",
+    "type": "multi",
+    "options": [
+      "No one (static configuration)",
+      "Developers only",
+      "Administrators via admin panel",
+      "Automated systems or pipelines",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_store",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "prompt_tampering",
+      "supply_chain",
+      "insider_threat"
+    ],
+    "mitigation_context": [
+      "change_control",
+      "access_control",
+      "audit_logging"
+    ]
+  },
+  {
+    "id": 43,
+    "text": "Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?",
+    "type": "single",
+    "options": [
+      "No reuse",
+      "Yes, for indexing only",
+      "Yes, for training or fine-tuning",
+      "Yes, both indexing and training",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow",
+      "process"
+    ],
+    "risk_context": [
+      "data_poisoning",
+      "privacy",
+      "data_persistence"
+    ],
+    "mitigation_context": [
+      "data_governance",
+      "consent_management",
+      "data_filtering"
+    ]
+  },
+  {
+    "id": 44,
+    "text": "Are LLM tool permissions separated by action type (read, write, admin, destructive)?",
+    "type": "single",
+    "options": [
+      "No separation of permissions",
+      "Basic separation (read vs write)",
+      "Granular permissions including admin or destructive actions",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "process",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "excessive_agency",
+      "unauthorized_actions"
+    ],
+    "mitigation_context": [
+      "least_privilege",
+      "permission_modeling"
+    ]
+  },
+  {
+    "id": 45,
+    "text": "Can the LLM access secrets, credentials, or hidden system instructions at runtime?",
+    "type": "single",
+    "options": [
+      "No access to secrets or hidden data",
+      "Access to limited non-sensitive configuration",
+      "Access to sensitive data such as API keys or credentials",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow",
+      "process"
+    ],
+    "risk_context": [
+      "credential_exposure",
+      "data_leakage",
+      "prompt_leakage"
+    ],
+    "mitigation_context": [
+      "secret_management",
+      "prompt_isolation",
+      "least_privilege"
+    ]
+  },
+  {
+    "id": 46,
+    "text": "Is conversation or memory data isolated per user, session, or tenant?",
+    "type": "single",
+    "options": [
+      "No isolation",
+      "Session-level isolation only",
+      "User-level isolation",
+      "Tenant-level isolation",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow",
+      "trust_boundary"
+    ],
+    "risk_context": [
+      "data_leakage",
+      "cross_user_exposure"
+    ],
+    "mitigation_context": [
+      "data_isolation",
+      "session_management"
+    ]
+  },
+  {
+    "id": 47,
+    "text": "Do logs or monitoring systems store full prompts, responses, or sensitive content?",
+    "type": "single",
+    "options": [
+      "No logging of LLM data",
+      "Logs contain non-sensitive metadata only",
+      "Logs contain full prompts and responses",
+      "Unknown"
+    ],
+    "dfd_impact": [
+      "data_store",
+      "data_flow"
+    ],
+    "risk_context": [
+      "data_leakage",
+      "privacy",
+      "log_exposure"
+    ],
+    "mitigation_context": [
+      "log_sanitization",
+      "access_control",
+      "data_masking"
+    ]
   }
 ]
