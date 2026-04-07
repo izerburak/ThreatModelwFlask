@@ -1,127 +1,211 @@
-FLOW:
-  - Q1
-  - Q2
+version: 1
 
-BRANCHES:
-  - when:
-      question: Q2
-      any_of:
-        - "Anonymous public internet users"
-        - "Authenticated public users"
-    ask:
-      - Q3
-      - Q25
-      - Q26
-      - Q34
-    else_ask:
-      - Q3
-      - Q25
-      - Q26
+start: Q1
 
-  - ask:
-      - Q4
+questions:
+  Q1:
+    next: Q2
 
-  - when:
-      question: Q4
-      equals: "Yes"
-    ask:
-      - Q24
+  Q2:
+    conditions:
+      - if:
+          any_of:
+            - "Anonymous public internet users"
+            - "Authenticated public users"
+        then:
+          - Q3
+          - Q25
+          - Q26
+          - Q34
+        next_after: Q4
+      - else:
+          - Q3
+          - Q25
+          - Q26
+        next_after: Q4
 
-  - ask:
-      - Q5
-      - Q6
+  Q3:
+    next: null
+  Q25:
+    next: null
+  Q26:
+    next: null
+  Q34:
+    next: null
 
-  - when:
-      question: Q6
-      any_of:
-        - "User text input only"
-        - "File uploads"
-        - "Web URLs"
-        - "Email or ticket data"
-        - "Public repositories"
-    ask:
-      - Q7
-      - Q30
-    else_ask:
-      - Q7
+  Q4:
+    conditions:
+      - if:
+          equals: "Yes"
+        then:
+          - Q24
+        next_after: Q5
+      - else:
+          - []
+        next_after: Q5
 
-  - ask:
-      - Q8
+  Q24:
+    next: null
 
-  - when:
-      question: Q8
-      not_includes: "No RAG"
-    ask:
-      - Q27
-      - Q36
-      - Q20
-      - Q32
+  Q5:
+    next: Q6
 
-  - ask:
-      - Q9
-      - Q10
+  Q6:
+    conditions:
+      - if:
+          any_of:
+            - "User text input only"
+            - "File uploads"
+            - "Web URLs"
+            - "Email or ticket data"
+            - "Public repositories"
+        then:
+          - Q7
+          - Q30
+        next_after: Q8
+      - else:
+          - Q7
+        next_after: Q8
 
-  - when:
-      question: Q10
-      not_equals: "No"
-    ask:
-      - Q32
+  Q7:
+    next: null
+  Q30:
+    next: null
 
-  - ask:
-      - Q11
+  Q8:
+    conditions:
+      - if:
+          not_includes: "No RAG"
+        then:
+          - Q27
+          - Q36
+          - Q20
+          - Q32
+        next_after: Q9
+      - else:
+          - []
+        next_after: Q9
 
-  - when:
-      question: Q11
-      not_any_of:
-        - "None"
-        - "Unknown"
-    ask:
-      - Q18
+  Q27:
+    next: null
+  Q36:
+    next: null
 
-  - ask:
-      - Q12
+  Q9:
+    next: Q10
 
-  - when:
-      question: Q12
-      not_includes: "None"
-    ask:
-      - Q13
-      - Q14
-      - Q15
+  Q10:
+    conditions:
+      - if:
+          not_equals: "No"
+        then:
+          - Q32
+        next_after: Q11
+      - else:
+          - []
+        next_after: Q11
 
-  - when:
-      question: Q15
-      any_of:
-        - "Create or update tickets/records"
-        - "Send emails or notifications"
-        - "Execute workflows or transactions"
-        - "Modify system configurations"
-    ask:
-      - Q31
-      - Q28
-      - Q16
-      - Q39
+  Q11:
+    conditions:
+      - if:
+          not_any_of:
+            - "None"
+            - "Unknown"
+        then:
+          - Q18
+        next_after: Q12
+      - else:
+          - []
+        next_after: Q12
 
-  - ask:
-      - Q17
-      - Q35
-      - Q19
-      - Q20
-      - Q21
-      - Q22
+  Q18:
+    next: null
 
-  - when:
-      question: Q22
-      any_of:
-        - "API response consumed by other systems"
-        - "Directly used in backend automation"
-        - "Email, messaging, or notification channel"
-    ask:
-      - Q31
+  Q12:
+    conditions:
+      - if:
+          not_includes: "None"
+        then:
+          - Q13
+          - Q14
+          - Q15
+        next_after: Q17
+      - else:
+          - []
+        next_after: Q17
 
-  - ask:
-      - Q23
-      - Q29
-      - Q33
-      - Q37
-      - Q38
+  Q13:
+    next: null
+  Q14:
+    next: null
+
+  Q15:
+    conditions:
+      - if:
+          any_of:
+            - "Create or update tickets/records"
+            - "Send emails or notifications"
+            - "Execute workflows or transactions"
+            - "Modify system configurations"
+        then:
+          - Q31
+          - Q28
+          - Q16
+          - Q39
+        next_after: Q17
+      - else:
+          - []
+        next_after: Q17
+
+  Q31:
+    next: null
+  Q28:
+    next: null
+  Q16:
+    next: null
+  Q39:
+    next: null
+
+  Q17:
+    next: Q35
+
+  Q35:
+    next: Q19
+
+  Q19:
+    next: Q20
+
+  Q20:
+    next: Q21
+
+  Q21:
+    next: Q22
+
+  Q22:
+    conditions:
+      - if:
+          any_of:
+            - "API response consumed by other systems"
+            - "Directly used in backend automation"
+            - "Email, messaging, or notification channel"
+        then:
+          - Q31
+        next_after: Q23
+      - else:
+          - []
+        next_after: Q23
+
+  Q23:
+    next: Q29
+
+  Q29:
+    next: Q33
+
+  Q33:
+    next: Q37
+
+  Q37:
+    next: Q38
+
+  Q38:
+    next: END
