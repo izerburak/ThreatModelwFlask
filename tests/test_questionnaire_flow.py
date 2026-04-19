@@ -3,17 +3,15 @@ import importlib.util
 from pathlib import Path
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
-MODULE_PATH = ROOT_PATH / "app" / "utils" / "questionnaire_flow.py"
-SPEC = importlib.util.spec_from_file_location("questionnaire_flow", MODULE_PATH)
-questionnaire_flow = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(questionnaire_flow)
-
-build_survey_state = questionnaire_flow.build_survey_state
-get_follow_up_questions = questionnaire_flow.get_follow_up_questions
+MODULE_PATH = ROOT_PATH / "app" / "question_flow.py"
+SPEC = importlib.util.spec_from_file_location("question_flow", MODULE_PATH)
+question_flow = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(question_flow)
 
 
 def _pending(answers):
-    return build_survey_state(answers, ROOT_PATH)["pending_question_queue"]
+    engine = question_flow.QuestionFlowEngine(ROOT_PATH)
+    return engine._build_survey_state(answers)["pending_question_ids"]
 
 
 class QuestionnaireFlowTests(unittest.TestCase):
@@ -181,12 +179,12 @@ class QuestionnaireFlowTests(unittest.TestCase):
         self.assertEqual(_pending(answers), ["Q23"])
 
     def test_follow_up_questions_for_q2_match_expected_example(self):
-        answers = {
-            "Q2": ["Anonymous public internet users"],
-        }
+        engine = question_flow.QuestionFlowEngine(ROOT_PATH)
+        answers = {"Q2": ["Anonymous public internet users"]}
+        node = engine.flow_definition["questions"]["Q2"]
 
         self.assertEqual(
-            get_follow_up_questions("Q2", answers, ROOT_PATH),
+            question_flow._get_follow_up_questions(node, answers["Q2"]),
             ["Q3", "Q25", "Q26", "Q34", "Q4"],
         )
 

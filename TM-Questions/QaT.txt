@@ -1,81 +1,211 @@
-[START]
-└── Q1. What is the primary purpose of the LLM in this system?
-    └── Q2. Who can directly interact with the LLM system?
-        ├── If "Anonymous public internet users" or "Authenticated public users" selected:
-        │   ├── Q3. Through which interfaces is the LLM accessible?
-        │   ├── Q25. How are users authenticated before interacting with the LLM?
-        │   ├── Q26. How is authorization enforced for LLM access?
-        │   └── Q34. Are rate limits or abuse protections applied to the LLM interface?
-        └── Else:
-            ├── Q3. Through which interfaces is the LLM accessible?
-            ├── Q25. How are users authenticated before interacting with the LLM?
-            └── Q26. How is authorization enforced for LLM access?
+version: 1
 
-                └── Q4. Does the LLM process sensitive or business-critical data?
-                    ├── If "Yes":
-                    │   └── Q24. Which sensitive data categories are accessible to the LLM?
-                    └── If "No" or "Unknown":
-                        └── (Continue)
+start: Q1
 
-                            └── Q5. What are the primary sources of input data for the LLM?
-                                └── Q6. What types of external or untrusted content can be ingested by the LLM?
-                                    ├── If any untrusted/external content exists:
-                                    │   ├── Q7. What processing steps occur before user input reaches the LLM?
-                                    │   └── Q30. Are safeguards implemented against prompt injection attacks?
-                                    └── Else:
-                                        └── (Skip Q30, continue)
+questions:
+  Q1:
+    next: Q2
 
-                                            └── Q8. Which data sources are connected to the LLM via retrieval or RAG mechanisms?
-                                                ├── If any RAG/retrieval source selected:
-                                                │   ├── Q27. Is role-based filtering applied to retrieved documents or data?
-                                                │   ├── Q36. Are embeddings or vector databases protected against unauthorized access?
-                                                │   ├── Q20. Can users influence system prompts or instructions indirectly?
-                                                │   └── Q32. Are safeguards implemented to prevent sensitive data leakage?
-                                                └── If "No retrieval or RAG used":
-                                                    └── (Skip Q27 and Q36, continue)
+  Q2:
+    conditions:
+      - if:
+          any_of:
+            - "Anonymous public internet users"
+            - "Authenticated public users"
+        then:
+          - Q3
+          - Q25
+          - Q26
+          - Q34
+        next_after: Q4
+      - else:
+          - Q3
+          - Q25
+          - Q26
+        next_after: Q4
 
-                                                        └── Q9. Which internal services are allowed to call the LLM?
-                                                            └── Q10. Does the system store conversation history or memory for the LLM?
-                                                                ├── If memory is session, per-user, or global:
-                                                                │   └── Q32. Are safeguards implemented to prevent sensitive data leakage?
-                                                                └── If no persistent storage / unknown:
-                                                                    └── (Continue)
+  Q3:
+    next: null
+  Q25:
+    next: null
+  Q26:
+    next: null
+  Q34:
+    next: null
 
-                                                                        └── Q11. Is there an orchestration layer coordinating LLM interactions?
-                                                                            ├── If orchestration/agent/routing exists:
-                                                                            │   └── Q18. Does the system use multiple LLM models for different tasks?
-                                                                            └── Else:
-                                                                                └── (Skip Q18, continue)
+  Q4:
+    conditions:
+      - if:
+          equals: "Yes"
+        then:
+          - Q24
+        next_after: Q5
+      - else:
+          - []
+        next_after: Q5
 
-                                                                                    └── Q12. Does the LLM have access to internal services or tools?
-                                                                                        ├── If "No tool access" only:
-                                                                                        │   └── Go to Q17
-                                                                                        └── Else:
-                                                                                            ├── Q13. Which data storage systems are accessible to the LLM pipeline?
-                                                                                            ├── Q14. Can the LLM initiate calls to external services or APIs?
-                                                                                            └── Q15. What types of actions can the LLM trigger or influence?
-                                                                                                ├── If only "Generate text responses only":
-                                                                                                │   └── Go to Q17
-                                                                                                └── If any action beyond text generation exists:
-                                                                                                    ├── Q31. Is LLM output validated before being used by other systems?
-                                                                                                    ├── Q28. Is the LLM's behavior limited by user role, data scope, or task permissions?
-                                                                                                    ├── Q16. Can the LLM affect real-world state or business processes without human approval?
-                                                                                                    └── Q39. Does the system rely on LLM responses for automated decision making?
+  Q24:
+    next: null
 
-                                                                                                        └── Q17. Where is the LLM hosted?
-                                                                                                            └── Q35. How are external models or dependencies validated?
-                                                                                                                └── Q19. How are LLM prompts or system instructions managed?
-                                                                                                                    └── Q20. Can users influence system prompts or instructions indirectly?
-                                                                                                                        └── Q21. What output formats are produced by the LLM?
-                                                                                                                            └── Q22. Where is LLM output rendered or consumed?
-                                                                                                                                ├── If output is shown to users or rendered in downstream systems:
-                                                                                                                                │   └── Q31. Is LLM output validated before being used by other systems?
-                                                                                                                                └── Else:
-                                                                                                                                    └── (Continue)
+  Q5:
+    next: Q6
 
-                                                                                                                                        └── Q23. Which trust boundaries does user input cross before reaching the LLM?
-                                                                                                                                            └── Q29. Which components expose the largest LLM-related attack surface?
-                                                                                                                                                └── Q33. How are LLM interactions logged and monitored?
-                                                                                                                                                    └── Q37. Which misuse scenarios are most plausible for this LLM deployment?
-                                                                                                                                                        └── Q38. What operational weaknesses could increase LLM-related security risks?
-                                                                                                                                                            └── [END]
+  Q6:
+    conditions:
+      - if:
+          any_of:
+            - "User text input only"
+            - "File uploads"
+            - "Web URLs"
+            - "Email or ticket data"
+            - "Public repositories"
+        then:
+          - Q7
+          - Q30
+        next_after: Q8
+      - else:
+          - Q7
+        next_after: Q8
+
+  Q7:
+    next: null
+  Q30:
+    next: null
+
+  Q8:
+    conditions:
+      - if:
+          not_includes: "No RAG"
+        then:
+          - Q27
+          - Q36
+          - Q20
+          - Q32
+        next_after: Q9
+      - else:
+          - []
+        next_after: Q9
+
+  Q27:
+    next: null
+  Q36:
+    next: null
+
+  Q9:
+    next: Q10
+
+  Q10:
+    conditions:
+      - if:
+          not_equals: "No"
+        then:
+          - Q32
+        next_after: Q11
+      - else:
+          - []
+        next_after: Q11
+
+  Q11:
+    conditions:
+      - if:
+          not_any_of:
+            - "None"
+            - "Unknown"
+        then:
+          - Q18
+        next_after: Q12
+      - else:
+          - []
+        next_after: Q12
+
+  Q18:
+    next: null
+
+  Q12:
+    conditions:
+      - if:
+          not_includes: "None"
+        then:
+          - Q13
+          - Q14
+          - Q15
+        next_after: Q17
+      - else:
+          - []
+        next_after: Q17
+
+  Q13:
+    next: null
+  Q14:
+    next: null
+
+  Q15:
+    conditions:
+      - if:
+          any_of:
+            - "Create or update tickets/records"
+            - "Send emails or notifications"
+            - "Execute workflows or transactions"
+            - "Modify system configurations"
+        then:
+          - Q31
+          - Q28
+          - Q16
+          - Q39
+        next_after: Q17
+      - else:
+          - []
+        next_after: Q17
+
+  Q31:
+    next: null
+  Q28:
+    next: null
+  Q16:
+    next: null
+  Q39:
+    next: null
+
+  Q17:
+    next: Q35
+
+  Q35:
+    next: Q19
+
+  Q19:
+    next: Q20
+
+  Q20:
+    next: Q21
+
+  Q21:
+    next: Q22
+
+  Q22:
+    conditions:
+      - if:
+          any_of:
+            - "API response consumed by other systems"
+            - "Directly used in backend automation"
+            - "Email, messaging, or notification channel"
+        then:
+          - Q31
+        next_after: Q23
+      - else:
+          - []
+        next_after: Q23
+
+  Q23:
+    next: Q29
+
+  Q29:
+    next: Q33
+
+  Q33:
+    next: Q37
+
+  Q37:
+    next: Q38
+
+  Q38:
+    next: END
