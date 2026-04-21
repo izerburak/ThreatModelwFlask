@@ -11,17 +11,9 @@
       "Agent or workflow automation component",
       "Experimental or research feature"
     ],
-    "dfd_impact": [
-      "process"
-    ],
-    "risk_context": [
-      "misuse",
-      "overreliance"
-    ],
-    "mitigation_context": [
-      "use_case_definition",
-      "scope_limitation"
-    ]
+    "owasp_llm": ["LLM09"],
+    "severity_weight": 2,
+    "confidence_weight": 4
   },
   {
     "id": 2,
@@ -34,21 +26,9 @@
       "Administrators only",
       "Local system processes only"
     ],
-    "dfd_impact": [
-      "actor",
-      "trust_boundary",
-      "data_flow"
-    ],
-    "risk_context": [
-      "attack_surface",
-      "prompt_injection",
-      "unauthorized_access"
-    ],
-    "mitigation_context": [
-      "authentication",
-      "rate_limiting",
-      "input_validation"
-    ]
+    "owasp_llm": ["LLM01", "LLM10"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 3,
@@ -61,43 +41,18 @@
       "CLI or local scripts",
       "Third-party integration"
     ],
-    "dfd_impact": [
-      "process",
-      "external_entity",
-      "data_flow"
-    ],
-    "risk_context": [
-      "api_exposure",
-      "integration_risk"
-    ],
-    "mitigation_context": [
-      "api_gateway",
-      "authentication",
-      "input_validation"
-    ]
+    "owasp_llm": ["LLM01", "LLM10"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 4,
     "text": "Does the LLM process sensitive or business-critical data?",
     "type": "single",
-    "options": [
-      "Yes",
-      "No",
-      "Unknown"
-    ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "data_leakage",
-      "privacy"
-    ],
-    "mitigation_context": [
-      "data_masking",
-      "access_control",
-      "encryption"
-    ]
+    "options": ["Yes", "No", "Unknown"],
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 5,
@@ -110,19 +65,9 @@
       "External web content",
       "API or database records"
     ],
-    "dfd_impact": [
-      "external_entity",
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "untrusted_input",
-      "data_poisoning"
-    ],
-    "mitigation_context": [
-      "input_validation",
-      "source_validation"
-    ]
+    "owasp_llm": ["LLM01", "LLM04"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 6,
@@ -135,18 +80,9 @@
       "Email or ticket data",
       "Public repositories"
     ],
-    "dfd_impact": [
-      "external_entity",
-      "data_flow"
-    ],
-    "risk_context": [
-      "prompt_injection",
-      "malicious_content"
-    ],
-    "mitigation_context": [
-      "content_filtering",
-      "sandboxing"
-    ]
+    "owasp_llm": ["LLM01", "LLM04"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 7,
@@ -159,17 +95,9 @@
       "RAG augmentation",
       "Routing/classification"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "insufficient_filtering"
-    ],
-    "mitigation_context": [
-      "input_sanitization",
-      "validation"
-    ]
+    "owasp_llm": ["LLM01"],
+    "severity_weight": 4,
+    "confidence_weight": 4
   },
   {
     "id": 8,
@@ -182,20 +110,9 @@
       "Source code",
       "No RAG"
     ],
-    "dfd_impact": [
-      "data_store",
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "data_leakage",
-      "vector_poisoning"
-    ],
-    "mitigation_context": [
-      "access_control",
-      "embedding_security"
-    ]
+    "owasp_llm": ["LLM02", "LLM04", "LLM08"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 9,
@@ -208,18 +125,9 @@
       "Monitoring service",
       "None"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "privilege_escalation"
-    ],
-    "mitigation_context": [
-      "service_auth",
-      "network_segmentation"
-    ]
+    "owasp_llm": ["LLM06"],
+    "severity_weight": 4,
+    "confidence_weight": 4
   },
   {
     "id": 10,
@@ -232,115 +140,45 @@
       "Global",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "data_retention",
-      "privacy"
-    ],
-    "mitigation_context": [
-      "data_minimization",
-      "encryption"
-    ]
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 11,
     "text": "Is there an orchestration layer?",
     "type": "single",
-    "options": [
-      "None",
-      "Basic logic",
-      "Framework",
-      "Agent workflow",
-      "Unknown"
-    ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "complexity_risk"
-    ],
-    "mitigation_context": [
-      "control_flow_validation"
-    ]
+    "options": ["None", "Basic logic", "Framework", "Agent workflow", "Unknown"],
+    "owasp_llm": ["LLM06"],
+    "severity_weight": 3,
+    "confidence_weight": 4
   },
   {
     "id": 12,
     "text": "Does the LLM have access to tools?",
     "type": "multi",
-    "options": [
-      "Search",
-      "Database",
-      "Internal APIs",
-      "Admin tools",
-      "None"
-    ],
-    "dfd_impact": [
-      "process",
-      "data_store",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "excessive_agency",
-      "data_exfiltration"
-    ],
-    "mitigation_context": [
-      "least_privilege",
-      "tool_sandboxing",
-      "audit_logging"
-    ]
+    "options": ["Search", "Database", "Internal APIs", "Admin tools", "None"],
+    "owasp_llm": ["LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 13,
     "text": "Which storage systems are accessible?",
     "type": "multi",
-    "options": [
-      "Vector DB",
-      "SQL/NoSQL",
-      "File storage",
-      "Cloud storage",
-      "None"
-    ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "data_exposure"
-    ],
-    "mitigation_context": [
-      "access_control",
-      "encryption"
-    ]
+    "options": ["Vector DB", "SQL/NoSQL", "File storage", "Cloud storage", "None"],
+    "owasp_llm": ["LLM02", "LLM08"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 14,
     "text": "Can the LLM call external APIs?",
     "type": "single",
-    "options": [
-      "No",
-      "Directly",
-      "Via backend",
-      "Unknown"
-    ],
-    "dfd_impact": [
-      "external_entity",
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "data_exfiltration"
-    ],
-    "mitigation_context": [
-      "api_control",
-      "egress_filtering"
-    ]
+    "options": ["No", "Directly", "Via backend", "Unknown"],
+    "owasp_llm": ["LLM06"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 15,
@@ -353,18 +191,9 @@
       "Execute workflows or transactions",
       "Modify system configurations"
     ],
-    "dfd_impact": [
-      "process",
-      "external_entity",
-      "data_flow"
-    ],
-    "risk_context": [
-      "unauthorized_actions"
-    ],
-    "mitigation_context": [
-      "approval_flow",
-      "logging"
-    ]
+    "owasp_llm": ["LLM05", "LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 16,
@@ -376,16 +205,9 @@
       "Yes, in business-critical actions",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "excessive_agency"
-    ],
-    "mitigation_context": [
-      "human_in_the_loop"
-    ]
+    "owasp_llm": ["LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 17,
@@ -398,16 +220,9 @@
       "Hybrid deployment",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "supply_chain"
-    ],
-    "mitigation_context": [
-      "vendor_assessment"
-    ]
+    "owasp_llm": ["LLM03"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 18,
@@ -419,16 +234,9 @@
       "Yes, fallback or routing between models",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "model_inconsistency"
-    ],
-    "mitigation_context": [
-      "model_validation"
-    ]
+    "owasp_llm": ["LLM03", "LLM09"],
+    "severity_weight": 3,
+    "confidence_weight": 3
   },
   {
     "id": 19,
@@ -441,17 +249,9 @@
       "Dynamically generated at runtime",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "prompt_leakage"
-    ],
-    "mitigation_context": [
-      "prompt_isolation"
-    ]
+    "owasp_llm": ["LLM07"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 20,
@@ -464,17 +264,9 @@
       "Yes, through prompt templates or variables",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "prompt_injection"
-    ],
-    "mitigation_context": [
-      "instruction_hierarchy"
-    ]
+    "owasp_llm": ["LLM01", "LLM07"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 21,
@@ -487,16 +279,9 @@
       "Code or scripts",
       "HTML or rendered content"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "output_injection"
-    ],
-    "mitigation_context": [
-      "output_validation"
-    ]
+    "owasp_llm": ["LLM05"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 22,
@@ -509,20 +294,9 @@
       "Email, messaging, or notification channel",
       "Directly used in backend automation"
     ],
-    "dfd_impact": [
-      "process",
-      "external_entity",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "execution_risk",
-      "unsafe_output"
-    ],
-    "mitigation_context": [
-      "context_sanitization",
-      "output_validation"
-    ]
+    "owasp_llm": ["LLM05", "LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 23,
@@ -535,20 +309,9 @@
       "Cross-tenant or cross-user context boundary",
       "No significant trust boundary"
     ],
-    "dfd_impact": [
-      "trust_boundary",
-      "data_flow",
-      "process"
-    ],
-    "risk_context": [
-      "boundary_crossing",
-      "multi_tenancy_risk"
-    ],
-    "mitigation_context": [
-      "segmentation",
-      "isolation",
-      "access_control"
-    ]
+    "owasp_llm": ["LLM01", "LLM02"],
+    "severity_weight": 4,
+    "confidence_weight": 4
   },
   {
     "id": 24,
@@ -561,19 +324,9 @@
       "Customer support records",
       "No sensitive data"
     ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "data_leakage",
-      "credential_exposure"
-    ],
-    "mitigation_context": [
-      "data_classification",
-      "masking",
-      "least_privilege"
-    ]
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 25,
@@ -586,18 +339,9 @@
       "API keys or tokens",
       "Internal network authentication"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "unauthorized_access"
-    ],
-    "mitigation_context": [
-      "strong_authentication",
-      "session_control"
-    ]
+    "owasp_llm": ["LLM10"],
+    "severity_weight": 4,
+    "confidence_weight": 4
   },
   {
     "id": 26,
@@ -610,20 +354,9 @@
       "Hardcoded application logic",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "privilege_escalation",
-      "excessive_access"
-    ],
-    "mitigation_context": [
-      "rbac",
-      "policy_enforcement",
-      "least_privilege"
-    ]
+    "owasp_llm": ["LLM02", "LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 27,
@@ -636,19 +369,9 @@
       "Not applicable",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "data_exposure",
-      "retrieval_leakage"
-    ],
-    "mitigation_context": [
-      "access_filtering",
-      "document_scoping"
-    ]
+    "owasp_llm": ["LLM02", "LLM08"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 28,
@@ -660,19 +383,9 @@
       "No, same behavior for all users",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "over_permission",
-      "unsafe_behavior"
-    ],
-    "mitigation_context": [
-      "policy_enforcement",
-      "task_scoping"
-    ]
+    "owasp_llm": ["LLM02", "LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 29,
@@ -685,21 +398,9 @@
       "Admin or internal operator interface",
       "Model hosting or API integration layer"
     ],
-    "dfd_impact": [
-      "process",
-      "external_entity",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "entry_point_risk",
-      "attack_surface"
-    ],
-    "mitigation_context": [
-      "hardening",
-      "surface_reduction",
-      "monitoring"
-    ]
+    "owasp_llm": ["LLM01", "LLM06", "LLM08", "LLM10"],
+    "severity_weight": 5,
+    "confidence_weight": 4
   },
   {
     "id": 30,
@@ -712,18 +413,9 @@
       "Prompt injection detection or scanning",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "prompt_injection"
-    ],
-    "mitigation_context": [
-      "input_filtering",
-      "isolation",
-      "prompt_scanning"
-    ]
+    "owasp_llm": ["LLM01"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 31,
@@ -736,19 +428,9 @@
       "Human-in-the-loop plus technical validation",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "unsafe_output",
-      "output_handling_risk"
-    ],
-    "mitigation_context": [
-      "validation",
-      "schema_enforcement",
-      "human_review"
-    ]
+    "owasp_llm": ["LLM05"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 32,
@@ -761,19 +443,9 @@
       "DLP or content inspection mechanisms",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "data_store"
-    ],
-    "risk_context": [
-      "data_leakage"
-    ],
-    "mitigation_context": [
-      "dlp",
-      "masking",
-      "scoped_retrieval"
-    ]
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 33,
@@ -786,20 +458,9 @@
       "Security monitoring with alerts",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "lack_of_visibility",
-      "incident_detection_gap"
-    ],
-    "mitigation_context": [
-      "monitoring",
-      "audit_logging",
-      "alerting"
-    ]
+    "owasp_llm": [],
+    "severity_weight": 3,
+    "confidence_weight": 3
   },
   {
     "id": 34,
@@ -812,18 +473,9 @@
       "Rate limits plus abuse/anomaly detection",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "dos",
-      "abuse"
-    ],
-    "mitigation_context": [
-      "rate_limiting",
-      "anomaly_detection"
-    ]
+    "owasp_llm": ["LLM10"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 35,
@@ -836,18 +488,9 @@
       "Security review and supply chain controls",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "supply_chain"
-    ],
-    "mitigation_context": [
-      "dependency_review",
-      "version_pinning",
-      "security_assessment"
-    ]
+    "owasp_llm": ["LLM03"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 36,
@@ -860,19 +503,9 @@
       "Not applicable",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "embedding_attack",
-      "retrieval_exposure"
-    ],
-    "mitigation_context": [
-      "access_control",
-      "network_isolation",
-      "encryption"
-    ]
+    "owasp_llm": ["LLM08"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 37,
@@ -885,19 +518,9 @@
       "Misinformation or unsafe recommendations",
       "Denial of service or excessive usage"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "misuse",
-      "abuse_case_identification"
-    ],
-    "mitigation_context": [
-      "monitoring",
-      "policy_controls",
-      "scenario_testing"
-    ]
+    "owasp_llm": ["LLM01", "LLM02", "LLM06", "LLM09", "LLM10"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 38,
@@ -910,18 +533,9 @@
       "Weak access control hygiene",
       "No incident response process for LLM misuse"
     ],
-    "dfd_impact": [
-      "process"
-    ],
-    "risk_context": [
-      "operational_risk",
-      "governance_gap"
-    ],
-    "mitigation_context": [
-      "governance",
-      "change_management",
-      "incident_response"
-    ]
+    "owasp_llm": [],
+    "severity_weight": 3,
+    "confidence_weight": 3
   },
   {
     "id": 39,
@@ -934,19 +548,9 @@
       "Yes, high-impact or business-critical decisions",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow"
-    ],
-    "risk_context": [
-      "overreliance",
-      "decision_risk"
-    ],
-    "mitigation_context": [
-      "human_review",
-      "decision_thresholds",
-      "fallback_controls"
-    ]
+    "owasp_llm": ["LLM09"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 40,
@@ -958,19 +562,9 @@
       "Multi-tenant with weak or unclear isolation",
       "Unknown"
     ],
-    "dfd_impact": [
-      "trust_boundary",
-      "data_flow",
-      "data_store"
-    ],
-    "risk_context": [
-      "multi_tenancy_risk",
-      "data_leakage"
-    ],
-    "mitigation_context": [
-      "tenant_isolation",
-      "data_segmentation"
-    ]
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 4
   },
   {
     "id": 41,
@@ -983,20 +577,9 @@
       "User identity consistently enforced end-to-end",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "authorization_gap",
-      "privilege_escalation"
-    ],
-    "mitigation_context": [
-      "identity_propagation",
-      "access_control",
-      "token_scoping"
-    ]
+    "owasp_llm": ["LLM06", "LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 42,
@@ -1009,21 +592,9 @@
       "Automated systems or pipelines",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_store",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "prompt_tampering",
-      "supply_chain",
-      "insider_threat"
-    ],
-    "mitigation_context": [
-      "change_control",
-      "access_control",
-      "audit_logging"
-    ]
+    "owasp_llm": ["LLM03", "LLM07"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   },
   {
     "id": 43,
@@ -1036,21 +607,9 @@
       "Yes, both indexing and training",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow",
-      "process"
-    ],
-    "risk_context": [
-      "data_poisoning",
-      "privacy",
-      "data_persistence"
-    ],
-    "mitigation_context": [
-      "data_governance",
-      "consent_management",
-      "data_filtering"
-    ]
+    "owasp_llm": ["LLM04", "LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 44,
@@ -1062,19 +621,9 @@
       "Granular permissions including admin or destructive actions",
       "Unknown"
     ],
-    "dfd_impact": [
-      "process",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "excessive_agency",
-      "unauthorized_actions"
-    ],
-    "mitigation_context": [
-      "least_privilege",
-      "permission_modeling"
-    ]
+    "owasp_llm": ["LLM06"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 45,
@@ -1086,21 +635,9 @@
       "Access to sensitive data such as API keys or credentials",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow",
-      "process"
-    ],
-    "risk_context": [
-      "credential_exposure",
-      "data_leakage",
-      "prompt_leakage"
-    ],
-    "mitigation_context": [
-      "secret_management",
-      "prompt_isolation",
-      "least_privilege"
-    ]
+    "owasp_llm": ["LLM02", "LLM07"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 46,
@@ -1113,19 +650,9 @@
       "Tenant-level isolation",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow",
-      "trust_boundary"
-    ],
-    "risk_context": [
-      "data_leakage",
-      "cross_user_exposure"
-    ],
-    "mitigation_context": [
-      "data_isolation",
-      "session_management"
-    ]
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 5,
+    "confidence_weight": 5
   },
   {
     "id": 47,
@@ -1137,19 +664,8 @@
       "Logs contain full prompts and responses",
       "Unknown"
     ],
-    "dfd_impact": [
-      "data_store",
-      "data_flow"
-    ],
-    "risk_context": [
-      "data_leakage",
-      "privacy",
-      "log_exposure"
-    ],
-    "mitigation_context": [
-      "log_sanitization",
-      "access_control",
-      "data_masking"
-    ]
+    "owasp_llm": ["LLM02"],
+    "severity_weight": 4,
+    "confidence_weight": 5
   }
 ]
