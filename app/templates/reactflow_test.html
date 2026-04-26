@@ -1,0 +1,279 @@
+{% extends "layout.html" %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css">
+<style>
+    .lab-shell {
+        padding: 1.25rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 24px;
+        min-height: calc(100vh - 150px);
+        display: flex;
+        flex-direction: column;
+        background:
+            radial-gradient(circle at top left, rgba(14, 165, 233, 0.12), transparent 22%),
+            radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.08), transparent 24%),
+            linear-gradient(180deg, rgba(8, 15, 30, 0.98), rgba(15, 23, 42, 0.94));
+        box-shadow: 0 28px 70px rgba(2, 6, 23, 0.35);
+    }
+
+    .lab-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .lab-kicker {
+        display: inline-block;
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #7dd3fc;
+    }
+
+    .lab-title {
+        margin-top: 0.7rem;
+        margin-bottom: 0.4rem;
+        font-size: clamp(2rem, 3vw, 2.8rem);
+        line-height: 1.02;
+    }
+
+    .lab-subtitle {
+        max-width: 720px;
+        color: #94a3b8;
+        margin-bottom: 0;
+    }
+
+    .lab-badge {
+        padding: 0.7rem 0.95rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.65);
+        color: #cbd5e1;
+        font-size: 0.88rem;
+        white-space: nowrap;
+    }
+
+    .lab-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.1rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 20px;
+        background: rgba(15, 23, 42, 0.7);
+    }
+
+    .lab-toolbar-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .lab-toolbar-copy {
+        color: #94a3b8;
+        font-size: 0.93rem;
+    }
+
+    .lab-grid {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr) 320px;
+        gap: 1rem;
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .lab-panel,
+    .lab-canvas {
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.86));
+        box-shadow: 0 18px 42px rgba(2, 6, 23, 0.22);
+        min-height: 0;
+    }
+
+    .lab-panel {
+        padding: 1rem;
+    }
+
+    .palette-panel {
+        display: flex;
+        flex-direction: column;
+        align-self: start;
+    }
+
+    .palette-scroll {
+        max-height: calc(100vh - 330px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 0.35rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(96, 165, 250, 0.55) rgba(15, 23, 42, 0.35);
+    }
+
+    .palette-scroll::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .palette-scroll::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.35);
+        border-radius: 999px;
+    }
+
+    .palette-scroll::-webkit-scrollbar-thumb {
+        background: rgba(96, 165, 250, 0.55);
+        border-radius: 999px;
+        border: 2px solid rgba(15, 23, 42, 0.35);
+    }
+
+    .lab-panel h5 {
+        margin-bottom: 0.8rem;
+    }
+
+    .lab-panel-copy,
+    .lab-status {
+        color: #94a3b8;
+        font-size: 0.93rem;
+    }
+
+    .lab-status {
+        line-height: 1.45;
+    }
+
+    .extract-panel {
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .extract-panel textarea {
+        min-height: 180px;
+        resize: vertical;
+    }
+
+    .extract-message {
+        margin-top: 0.75rem;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        line-height: 1.45;
+    }
+
+    .extract-message.error {
+        color: #fecaca;
+    }
+
+    .palette-item {
+        padding: 0.95rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.72);
+        cursor: grab;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .palette-item + .palette-item {
+        margin-top: 0.75rem;
+    }
+
+    .palette-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(96, 165, 250, 0.48);
+        background: rgba(20, 30, 52, 0.84);
+    }
+
+    .palette-item strong {
+        display: block;
+        color: #f8fafc;
+    }
+
+    .palette-item small {
+        color: #94a3b8;
+    }
+
+    .palette-actions {
+        display: grid;
+        gap: 0.7rem;
+        margin-top: 1rem;
+    }
+
+    .canvas-wrapper {
+        height: 100%;
+        min-height: 0;
+        border-radius: 20px;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top, rgba(59, 130, 246, 0.14), transparent 30%),
+            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(10, 15, 28, 0.98));
+    }
+
+    .react-flow__controls,
+    .react-flow__minimap {
+        background: rgba(8, 15, 30, 0.94);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .react-flow__attribution {
+        background: transparent;
+        color: #64748b;
+    }
+
+    @media (max-width: 1199px) {
+        .lab-grid {
+            grid-template-columns: 1fr;
+            height: auto;
+            overflow: visible;
+        }
+
+        .canvas-wrapper {
+            min-height: 640px;
+        }
+
+        .palette-panel {
+            height: auto;
+        }
+
+        .palette-scroll {
+            height: auto;
+            max-height: 420px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .lab-hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+{% block content_container_class %}container-fluid px-3 px-xl-4{% endblock %}
+{% block content %}
+<div class="lab-shell">
+    <div class="lab-hero">
+        <div>
+            <span class="lab-kicker">Sandbox Editor</span>
+            <h1 class="lab-title">React Flow Lab</h1>
+            <p class="lab-subtitle">
+                A standalone testing page for manual DFD interaction experiments before wiring any extraction or LLM pipeline.
+            </p>
+        </div>
+        <div class="lab-badge">localStorage key: <code>reactflow_test_graph</code></div>
+    </div>
+
+    <div id="reactflow-test-root"></div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js" crossorigin></script>
+<script src="{{ url_for('static', filename='js/reactflow_test.js') }}"></script>
+{% endblock %}

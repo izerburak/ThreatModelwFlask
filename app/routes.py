@@ -3,6 +3,7 @@ from pathlib import Path
 
 from flask import (
     Blueprint,
+    Response,
     abort,
     current_app,
     flash,
@@ -15,6 +16,16 @@ from flask import (
 )
 
 from app.question_flow import clear_question_flow_caches, get_question_flow_engine
+from app.services.dfd_service import (
+    export_diagram_as_mermaid,
+    export_diagram_as_plantuml,
+    list_response_files,
+    load_model_record,
+    load_response_payload,
+    save_model_record,
+)
+from app.services.llm_generator import build_mock_dfd_payload
+from app.services.extract_to_reactflow import extract_to_reactflow
 from app.utils.save_utils import (
     append_question_to_layer,
     save_adaptive_llm_sec_answers,
@@ -61,27 +72,129 @@ def add_question():
     return render_template("add_question.html", active_tab="add")
 
 
-@main.route("/dfd", methods=["GET", "POST"])
+@main.route("/dfd")
 def dfd():
-    responses_dir = Path(current_app.root_path).parent / "responses"
-    response_files = []
-
-    if responses_dir.exists():
-        response_files = sorted([f.name for f in responses_dir.glob("*.json")])
-
-    if request.method == "POST":
-        selected_file = request.form.get("response_file")
-        return render_template(
-            "dfd.html",
-            active_tab="dfd",
-            response_files=response_files,
-            selected_file=selected_file,
-        )
-
     return render_template(
         "dfd.html",
         active_tab="dfd",
-        response_files=response_files,
+        response_files=list_response_files(current_app.root_path),
+    )
+
+
+@main.route("/dfd/editor/<model_id>")
+def dfd_editor(model_id):
+    model_record = load_model_record(current_app.root_path, model_id)
+    if model_record is None:
+        abort(404, description="Threat model not found.")
+
+    editor_script_path = Path(current_app.root_path) / "static" / "js" / "dfd_editor.js"
+    editor_asset_version = int(editor_script_path.stat().st_mtime) if editor_script_path.exists() else 1
+
+    return render_template(
+        "dfd_editor.html",
+        active_tab="dfd",
+        model_id=model_id,
+        model_record=model_record,
+        editor_asset_version=editor_asset_version,
+    )
+
+
+@main.route("/reactflow-test")
+def reactflow_test():
+    return render_template(
+        "reactflow_test.html",
+        active_tab="reactflow_test",
+    )
+
+
+@main.route("/api/reactflow/from-extract", methods=["POST"])
+def reactflow_from_extract():
+    payload = request.get_json(silent=True) or {}
+    graph = extract_to_reactflow(payload)
+    return jsonify(graph)
+
+
+@main.route("/api/generate-dfd", methods=["POST"])
+def generate_dfd():
+    payload = request.get_json(silent=True) or request.form.to_dict(flat=False)
+    normalized_payload = _normalize_generation_payload(payload)
+
+    response_file = normalized_payload.get("response_file")
+    if not response_file:
+        return jsonify({"success": False, "error": "A survey response file is required."}), 400
+
+    try:
+        response_payload = load_response_payload(current_app.root_path, response_file)
+        model_record = build_mock_dfd_payload(normalized_payload, response_payload, response_file)
+        save_model_record(current_app.root_path, model_record["model_id"], model_record)
+    except FileNotFoundError:
+        return jsonify({"success": False, "error": "Selected response file was not found."}), 404
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+
+    return jsonify(
+        {
+            "success": True,
+            "model_id": model_record["model_id"],
+            "redirect_url": url_for("main.dfd_editor", model_id=model_record["model_id"]),
+        }
+    )
+
+
+@main.route("/api/save-model/<model_id>", methods=["POST"])
+def save_dfd_model(model_id):
+    model_record = load_model_record(current_app.root_path, model_id)
+    if model_record is None:
+        return jsonify({"success": False, "error": "Threat model not found."}), 404
+
+    payload = request.get_json(silent=True) or {}
+    diagram = payload.get("diagram")
+    if not isinstance(diagram, dict):
+        return jsonify({"success": False, "error": "Diagram payload is required."}), 400
+
+    model_record["diagram"] = diagram
+    model_record["last_saved_at"] = payload.get("saved_at")
+    save_model_record(current_app.root_path, model_id, model_record)
+
+    return jsonify({"success": True, "model_id": model_id})
+
+
+@main.route("/api/export/json/<model_id>")
+def export_dfd_json(model_id):
+    model_record = load_model_record(current_app.root_path, model_id)
+    if model_record is None:
+        abort(404, description="Threat model not found.")
+
+    return Response(
+        json.dumps(model_record["diagram"], indent=2),
+        mimetype="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{model_id}.json"'},
+    )
+
+
+@main.route("/api/export/mermaid/<model_id>")
+def export_dfd_mermaid(model_id):
+    model_record = load_model_record(current_app.root_path, model_id)
+    if model_record is None:
+        abort(404, description="Threat model not found.")
+
+    return Response(
+        export_diagram_as_mermaid(model_record["diagram"]),
+        mimetype="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="{model_id}.mmd"'},
+    )
+
+
+@main.route("/api/export/plantuml/<model_id>")
+def export_dfd_plantuml(model_id):
+    model_record = load_model_record(current_app.root_path, model_id)
+    if model_record is None:
+        abort(404, description="Threat model not found.")
+
+    return Response(
+        export_diagram_as_plantuml(model_record["diagram"]),
+        mimetype="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="{model_id}.puml"'},
     )
 
 
@@ -249,3 +362,30 @@ def _truncate_history_after(history, current_flow_id):
 
     current_index = history.index(current_flow_id)
     del history[current_index + 1:]
+
+
+def _normalize_generation_payload(payload):
+    normalized = {}
+
+    if isinstance(payload, dict):
+        for key, value in payload.items():
+            if isinstance(value, list):
+                normalized[key] = value if len(value) > 1 else value[0]
+            else:
+                normalized[key] = value
+
+    option_keys = {
+        "include_trust_boundaries",
+        "include_risk_tags",
+        "auto_layout",
+        "editable_canvas",
+    }
+
+    for option_key in option_keys:
+        option_value = normalized.get(option_key, False)
+        if isinstance(option_value, str):
+            normalized[option_key] = option_value.lower() in {"1", "true", "yes", "on"}
+        else:
+            normalized[option_key] = bool(option_value)
+
+    return normalized

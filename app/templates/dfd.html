@@ -1,51 +1,426 @@
 {% extends "layout.html" %}
-{% block content %}
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <h3 class="mb-4">📊 DFD Drawing - Threat Model Generation</h3>
+{% block extra_head %}
+<style>
+    .dfd-setup-shell {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        background:
+            radial-gradient(circle at top left, rgba(59, 130, 246, 0.28), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 24%),
+            linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(12, 18, 34, 0.98));
+        box-shadow: 0 22px 60px rgba(2, 6, 23, 0.45);
+    }
 
-        <div class="card shadow-sm mb-5">
-            <div class="card-header">
-                <h5 class="mb-0">Select Survey Response</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">
-                    Choose a survey response file to generate the threat model and DFD diagram.
+    .dfd-setup-shell::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+        background-size: 36px 36px;
+        pointer-events: none;
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 100%);
+    }
+
+    .setup-panel,
+    .preview-panel {
+        position: relative;
+        z-index: 1;
+    }
+
+    .setup-panel {
+        padding: 2rem;
+    }
+
+    .preview-panel {
+        height: 100%;
+        min-height: 100%;
+        padding: 2rem;
+        border-left: 1px solid rgba(148, 163, 184, 0.12);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.75));
+    }
+
+    .section-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #93c5fd;
+    }
+
+    .setup-title {
+        max-width: 760px;
+        margin-top: 1rem;
+        font-size: clamp(2rem, 3vw, 2.8rem);
+        line-height: 1.05;
+    }
+
+    .setup-subtitle {
+        max-width: 760px;
+        margin-top: 1rem;
+        color: #cbd5e1;
+        font-size: 1.02rem;
+    }
+
+    .setup-grid {
+        margin-top: 2rem;
+    }
+
+    .section-card {
+        height: 100%;
+        padding: 1.4rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 18px;
+        background: rgba(15, 23, 42, 0.62);
+        backdrop-filter: blur(14px);
+    }
+
+    .section-card h5 {
+        margin-bottom: 1rem;
+    }
+
+    .mode-chip,
+    .option-chip {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.74);
+    }
+
+    .mode-chip + .mode-chip,
+    .option-chip + .option-chip {
+        margin-top: 0.85rem;
+    }
+
+    .mode-chip .form-check,
+    .option-chip .form-check {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .mode-chip .form-check-label,
+    .option-chip .form-check-label {
+        color: #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .mode-chip small,
+    .option-chip small {
+        color: #94a3b8;
+    }
+
+    .preview-stack {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.25rem;
+    }
+
+    .preview-card {
+        padding: 1rem 1.1rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 16px;
+        background: rgba(8, 15, 30, 0.62);
+    }
+
+    .preview-card strong {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #f8fafc;
+    }
+
+    .preview-card span {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
+    .status-strip {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        background: rgba(15, 23, 42, 0.55);
+        color: #cbd5e1;
+        font-size: 0.88rem;
+    }
+
+    .generate-btn {
+        margin-top: 1.75rem;
+        min-height: 56px;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    }
+
+    .generate-btn:disabled {
+        opacity: 0.7;
+    }
+
+    @media (max-width: 991px) {
+        .preview-panel {
+            border-left: none;
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="dfd-setup-shell">
+    <div class="row g-0">
+        <div class="col-lg-8">
+            <div class="setup-panel">
+                <span class="section-label">DFD Workflow</span>
+                <h1 class="setup-title">Threat model setup for a future-ready DFD generation pipeline.</h1>
+                <p class="setup-subtitle">
+                    Configure the model metadata, choose a saved survey response, and generate a mock DFD now.
+                    The same backend contract is ready to accept local LLM output later.
                 </p>
 
-                <form method="post" class="mt-4">
-                    <div class="mb-4">
-                        <label for="responseFile" class="form-label fw-semibold">
-                            Survey Response File
-                        </label>
-                        <select class="form-select form-select-lg" id="responseFile" name="response_file" required>
-                            <option value="" selected disabled>-- Select a response file --</option>
-                            {% for file in response_files %}
-                            <option value="{{ file }}">{{ file }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="form-text">
-                            Select from previously saved survey responses in the responses folder.
+                <form id="dfd-generation-form" class="setup-grid">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="section-card">
+                                <h5>Model Metadata</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="modelTitle" class="form-label">Model Title</label>
+                                        <input id="modelTitle" name="model_title" class="form-control" required placeholder="Customer Portal Threat Model">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="projectName" class="form-label">Project Name</label>
+                                        <input id="projectName" name="project_name" class="form-control" required placeholder="LLM Sentinel">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="owner" class="form-label">Owner</label>
+                                        <input id="owner" name="owner" class="form-control" placeholder="Security Engineering">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="reviewer" class="form-label">Reviewer</label>
+                                        <input id="reviewer" name="reviewer" class="form-control" placeholder="Thesis Supervisor">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea id="description" name="description" rows="4" class="form-control" placeholder="Describe the system scope, critical assets, integrations, and assumptions."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="section-card">
+                                <h5>Environment & Source</h5>
+                                <div class="mb-4">
+                                    <label class="form-label d-block">Environment</label>
+                                    <div class="mode-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="environment" id="envProduction" value="Production" required>
+                                            <label class="form-check-label" for="envProduction">
+                                                Production
+                                                <small>Live operational environment with real users and data.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mode-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="environment" id="envDevelopment" value="Development" checked>
+                                            <label class="form-check-label" for="envDevelopment">
+                                                Development
+                                                <small>Current iteration environment for design-time modeling.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mode-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="environment" id="envTest" value="Test">
+                                            <label class="form-check-label" for="envTest">
+                                                Test
+                                                <small>Pre-production validation environment.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="responseFile" class="form-label">Survey Response File</label>
+                                    <select id="responseFile" name="response_file" class="form-select" required>
+                                        <option value="" selected disabled>Select a response file from /responses</option>
+                                        {% for file in response_files %}
+                                        <option value="{{ file }}">{{ file }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">This is populated automatically from the local `responses` folder.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="section-card">
+                                <h5>Generation Controls</h5>
+                                <div class="mb-4">
+                                    <label class="form-label d-block">Generation Mode</label>
+                                    <div class="mode-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="generation_mode" id="modeFast" value="Fast" checked>
+                                            <label class="form-check-label" for="modeFast">
+                                                Fast
+                                                <small>Generate a concise starter model quickly.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mode-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="generation_mode" id="modeDetailed" value="Detailed">
+                                            <label class="form-check-label" for="modeDetailed">
+                                                Detailed
+                                                <small>Add richer metadata and annotations for review.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mode-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="generation_mode" id="modeStrict" value="Strict">
+                                            <label class="form-check-label" for="modeStrict">
+                                                Strict
+                                                <small>Preserve explicit structure for future automated checks.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="form-label d-block">Options</label>
+                                    <div class="option-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="include_trust_boundaries" id="includeTrustBoundaries" checked>
+                                            <label class="form-check-label" for="includeTrustBoundaries">
+                                                Include Trust Boundaries
+                                                <small>Add logical trust zones to the initial model.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="include_risk_tags" id="includeRiskTags" checked>
+                                            <label class="form-check-label" for="includeRiskTags">
+                                                Include Risk Tags
+                                                <small>Seed the canvas with a risk context note.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="auto_layout" id="autoLayout" checked>
+                                            <label class="form-check-label" for="autoLayout">
+                                                Auto Layout
+                                                <small>Start from a pre-arranged canvas that can still be edited.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="option-chip">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="editable_canvas" id="editableCanvas" checked>
+                                            <label class="form-check-label" for="editableCanvas">
+                                                Editable Canvas
+                                                <small>Open the generated result directly in the editor.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            🚀 Generate Threat Model & DFD
-                        </button>
-                    </div>
+                    <button id="generateButton" type="submit" class="btn btn-primary w-100 generate-btn">
+                        Generate Threat Model &amp; DFD
+                    </button>
                 </form>
             </div>
         </div>
 
-        <div class="alert alert-info mt-4" role="alert">
-            <strong>ℹ️ How it works:</strong>
-            <ul class="mb-0 mt-2">
-                <li>Select a survey response file from the dropdown</li>
-                <li>Click the button to generate the threat model</li>
-                <li>The system will analyze the responses and create a DFD diagram</li>
-            </ul>
+        <div class="col-lg-4">
+            <div class="preview-panel">
+                <span class="section-label">Workflow Preview</span>
+                <div class="preview-stack">
+                    <div class="preview-card">
+                        <strong>Stage 1</strong>
+                        <span>Capture model metadata, generation preferences, and survey-response source.</span>
+                    </div>
+                    <div class="preview-card">
+                        <strong>Stage 2</strong>
+                        <span>Open a React Flow canvas with editable nodes, edges, exports, and save support.</span>
+                    </div>
+                    <div class="preview-card">
+                        <strong>Future Integration</strong>
+                        <span>Mock JSON is stored now, and `services/llm_generator.py` can later return the same schema from a local LLM.</span>
+                    </div>
+                </div>
+
+                <div class="status-strip">
+                    <span class="status-pill">Stored to `generated_models/`</span>
+                    <span class="status-pill">No live LLM call yet</span>
+                    <span class="status-pill">OWASP-style setup flow</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    const dfdForm = document.getElementById("dfd-generation-form");
+    const generateButton = document.getElementById("generateButton");
+
+    dfdForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(dfdForm);
+        const payload = Object.fromEntries(formData.entries());
+        payload.include_trust_boundaries = formData.has("include_trust_boundaries");
+        payload.include_risk_tags = formData.has("include_risk_tags");
+        payload.auto_layout = formData.has("auto_layout");
+        payload.editable_canvas = formData.has("editable_canvas");
+
+        generateButton.disabled = true;
+        generateButton.textContent = "Generating Threat Model...";
+
+        try {
+            const response = await fetch("{{ url_for('main.generate_dfd') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.error || "Unable to generate the DFD.");
+            }
+
+            window.location.href = result.redirect_url;
+        } catch (error) {
+            generateButton.disabled = false;
+            generateButton.textContent = "Generate Threat Model & DFD";
+            window.alert(error.message);
+        }
+    });
+</script>
 {% endblock %}

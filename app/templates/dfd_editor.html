@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css">
+<style>
+    .editor-shell {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr) 320px;
+        gap: 1rem;
+        min-height: calc(100vh - 180px);
+    }
+
+    .editor-panel,
+    .editor-canvas {
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.85));
+        box-shadow: 0 22px 50px rgba(2, 6, 23, 0.34);
+    }
+
+    .editor-panel {
+        padding: 1rem;
+    }
+
+    .editor-panel h5,
+    .editor-panel h6 {
+        margin-bottom: 0.9rem;
+    }
+
+    .editor-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(8, 15, 30, 0.98), rgba(15, 23, 42, 0.92));
+    }
+
+    .editor-toolbar-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-meta span {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.92rem;
+    }
+
+    .canvas-wrapper {
+        height: 100%;
+        min-height: 720px;
+        border-radius: 20px;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 30%),
+            linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(10, 15, 28, 0.98));
+    }
+
+    .palette-item {
+        padding: 0.9rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.72);
+        cursor: grab;
+        transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .palette-item + .palette-item {
+        margin-top: 0.7rem;
+    }
+
+    .palette-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(96, 165, 250, 0.45);
+    }
+
+    .palette-item strong {
+        display: block;
+        color: #f8fafc;
+    }
+
+    .palette-item small {
+        color: #94a3b8;
+    }
+
+    .properties-empty,
+    .save-status {
+        color: #94a3b8;
+        font-size: 0.93rem;
+    }
+
+    .react-flow__controls,
+    .react-flow__minimap {
+        background: rgba(8, 15, 30, 0.94);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .react-flow__attribution {
+        background: transparent;
+        color: #64748b;
+    }
+
+    @media (max-width: 1199px) {
+        .editor-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .canvas-wrapper {
+            min-height: 640px;
+        }
+    }
+</style>
+{% endblock %}
+{% block content_container_class %}container-fluid px-3 px-xl-4{% endblock %}
+{% block content %}
+<div id="dfd-editor-root"
+    data-model='{{ model_record | tojson | forceescape }}'
+    data-save-url="{{ url_for('main.save_dfd_model', model_id=model_id) }}"
+    data-export-json-url="{{ url_for('main.export_dfd_json', model_id=model_id) }}"
+    data-export-mermaid-url="{{ url_for('main.export_dfd_mermaid', model_id=model_id) }}"
+    data-export-plantuml-url="{{ url_for('main.export_dfd_plantuml', model_id=model_id) }}">
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script type="module" src="{{ url_for('static', filename='js/dfd_editor.js', v=editor_asset_version) }}"></script>
+{% endblock %}
