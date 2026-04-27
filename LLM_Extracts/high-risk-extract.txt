@@ -1,0 +1,127 @@
+{
+  "system_summary": {
+    "purpose": "Customer support assistant",
+    "exposure": "Anonymous public internet users, Authenticated public users",
+    "key_components": [
+      "Web-based chat interface",
+      "Backend API",
+      "Internal knowledge base",
+      "Customer data"
+    ],
+    "trust_boundaries": [
+      "Public internet to web application",
+      "Web application to internal API",
+      "Internal API to model service",
+      "User-level isolation"
+    ]
+  },
+  "architecture": {
+    "actors": [
+      "Anonymous public internet users",
+      "Authenticated public users",
+      "Administrators",
+      "Developers"
+    ],
+    "interfaces": [
+      "Web-based chat interface",
+      "REST API endpoint",
+      "Frontend",
+      "Backend API"
+    ],
+    "data_sources": [
+      "Direct user prompts",
+      "Retrieved internal documents",
+      "API or database records",
+      "Customer data",
+      "Vector DB",
+      "SQL/NoSQL",
+      "Cloud storage"
+    ],
+    "tools": [
+      "Input filtering",
+      "Prompt templating",
+      "RAG augmentation",
+      "RAG or document ingestion pipeline"
+    ],
+    "storage": [
+      "Search",
+      "Database",
+      "Internal APIs",
+      "Vector DB",
+      "SQL/NoSQL",
+      "Cloud storage"
+    ]
+  },
+  "top_risks": [
+    {
+      "code": "LLM01",
+      "name": "Prompt Injection",
+      "risk_level": "High",
+      "why": "Basic input filtering only and no prompt injection detection or scanning.",
+      "evidence": ["Q30", "Q37"],
+      "mitigation": "Implement prompt injection detection and input sanitization at input layer."
+    },
+    {
+      "code": "LLM02",
+      "name": "Sensitive Information Disclosure",
+      "risk_level": "High",
+      "why": "Handles PII and customer support records without strong controls.",
+      "evidence": ["Q24", "Q28", "Q32"],
+      "mitigation": "Enforce access controls and scoped retrieval for sensitive data."
+    },
+    {
+      "code": "LLM03",
+      "name": "Supply Chain",
+      "risk_level": "Medium",
+      "why": "Manual trust in vendor/source and no automated validation.",
+      "evidence": ["Q35"],
+      "mitigation": "Implement automated dependency validation and security reviews."
+    },
+    {
+      "code": "LLM04",
+      "name": "Data/Model Poisoning",
+      "risk_level": "Medium",
+      "why": "RAG augmentation with no filtering or validation.",
+      "evidence": ["Q7", "Q38"],
+      "mitigation": "Implement input filtering and content validation for RAG sources."
+    },
+    {
+      "code": "LLM05",
+      "name": "Improper Output Handling",
+      "risk_level": "Medium",
+      "why": "User-facing web interface with rule-based validation only.",
+      "evidence": ["Q21", "Q31", "Q22"],
+      "mitigation": "Add schema validation and human-in-the-loop for critical outputs."
+    },
+    {
+      "code": "LLM07",
+      "name": "System Prompt Leakage",
+      "risk_level": "Medium",
+      "why": "Prompt templating without controls and logs containing full prompts.",
+      "evidence": ["Q7", "Q47"],
+      "mitigation": "Implement prompt templating controls and restrict logging of full prompts."
+    },
+    {
+      "code": "LLM08",
+      "name": "Vector/Embedding Weaknesses",
+      "risk_level": "Medium",
+      "why": "Vector DB used without protection or validation.",
+      "evidence": ["Q13", "Q36"],
+      "mitigation": "Implement vector DB protection and access controls."
+    },
+    {
+      "code": "LLM10",
+      "name": "Unbounded Consumption / Abuse",
+      "risk_level": "Low",
+      "why": "User/account-based rate limiting and no abuse detection.",
+      "evidence": ["Q34"],
+      "mitigation": "Implement abuse detection and anomaly detection for usage patterns."
+    }
+  ],
+  "quick_wins": [
+    "Enable prompt injection detection and input sanitization (Q30)",
+    "Enforce access controls and scoped retrieval for sensitive data (Q32)",
+    "Implement schema validation for user-facing outputs (Q31)"
+  ],
+  "overall_posture": "High"
+}

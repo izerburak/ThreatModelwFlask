@@ -1,0 +1,108 @@
+{
+  "system_summary": {
+    "purpose": "Agent or workflow automation component",
+    "exposure": "Internal employees only, Administrators only",
+    "key_components": [
+      "Agent workflow",
+      "Backend API",
+      "Monitoring service",
+      "Internal knowledge base",
+      "Customer data"
+    ],
+    "trust_boundaries": [
+      "Cross-tenant or cross-user context boundary",
+      "Tenant-level isolation",
+      "Internal API to model service"
+    ]
+  },
+  "architecture": {
+    "actors": [
+      "Internal employees",
+      "Administrators",
+      "Automated systems or pipelines"
+    ],
+    "interfaces": [
+      "REST API endpoint",
+      "Internal service-to-service calls",
+      "Single sign-on (SSO)",
+      "Directly used in backend automation",
+      "API response consumed by other systems"
+    ],
+    "data_sources": [
+      "API or database records",
+      "Retrieved internal documents",
+      "Personally identifiable information (PII)",
+      "API keys or credentials",
+      "Customer support records"
+    ],
+    "tools": [
+      "Routing/classification",
+      "Prompt templating",
+      "Tool-calling or agent framework",
+      "Model hosting or API integration layer"
+    ],
+    "storage": [
+      "Database",
+      "Internal APIs",
+      "Admin tools",
+      "SQL/NoSQL",
+      "Cloud storage"
+    ]
+  },
+  "top_risks": [
+    {
+      "code": "LLM01",
+      "name": "Prompt Injection",
+      "risk_level": "High",
+      "why": "Prompt influence paths and lack of prompt injection detection or scanning.",
+      "evidence": ["Q20", "Q30"],
+      "mitigation": "Implement prompt injection detection or scanning at input layer."
+    },
+    {
+      "code": "LLM02",
+      "name": "Sensitive Information Disclosure",
+      "risk_level": "High",
+      "why": "Handles PII, API keys, and customer data without clear controls.",
+      "evidence": ["Q24", "Q45"],
+      "mitigation": "Enforce strict access controls and data masking for sensitive data."
+    },
+    {
+      "code": "LLM06",
+      "name": "Excessive Agency",
+      "risk_level": "High",
+      "why": "Agent can create/update tickets, send emails, execute workflows without sufficient limits.",
+      "evidence": ["Q15", "Q34"],
+      "mitigation": "Implement granular permissions and rate limits for actions."
+    },
+    {
+      "code": "LLM05",
+      "name": "Improper Output Handling",
+      "risk_level": "Medium",
+      "why": "Outputs consumed by systems without validation.",
+      "evidence": ["Q22", "Q31"],
+      "mitigation": "Add technical validation and human-in-the-loop for critical outputs."
+    },
+    {
+      "code": "LLM09",
+      "name": "Misinformation / Overreliance",
+      "risk_level": "Medium",
+      "why": "Automated decisions for high-impact actions without sufficient validation.",
+      "evidence": ["Q39"],
+      "mitigation": "Add human-in-the-loop validation for critical decisions."
+    },
+    {
+      "code": "LLM10",
+      "name": "Unbounded Consumption / Abuse",
+      "risk_level": "Medium",
+      "why": "Weak rate limits and no clear abuse detection for automated actions.",
+      "evidence": ["Q34", "Q40"],
+      "mitigation": "Implement rate limits and anomaly detection for usage patterns."
+    }
+  ],
+  "quick_wins": [
+    "Enable prompt injection detection at input layer (Q30)",
+    "Enforce granular permissions for agent actions (Q44)",
+    "Add human-in-the-loop for critical automated decisions (Q31)"
+  ],
+  "overall_posture": "High"
+}
