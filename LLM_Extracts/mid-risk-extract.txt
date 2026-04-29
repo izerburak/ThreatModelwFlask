@@ -1,0 +1,98 @@
+{
+  "system_summary": {
+    "purpose": "Developer documentation assistant",
+    "exposure": "Internal employees only, Administrators only",
+    "key_components": [
+      "Web-based chat interface",
+      "Backend API",
+      "Documentation",
+      "Source code"
+    ],
+    "trust_boundaries": [
+      "Web application to internal API",
+      "Internal API to model service",
+      "User-level isolation",
+      "Single-tenant system"
+    ]
+  },
+  "architecture": {
+    "actors": [
+      "Internal employees",
+      "Administrators",
+      "Developers"
+    ],
+    "interfaces": [
+      "Web-based chat interface",
+      "Internal service-to-service calls",
+      "Frontend",
+      "Backend API"
+    ],
+    "data_sources": [
+      "Direct user prompts",
+      "Retrieved internal documents",
+      "Documentation",
+      "Source code",
+      "Vector DB",
+      "SQL/NoSQL"
+    ],
+    "tools": [
+      "Prompt templating",
+      "RAG augmentation",
+      "RAG or document ingestion pipeline"
+    ],
+    "storage": [
+      "Search",
+      "Database",
+      "Vector DB",
+      "SQL/NoSQL"
+    ]
+  },
+  "top_risks": [
+    {
+      "code": "LLM02",
+      "name": "Sensitive Information Disclosure",
+      "risk_level": "Medium",
+      "why": "Potential for sensitive data extraction despite access controls.",
+      "evidence": ["Q37", "Q45"],
+      "mitigation": "Implement strict data extraction controls and access restrictions."
+    },
+    {
+      "code": "LLM04",
+      "name": "Data/Model Poisoning",
+      "risk_level": "Medium",
+      "why": "RAG augmentation with no filtering or validation.",
+      "evidence": ["Q7", "Q38"],
+      "mitigation": "Implement input filtering and content validation for RAG sources."
+    },
+    {
+      "code": "LLM05",
+      "name": "Improper Output Handling",
+      "risk_level": "Low",
+      "why": "User-facing web interface with manual review only.",
+      "evidence": ["Q21", "Q31", "Q22"],
+      "mitigation": "Add schema validation and automated checks for outputs."
+    },
+    {
+      "code": "LLM07",
+      "name": "System Prompt Leakage",
+      "risk_level": "Low",
+      "why": "Prompt templating without controls and logs containing non-sensitive metadata.",
+      "evidence": ["Q7", "Q47"],
+      "mitigation": "Implement prompt templating controls and restrict logging of prompts."
+    },
+    {
+      "code": "LLM08",
+      "name": "Vector/Embedding Weaknesses",
+      "risk_level": "Low",
+      "why": "Vector DB used without validation or access controls.",
+      "evidence": ["Q13", "Q36"],
+      "mitigation": "Implement vector DB access controls and validation."
+    }
+  ],
+  "quick_wins": [
+    "Implement strict data extraction controls (Q37)",
+    "Add schema validation for outputs (Q31)",
+    "Restrict logging of prompts (Q47)"
+  ],
+  "overall_posture": "Medium"
+}
