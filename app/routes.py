@@ -25,6 +25,7 @@ from app.services.dfd_service import (
     save_model_record,
 )
 from app.services.llm_generator import build_mock_dfd_payload
+from app.services.ollama_client import OllamaError, chat as ollama_chat, get_ollama_config, list_models
 from app.services.extract_to_reactflow import extract_to_reactflow
 from app.utils.save_utils import (
     append_question_to_layer,
@@ -104,6 +105,97 @@ def reactflow_test():
     return render_template(
         "reactflow_test.html",
         active_tab="reactflow_test",
+    )
+
+
+@main.route("/dfd-mapper-lab")
+def dfd_mapper_lab():
+    return render_template(
+        "dfd_mapper_lab.html",
+        active_tab="dfd_mapper_lab",
+    )
+
+
+@main.route("/llm")
+def llm_chat():
+    ollama_config = get_ollama_config(current_app.config)
+    return render_template(
+        "llm.html",
+        active_tab="llm",
+        ollama_model=ollama_config["model"],
+        ollama_host=ollama_config["host"],
+    )
+
+
+@main.route("/api/llm/status")
+def llm_status():
+    ollama_config = get_ollama_config(current_app.config)
+    try:
+        models = list_models(current_app.config)
+    except OllamaError as exc:
+        return jsonify(
+            {
+                "ok": False,
+                "host": ollama_config["host"],
+                "model": ollama_config["model"],
+                "error": str(exc),
+            }
+        ), 503
+
+    model_names = [model.get("name") for model in models if model.get("name")]
+    return jsonify(
+        {
+            "ok": ollama_config["model"] in model_names,
+            "host": ollama_config["host"],
+            "model": ollama_config["model"],
+            "available_models": model_names,
+        }
+    )
+
+
+@main.route("/api/llm/chat", methods=["POST"])
+def llm_chat_api():
+    payload = request.get_json(silent=True) or {}
+    messages = payload.get("messages")
+
+    if messages is None and payload.get("message"):
+        messages = [{"role": "user", "content": payload.get("message")}]
+
+    try:
+        response = ollama_chat(messages, current_app.config)
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    except OllamaError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 503
+
+    return jsonify({"ok": True, **response})
+
+
+@main.route("/api/llm-extracts")
+def list_llm_extracts():
+    return jsonify({"files": _list_llm_extract_files(current_app.root_path)})
+
+
+@main.route("/api/llm-extracts/<filename>")
+def get_llm_extract(filename):
+    allowed_files = _list_llm_extract_files(current_app.root_path)
+    if filename not in allowed_files:
+        abort(404, description="LLM extract file not found.")
+
+    extract_dir = _llm_extracts_dir(current_app.root_path).resolve()
+    extract_path = (extract_dir / filename).resolve()
+    if extract_path.parent != extract_dir:
+        abort(404, description="LLM extract file not found.")
+
+    raw = extract_path.read_text(encoding="utf-8")
+    parsed, parse_error = _parse_extract_json(raw)
+    return jsonify(
+        {
+            "filename": filename,
+            "raw": raw,
+            "parsed": parsed,
+            "parse_error": parse_error,
+        }
     )
 
 
@@ -389,3 +481,40 @@ def _normalize_generation_payload(payload):
             normalized[option_key] = bool(option_value)
 
     return normalized
+
+
+def _llm_extracts_dir(app_root_path):
+    return Path(app_root_path).parent / "LLM_Extracts"
+
+
+def _list_llm_extract_files(app_root_path):
+    extract_dir = _llm_extracts_dir(app_root_path)
+    if not extract_dir.exists() or not extract_dir.is_dir():
+        return []
+
+    allowed_suffixes = {".json", ".txt"}
+    files = []
+    for file_path in extract_dir.iterdir():
+        if file_path.is_file() and file_path.suffix.lower() in allowed_suffixes:
+            files.append(file_path.name)
+    return sorted(files)
+
+
+def _parse_extract_json(raw):
+    try:
+        return json.loads(raw), None
+    except json.JSONDecodeError:
+        pass
+
+    decoder = json.JSONDecoder()
+    for index, char in enumerate(raw):
+        if char != "{":
+            continue
+        try:
+            parsed, _ = decoder.raw_decode(raw[index:])
+            if isinstance(parsed, dict):
+                return parsed, None
+        except json.JSONDecodeError:
+            continue
+
+    return None, "Could not parse extract as JSON."

@@ -1,0 +1,254 @@
+{% extends "layout.html" %}
+
+{% block extra_head %}
+<style>
+    .llm-shell {
+        display: grid;
+        gap: 1rem;
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .llm-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.72);
+    }
+
+    .llm-status strong {
+        color: var(--text-main);
+    }
+
+    .llm-status-pill {
+        min-width: 7rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: #334155;
+        color: #e2e8f0;
+    }
+
+    .llm-status-pill.ready {
+        background: rgba(16, 185, 129, 0.18);
+        color: #86efac;
+    }
+
+    .llm-status-pill.error {
+        background: rgba(239, 68, 68, 0.18);
+        color: #fecaca;
+    }
+
+    .chat-panel {
+        min-height: 520px;
+        display: grid;
+        grid-template-rows: 1fr auto;
+    }
+
+    .chat-log {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        min-height: 360px;
+        max-height: 60vh;
+        overflow-y: auto;
+        padding: 1rem;
+        background: var(--background);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+    }
+
+    .chat-message {
+        max-width: min(82%, 760px);
+        padding: 0.85rem 1rem;
+        border-radius: var(--radius-md);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .chat-message.user {
+        align-self: flex-end;
+        background: var(--primary);
+        color: #ffffff;
+    }
+
+    .chat-message.assistant {
+        align-self: flex-start;
+        background: #263449;
+        color: var(--text-main);
+        border: 1px solid var(--border-light);
+    }
+
+    .chat-message.system {
+        align-self: center;
+        max-width: 100%;
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px dashed var(--border-light);
+        font-size: 0.9rem;
+    }
+
+    .chat-form {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .chat-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    #llmPrompt {
+        min-height: 6.5rem;
+        resize: vertical;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="llm-shell">
+    <div>
+        <h3>LLM Chat</h3>
+        <p class="text-muted mb-0">
+            Local Ollama integration using <code>{{ ollama_model }}</code> at <code>{{ ollama_host }}</code>.
+        </p>
+    </div>
+
+    <div class="llm-status" aria-live="polite">
+        <div>
+            <strong>Ollama</strong>
+            <div class="text-muted small" id="llmStatusDetail">Checking local model availability...</div>
+        </div>
+        <span class="llm-status-pill" id="llmStatusPill">Checking</span>
+    </div>
+
+    <div class="card chat-panel">
+        <div class="card-body">
+            <div class="chat-log" id="chatLog">
+                <div class="chat-message system">
+                    Send a short prompt to verify Flask can talk to your local qwen3 model.
+                </div>
+            </div>
+
+            <form class="chat-form" id="chatForm">
+                <label class="form-label" for="llmPrompt">Message</label>
+                <textarea class="form-control" id="llmPrompt" placeholder="Ask qwen3 something about your threat model..." required></textarea>
+                <div class="chat-actions">
+                    <button class="btn btn-outline-primary" type="button" id="clearChat">Clear</button>
+                    <button class="btn btn-primary" type="submit" id="sendChat">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const chatLog = document.getElementById('chatLog');
+    const chatForm = document.getElementById('chatForm');
+    const llmPrompt = document.getElementById('llmPrompt');
+    const sendChat = document.getElementById('sendChat');
+    const clearChat = document.getElementById('clearChat');
+    const statusPill = document.getElementById('llmStatusPill');
+    const statusDetail = document.getElementById('llmStatusDetail');
+    const messages = [
+        {
+            role: 'system',
+            content: 'You are a concise local assistant helping test an LLM Sentinel Flask integration.'
+        }
+    ];
+
+    function appendMessage(role, content) {
+        const node = document.createElement('div');
+        node.className = `chat-message ${role}`;
+        node.textContent = content;
+        chatLog.appendChild(node);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        return node;
+    }
+
+    function setBusy(isBusy) {
+        sendChat.disabled = isBusy;
+        sendChat.textContent = isBusy ? 'Sending...' : 'Send';
+        llmPrompt.disabled = isBusy;
+    }
+
+    function setStatus(kind, label, detail) {
+        statusPill.className = `llm-status-pill ${kind}`;
+        statusPill.textContent = label;
+        statusDetail.textContent = detail;
+    }
+
+    async function checkStatus() {
+        try {
+            const response = await fetch('{{ url_for("main.llm_status") }}');
+            const payload = await response.json();
+            if (!response.ok || !payload.ok) {
+                const models = payload.available_models && payload.available_models.length
+                    ? ` Available: ${payload.available_models.join(', ')}.`
+                    : '';
+                setStatus('error', 'Not ready', payload.error || `Model ${payload.model} was not found.${models}`);
+                return;
+            }
+            setStatus('ready', 'Ready', `Connected to ${payload.model}.`);
+        } catch (error) {
+            setStatus('error', 'Not ready', error.message);
+        }
+    }
+
+    chatForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const content = llmPrompt.value.trim();
+        if (!content) {
+            return;
+        }
+
+        messages.push({ role: 'user', content });
+        appendMessage('user', content);
+        llmPrompt.value = '';
+        setBusy(true);
+        const pendingNode = appendMessage('assistant', 'Thinking...');
+
+        try {
+            const response = await fetch('{{ url_for("main.llm_chat_api") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages })
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.ok) {
+                throw new Error(payload.error || 'LLM request failed.');
+            }
+
+            pendingNode.textContent = payload.message.content;
+            messages.push(payload.message);
+        } catch (error) {
+            pendingNode.className = 'chat-message system';
+            pendingNode.textContent = error.message;
+            messages.pop();
+        } finally {
+            setBusy(false);
+            llmPrompt.focus();
+        }
+    });
+
+    clearChat.addEventListener('click', () => {
+        messages.splice(1);
+        chatLog.innerHTML = '';
+        appendMessage('system', 'Chat cleared.');
+        llmPrompt.focus();
+    });
+
+    checkStatus();
+</script>
+{% endblock %}
