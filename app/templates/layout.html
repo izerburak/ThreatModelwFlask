@@ -339,19 +339,19 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'llm_sec' %}active{% endif %}"
-                            href="{{ url_for('main.llm_sec') }}">LLM Sec</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if active_tab == 'llm' %}active{% endif %}"
-                            href="{{ url_for('main.llm_chat') }}">LLM</a>
+                            href="{{ url_for('main.llm_sec') }}">Survey</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'add' %}active{% endif %}"
                             href="{{ url_for('main.add_question') }}">Add Question</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'llm' %}active{% endif %}"
+                            href="{{ url_for('main.llm_chat') }}">LLM</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'dfd' %}active{% endif %}"
-                            href="{{ url_for('main.dfd') }}">DFD</a>
+                            href="{{ url_for('main.dfd') }}">Extractor</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'reactflow_test' %}active{% endif %}"
@@ -360,6 +360,10 @@
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'dfd_mapper_lab' %}active{% endif %}"
                             href="{{ url_for('main.dfd_mapper_lab') }}">DFD Mapper Lab</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'garak' %}active{% endif %}"
+                            href="{{ url_for('main.garak') }}">Garak</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'risk' %}active{% endif %}"

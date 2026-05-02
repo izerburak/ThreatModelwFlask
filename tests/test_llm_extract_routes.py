@@ -1,6 +1,8 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 try:
     from app import create_app
@@ -63,6 +65,55 @@ class LlmExtractRoutesTests(unittest.TestCase):
         response = self.client.get("/api/llm-extracts/..%2Fsecret.txt")
 
         self.assertEqual(response.status_code, 404)
+
+    def test_generate_extract_preserves_response_filename_date(self):
+        responses_dir = self.root / "responses"
+        prompts_dir = self.root / "LLM-Prompts"
+        responses_dir.mkdir()
+        prompts_dir.mkdir()
+        (prompts_dir / "Response-Extractor-prompt.txt").write_text("Return JSON only.", encoding="utf-8")
+        (responses_dir / "llmsec_2026-12-30_10-20-30.json").write_text(
+            json.dumps(
+                {
+                    "answers": [
+                        {
+                            "flow_id": "Q1",
+                            "answer": "Customer support assistant",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with patch("app.services.llm_extract_service.chat") as mock_chat:
+            mock_chat.return_value = {
+                "model": "test-model",
+                "message": {
+                    "role": "assistant",
+                    "content": '{"system_summary": {"purpose": "Customer support assistant"}}',
+                },
+            }
+
+            response = self.client.post(
+                "/api/generate-extract",
+                json={
+                    "response_file": "llmsec_2026-12-30_10-20-30.json",
+                    "project_name": "LLM Sentinel",
+                    "model_title": "Support TM",
+                },
+            )
+
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["filename"], "llmsec_2026-12-30_10-20-30-extract.json")
+        self.assertTrue((self.extract_dir / "llmsec_2026-12-30_10-20-30-extract.json").exists())
+        self.assertEqual(
+            payload["parsed"]["system_summary"]["purpose"],
+            "Customer support assistant",
+        )
 
 
 if __name__ == "__main__":

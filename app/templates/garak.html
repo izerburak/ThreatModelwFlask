@@ -1,0 +1,446 @@
+{% extends "layout.html" %}
+{% block extra_head %}
+<style>
+    .garak-shell {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .garak-hero,
+    .garak-panel {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        background: #111827;
+    }
+
+    .garak-hero {
+        padding: 1.5rem;
+    }
+
+    .garak-hero h1 {
+        margin: 0;
+        font-size: 1.8rem;
+    }
+
+    .garak-hero p {
+        max-width: 840px;
+        margin: 0.65rem 0 0;
+        color: #cbd5e1;
+    }
+
+    .garak-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .status-pill,
+    .defcon-pill {
+        min-width: 7rem;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .status-pill.ready {
+        background: rgba(16, 185, 129, 0.18);
+        color: #86efac;
+    }
+
+    .status-pill.missing {
+        background: rgba(239, 68, 68, 0.18);
+        color: #fecaca;
+    }
+
+    .garak-grid {
+        display: grid;
+        grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+        gap: 1rem;
+    }
+
+    .garak-panel-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        background: #172033;
+    }
+
+    .garak-panel-header h2 {
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    .garak-panel-body {
+        padding: 1.25rem;
+    }
+
+    .form-stack,
+    .report-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .command-output {
+        min-height: 7rem;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.86rem;
+        line-height: 1.45;
+        white-space: pre-wrap;
+    }
+
+    .env-grid {
+        display: grid;
+        gap: 0.65rem;
+        margin-top: 1rem;
+    }
+
+    .env-row {
+        display: grid;
+        grid-template-columns: 9rem minmax(0, 1fr);
+        gap: 0.75rem;
+        padding: 0.7rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 8px;
+        background: #0f172a;
+    }
+
+    .report-item {
+        padding: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 8px;
+        background: #0f172a;
+    }
+
+    .report-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .defcon-pill {
+        min-width: 5.5rem;
+        font-size: 0.84rem;
+        background: rgba(148, 163, 184, 0.18);
+        color: #e2e8f0;
+    }
+
+    .defcon-1,
+    .defcon-2 {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fecaca;
+    }
+
+    .defcon-3 {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fde68a;
+    }
+
+    .defcon-4,
+    .defcon-5 {
+        background: rgba(16, 185, 129, 0.18);
+        color: #86efac;
+    }
+
+    .module-list {
+        display: grid;
+        gap: 0.65rem;
+        margin-top: 0.85rem;
+    }
+
+    .module-item {
+        padding: 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.74);
+    }
+
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.45rem;
+    }
+
+    .tag-chip {
+        padding: 0.18rem 0.45rem;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.15);
+        color: #bfdbfe;
+        font-size: 0.76rem;
+    }
+
+    code {
+        color: #f472b6;
+    }
+
+    @media (max-width: 991px) {
+        .garak-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .env-row,
+        .report-top {
+            grid-template-columns: 1fr;
+            display: grid;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="garak-shell">
+    <section class="garak-hero">
+        <h1>Garak</h1>
+        <p>
+            Build garak scan commands from safe presets, then use this page to review parsed HTML report results.
+            The actual garak report remains available as the source of truth.
+        </p>
+        <div class="garak-status">
+            <div>
+                <strong>Package Status</strong>
+                <div class="text-muted small">{{ garak_status.detail }}</div>
+            </div>
+            <span class="status-pill {{ 'ready' if garak_status.installed else 'missing' }}">
+                {{ 'Ready' if garak_status.installed else 'Missing' }}
+            </span>
+        </div>
+    </section>
+
+    <div class="garak-grid">
+        <section class="garak-panel">
+            <div class="garak-panel-header">
+                <h2>Scan Builder</h2>
+            </div>
+            <div class="garak-panel-body">
+                <div class="form-stack">
+                    <div>
+                        <label for="targetPreset" class="form-label">Target</label>
+                        <select id="targetPreset" class="form-select">
+                            {% for target in garak_status.presets.targets %}
+                            <option value="{{ loop.index0 }}">{{ target.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="targetType" class="form-label">Target Type</label>
+                            <input id="targetType" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="targetName" class="form-label">Target Name</label>
+                            <input id="targetName" class="form-control">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="probePreset" class="form-label">Probe / Test</label>
+                        <select id="probePreset" class="form-select">
+                            {% for probe in garak_status.presets.probes %}
+                            <option value="{{ loop.index0 }}">{{ probe.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text" id="probeDescription"></div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="detectorPreset" class="form-label">Detector</label>
+                            <select id="detectorPreset" class="form-select">
+                                {% for detector in garak_status.presets.detectors %}
+                                <option value="{{ detector.value }}">{{ detector.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="generations" class="form-label">Generations</label>
+                            <input id="generations" class="form-control" type="number" min="1" max="20" value="1">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="reportPrefix" class="form-label">Report Prefix</label>
+                        <input id="reportPrefix" class="form-control" value="llm_sentinel_garak">
+                    </div>
+                    <div>
+                        <label for="commandPreview" class="form-label">Command Preview</label>
+                        <textarea id="commandPreview" class="form-control command-output" readonly></textarea>
+                    </div>
+                </div>
+
+                <div class="env-grid">
+                    <div class="env-row">
+                        <strong>XDG_CONFIG_HOME</strong>
+                        <code>{{ garak_status.workspace_dirs.config }}</code>
+                    </div>
+                    <div class="env-row">
+                        <strong>XDG_CACHE_HOME</strong>
+                        <code>{{ garak_status.workspace_dirs.cache }}</code>
+                    </div>
+                    <div class="env-row">
+                        <strong>XDG_DATA_HOME</strong>
+                        <code>{{ garak_status.workspace_dirs.data }}</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="garak-panel">
+            <div class="garak-panel-header">
+                <h2>Parsed Reports</h2>
+            </div>
+            <div class="garak-panel-body">
+                {% if garak_status.reports %}
+                <div class="report-list">
+                    {% for report in garak_status.reports %}
+                    {% set summary = report.summary %}
+                    <article class="report-item">
+                        <div class="report-top">
+                            <div>
+                                <strong>{{ report.name }}</strong>
+                                <div class="text-muted small">
+                                    <code>{{ report.relative_path }}</code> · {{ report.size_kb }} KB
+                                </div>
+                                {% if summary %}
+                                <div class="text-muted small mt-1">
+                                    {{ summary.target_type }} · {{ summary.target_name }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                                {% if summary and summary.worst_defcon %}
+                                <span class="defcon-pill defcon-{{ summary.worst_defcon }}">DEFCON {{ summary.worst_defcon }}</span>
+                                {% endif %}
+                                <a class="btn btn-outline-primary"
+                                    href="{{ url_for('main.garak_report', report_path=report.relative_path) }}"
+                                    target="_blank" rel="noopener">
+                                    Open HTML
+                                </a>
+                            </div>
+                        </div>
+
+                        {% if summary and summary.modules %}
+                        <div class="module-list">
+                            {% for module in summary.modules[:3] %}
+                            <div class="module-item">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <div>
+                                        <strong>{{ module.probe }}</strong>
+                                        <div class="text-muted small">
+                                            Score {{ module.probe_score if module.probe_score is not none else 'n/a' }}%
+                                            · {{ module.group }}
+                                        </div>
+                                    </div>
+                                    {% if module.defcon %}
+                                    <span class="defcon-pill defcon-{{ module.defcon }}">DC {{ module.defcon }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if module.tags %}
+                                <div class="tag-list">
+                                    {% for tag in module.tags[:6] %}
+                                    <span class="tag-chip">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% elif not summary %}
+                        <div class="text-muted mt-3">This report could not be parsed yet, but the HTML can still be opened.</div>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-muted">No Garak HTML reports found under the local Garak folder.</div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    const presets = {{ garak_status.presets|tojson }};
+    const workspaceDirs = {{ garak_status.workspace_dirs|tojson }};
+
+    const targetPreset = document.getElementById("targetPreset");
+    const targetType = document.getElementById("targetType");
+    const targetName = document.getElementById("targetName");
+    const probePreset = document.getElementById("probePreset");
+    const probeDescription = document.getElementById("probeDescription");
+    const detectorPreset = document.getElementById("detectorPreset");
+    const generations = document.getElementById("generations");
+    const reportPrefix = document.getElementById("reportPrefix");
+    const commandPreview = document.getElementById("commandPreview");
+
+    function psQuote(value) {
+        return `'${String(value).replaceAll("'", "''")}'`;
+    }
+
+    function selectedProbe() {
+        return presets.probes[Number(probePreset.value)] || presets.probes[0];
+    }
+
+    function applyTargetPreset() {
+        const target = presets.targets[Number(targetPreset.value)] || presets.targets[0];
+        targetType.value = target.target_type;
+        targetName.value = target.target_name;
+        updateCommand();
+    }
+
+    function updateCommand() {
+        const probe = selectedProbe();
+        probeDescription.textContent = probe.description || "";
+
+        const args = [
+            "python",
+            "-m",
+            "garak",
+            "--target_type",
+            targetType.value || "ollama",
+            "--target_name",
+            targetName.value || "qwen3:8b",
+            "--detectors",
+            detectorPreset.value || "auto",
+            "--generations",
+            generations.value || "1",
+            "--report_prefix",
+            reportPrefix.value || "llm_sentinel_garak",
+        ];
+
+        if (probe.mode === "probe_tags") {
+            args.push("--probe_tags", probe.value);
+        } else {
+            args.push("--probes", probe.value);
+        }
+
+        const command = args.map(psQuote).join(" ");
+        const isWindows = navigator.platform.toLowerCase().includes("win");
+        commandPreview.value = isWindows
+            ? [
+                `$env:XDG_CONFIG_HOME=${psQuote(workspaceDirs.config)}`,
+                `$env:XDG_CACHE_HOME=${psQuote(workspaceDirs.cache)}`,
+                `$env:XDG_DATA_HOME=${psQuote(workspaceDirs.data)}`,
+                command,
+            ].join("\n")
+            : [
+                `export XDG_CONFIG_HOME=${psQuote(workspaceDirs.config)}`,
+                `export XDG_CACHE_HOME=${psQuote(workspaceDirs.cache)}`,
+                `export XDG_DATA_HOME=${psQuote(workspaceDirs.data)}`,
+                command,
+            ].join("\n");
+    }
+
+    targetPreset.addEventListener("change", applyTargetPreset);
+    [targetType, targetName, probePreset, detectorPreset, generations, reportPrefix].forEach((element) => {
+        element.addEventListener("input", updateCommand);
+        element.addEventListener("change", updateCommand);
+    });
+
+    applyTargetPreset();
+</script>
+{% endblock %}

@@ -11,6 +11,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_file,
     session,
     url_for,
 )
@@ -27,6 +28,9 @@ from app.services.dfd_service import (
 from app.services.llm_generator import build_mock_dfd_payload
 from app.services.ollama_client import OllamaError, chat as ollama_chat, get_ollama_config, list_models
 from app.services.extract_to_reactflow import extract_to_reactflow
+from app.services.llm_extract_service import generate_llm_extract
+from app.services.risk_analysis_service import build_risk_analysis, suggested_extract_filename
+from app.services.garak_service import garak_report_path, garak_status
 from app.utils.save_utils import (
     append_question_to_layer,
     save_adaptive_llm_sec_answers,
@@ -75,10 +79,13 @@ def add_question():
 
 @main.route("/dfd")
 def dfd():
+    ollama_config = get_ollama_config(current_app.config)
     return render_template(
         "dfd.html",
         active_tab="dfd",
         response_files=list_response_files(current_app.root_path),
+        ollama_model=ollama_config["model"],
+        ollama_host=ollama_config["host"],
     )
 
 
@@ -113,6 +120,7 @@ def dfd_mapper_lab():
     return render_template(
         "dfd_mapper_lab.html",
         active_tab="dfd_mapper_lab",
+        response_files=list_response_files(current_app.root_path),
     )
 
 
@@ -125,6 +133,25 @@ def llm_chat():
         ollama_model=ollama_config["model"],
         ollama_host=ollama_config["host"],
     )
+
+
+@main.route("/garak")
+def garak():
+    return render_template(
+        "garak.html",
+        active_tab="garak",
+        garak_status=garak_status(current_app.root_path),
+    )
+
+
+@main.route("/garak/reports/<path:report_path>")
+def garak_report(report_path):
+    try:
+        report_file = garak_report_path(current_app.root_path, report_path)
+    except (FileNotFoundError, ValueError):
+        abort(404, description="Garak report not found.")
+
+    return send_file(report_file)
 
 
 @main.route("/api/llm/status")
@@ -199,11 +226,53 @@ def get_llm_extract(filename):
     )
 
 
+@main.route("/api/responses/<filename>")
+def get_response(filename):
+    try:
+        response_payload = load_response_payload(current_app.root_path, filename)
+    except (FileNotFoundError, ValueError):
+        abort(404, description="Response file not found.")
+
+    return jsonify(
+        {
+            "filename": filename,
+            "answers_by_flow_id": _answers_by_flow_id(response_payload),
+            "raw": response_payload,
+        }
+    )
+
+
 @main.route("/api/reactflow/from-extract", methods=["POST"])
 def reactflow_from_extract():
     payload = request.get_json(silent=True) or {}
     graph = extract_to_reactflow(payload)
     return jsonify(graph)
+
+
+@main.route("/api/generate-extract", methods=["POST"])
+def generate_extract():
+    payload = request.get_json(silent=True) or {}
+    normalized_payload = _normalize_generation_payload(payload)
+
+    response_file = normalized_payload.get("response_file")
+    if not response_file:
+        return jsonify({"success": False, "error": "A survey response file is required."}), 400
+
+    try:
+        extract = generate_llm_extract(
+            current_app.root_path,
+            normalized_payload,
+            response_file,
+            current_app.config,
+        )
+    except FileNotFoundError:
+        return jsonify({"success": False, "error": "Selected response file was not found."}), 404
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+    except OllamaError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 503
+
+    return jsonify({"success": True, **extract})
 
 
 @main.route("/api/generate-dfd", methods=["POST"])
@@ -292,25 +361,38 @@ def export_dfd_plantuml(model_id):
 
 @main.route("/risk", methods=["GET", "POST"])
 def risk():
-    responses_dir = Path(current_app.root_path).parent / "responses"
-    response_files = []
-
-    if responses_dir.exists():
-        response_files = sorted([f.name for f in responses_dir.glob("*.json")])
+    response_files = list_response_files(current_app.root_path)
+    extract_files = _list_llm_extract_files(current_app.root_path)
+    selected_file = None
+    selected_extract = None
+    analysis = None
+    analysis_error = None
 
     if request.method == "POST":
         selected_file = request.form.get("response_file")
-        return render_template(
-            "risk.html",
-            active_tab="risk",
-            response_files=response_files,
-            selected_file=selected_file,
-        )
+        selected_extract = request.form.get("extract_file") or ""
+
+        try:
+            response_payload = load_response_payload(current_app.root_path, selected_file)
+            extract_payload = _load_extract_payload(selected_extract) if selected_extract else None
+            analysis = build_risk_analysis(current_app.root_path, response_payload, extract_payload)
+        except FileNotFoundError:
+            analysis_error = "Selected response or extract file was not found."
+        except ValueError as exc:
+            analysis_error = str(exc)
+
+    suggested_extract = suggested_extract_filename(selected_file) if selected_file else ""
 
     return render_template(
         "risk.html",
         active_tab="risk",
         response_files=response_files,
+        extract_files=extract_files,
+        selected_file=selected_file,
+        selected_extract=selected_extract,
+        suggested_extract=suggested_extract,
+        analysis=analysis,
+        analysis_error=analysis_error,
     )
 
 
@@ -518,3 +600,48 @@ def _parse_extract_json(raw):
             continue
 
     return None, "Could not parse extract as JSON."
+
+
+def _load_extract_payload(filename):
+    if not filename:
+        return None
+
+    allowed_files = _list_llm_extract_files(current_app.root_path)
+    if filename not in allowed_files:
+        raise FileNotFoundError(filename)
+
+    extract_dir = _llm_extracts_dir(current_app.root_path).resolve()
+    extract_path = (extract_dir / filename).resolve()
+    if extract_path.parent != extract_dir:
+        raise ValueError("Invalid extract file selection.")
+
+    raw = extract_path.read_text(encoding="utf-8")
+    parsed, parse_error = _parse_extract_json(raw)
+    if parse_error:
+        raise ValueError(parse_error)
+    return parsed
+
+
+def _answers_by_flow_id(response_payload):
+    if not isinstance(response_payload, dict):
+        return {}
+
+    compact_answers = response_payload.get("answers_by_flow_id")
+    if isinstance(compact_answers, dict):
+        return compact_answers
+
+    answers = response_payload.get("answers")
+    if not isinstance(answers, list):
+        return {}
+
+    normalized = {}
+    for answer_record in answers:
+        if not isinstance(answer_record, dict):
+            continue
+
+        flow_id = answer_record.get("flow_id")
+        answer = answer_record.get("answer")
+        if isinstance(flow_id, str) and flow_id.strip() and answer not in (None, "", []):
+            normalized[flow_id.strip()] = answer
+
+    return normalized

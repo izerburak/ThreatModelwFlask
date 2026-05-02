@@ -1,11 +1,12 @@
 import json
 import os
+from urllib.parse import urlsplit, urlunsplit
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 
 DEFAULT_OLLAMA_HOST = "http://127.0.0.1:11434"
-DEFAULT_OLLAMA_MODEL = "qwen3:latest"
+DEFAULT_OLLAMA_MODEL = "qwen3:8b"
 
 
 class OllamaError(RuntimeError):
@@ -15,7 +16,7 @@ class OllamaError(RuntimeError):
 def get_ollama_config(app_config=None):
     app_config = app_config or {}
     return {
-        "host": (app_config.get("OLLAMA_HOST") or os.environ.get("OLLAMA_HOST") or DEFAULT_OLLAMA_HOST).rstrip("/"),
+        "host": _normalize_ollama_host(app_config.get("OLLAMA_HOST") or os.environ.get("OLLAMA_HOST") or DEFAULT_OLLAMA_HOST),
         "model": app_config.get("OLLAMA_MODEL") or os.environ.get("OLLAMA_MODEL") or DEFAULT_OLLAMA_MODEL,
     }
 
@@ -98,3 +99,23 @@ def _request_json(url, payload=None, timeout=30):
         return json.loads(body)
     except json.JSONDecodeError as exc:
         raise OllamaError("Ollama returned invalid JSON.") from exc
+
+
+def _normalize_ollama_host(host):
+    value = str(host or DEFAULT_OLLAMA_HOST).strip().rstrip("/")
+    if not value:
+        value = DEFAULT_OLLAMA_HOST
+
+    if "://" not in value:
+        value = f"http://{value}"
+
+    parsed = urlsplit(value)
+    hostname = parsed.hostname or "127.0.0.1"
+    if hostname in {"0.0.0.0", "::"}:
+        hostname = "127.0.0.1"
+
+    netloc = hostname
+    if parsed.port:
+        netloc = f"{hostname}:{parsed.port}"
+
+    return urlunsplit((parsed.scheme or "http", netloc, "", "", ""))

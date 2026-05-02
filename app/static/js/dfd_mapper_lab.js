@@ -76,12 +76,15 @@
   }
 
   function App() {
-    const samples = window.mockDfdInputs || [];
+    // Legacy static fixtures are intentionally retained for console/manual debugging.
+    const legacySamples = window.mockDfdInputs || [];
     const initialGraph = React.useMemo(storageGraph, []);
+    const responseFiles = window.dfdMapperLabResponseFiles || [];
+    const [selectedResponse, setSelectedResponse] = React.useState("");
     const [extractFiles, setExtractFiles] = React.useState([]);
     const [selectedExtract, setSelectedExtract] = React.useState("");
-    const [answersText, setAnswersText] = React.useState(window.localStorage.getItem(ANSWERS_KEY) || pretty(samples[0]?.answersByFlowId));
-    const [extractText, setExtractText] = React.useState(window.localStorage.getItem(EXTRACT_KEY) || pretty(samples[0]?.qwenExtract));
+    const [answersText, setAnswersText] = React.useState(window.localStorage.getItem(ANSWERS_KEY) || pretty(legacySamples[0]?.answersByFlowId));
+    const [extractText, setExtractText] = React.useState(window.localStorage.getItem(EXTRACT_KEY) || pretty(legacySamples[0]?.qwenExtract));
     const [nodes, setNodes] = React.useState(initialGraph.nodes);
     const [edges, setEdges] = React.useState(initialGraph.edges);
     const [selectedNodeId, setSelectedNodeId] = React.useState(initialGraph.nodes[0]?.id || null);
@@ -130,6 +133,25 @@
         setStatusType("error");
       }
     }, [selectedExtract]);
+
+    const loadResponse = React.useCallback(async () => {
+      if (!selectedResponse) {
+        setStatus("Select a response file first.");
+        setStatusType("warning");
+        return;
+      }
+      try {
+        const response = await fetch(`/api/responses/${encodeURIComponent(selectedResponse)}`);
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.description || "Unable to load response.");
+        setAnswersText(pretty(payload.answers_by_flow_id));
+        setStatus(`Loaded response: ${payload.filename}.`);
+        setStatusType("info");
+      } catch (error) {
+        setStatus(error.message || "Unable to load response.");
+        setStatusType("error");
+      }
+    }, [selectedResponse]);
 
     const generateDfd = React.useCallback(() => {
       const answers = parseJson(answersText, "answers_by_flow_id");
@@ -190,15 +212,6 @@
       window.setTimeout(() => flowRef.current?.fitView({ padding: 0.18, duration: 250 }), 0);
     }, []);
 
-    const loadSample = React.useCallback((index) => {
-      const sample = samples[Number(index)];
-      if (!sample) return;
-      setAnswersText(pretty(sample.answersByFlowId));
-      setExtractText(pretty(sample.qwenExtract));
-      setStatus(`Loaded sample: ${sample.name}.`);
-      setStatusType("info");
-    }, [samples]);
-
     const updateSelectedNode = React.useCallback((field, value) => {
       if (!selectedNodeId) return;
       setNodes((current) => current.map((node) => {
@@ -210,16 +223,19 @@
     return e("div", { className: "mapper-shell" }, [
       e("aside", { key: "left", className: "mapper-panel" }, [
         e("h5", { key: "extract-title" }, "Inputs"),
-        e("label", { key: "sample-label", className: "form-label", htmlFor: "sampleSelect" }, "Load sample"),
-        e("select", {
-          key: "sample",
-          id: "sampleSelect",
-          className: "form-select mb-3",
-          defaultValue: "",
-          onChange: (event) => loadSample(event.target.value),
-        }, [
-          e("option", { key: "empty", value: "" }, "Select a sample"),
-          ...samples.map((sample, index) => e("option", { key: sample.name, value: index }, sample.name)),
+        e("label", { key: "response-label", className: "form-label", htmlFor: "responseFile" }, "Select response"),
+        e("div", { key: "response-row", className: "d-flex gap-2 mb-3" }, [
+          e("select", {
+            key: "select",
+            id: "responseFile",
+            className: "form-select",
+            value: selectedResponse,
+            onChange: (event) => setSelectedResponse(event.target.value),
+          }, [
+            e("option", { key: "empty", value: "" }, responseFiles.length ? "Select response from /responses" : "No response files found"),
+            ...responseFiles.map((file) => e("option", { key: file, value: file }, file)),
+          ]),
+          e("button", { key: "button", className: "btn btn-outline-primary", onClick: loadResponse }, "Load Response"),
         ]),
         e("label", { key: "file-label", className: "form-label", htmlFor: "extractFile" }, "Select LLM extract"),
         e("div", { key: "file-row", className: "d-flex gap-2 mb-3" }, [

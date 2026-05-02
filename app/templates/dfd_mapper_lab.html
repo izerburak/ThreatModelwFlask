@@ -99,8 +99,12 @@
 <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
 <script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js" crossorigin></script>
+<script>
+    window.dfdMapperLabResponseFiles = {{ response_files|tojson }};
+</script>
 <script src="{{ url_for('static', filename='js/dfd_mapper.js', v=3) }}"></script>
 <script src="{{ url_for('static', filename='js/dfd_node.js', v=3) }}"></script>
+{# Legacy static fixtures stay available for manual debugging; the UI now loads real files from /responses. #}
 <script src="{{ url_for('static', filename='js/mock_dfd_inputs.js', v=3) }}"></script>
 <script src="{{ url_for('static', filename='js/dfd_mapper_lab.js', v=3) }}"></script>
 {% endblock %}

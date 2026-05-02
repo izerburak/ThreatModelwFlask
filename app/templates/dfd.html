@@ -1,408 +1,314 @@
 {% extends "layout.html" %}
 {% block extra_head %}
 <style>
-    .dfd-setup-shell {
-        position: relative;
-        overflow: hidden;
-        border-radius: 24px;
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        background:
-            radial-gradient(circle at top left, rgba(59, 130, 246, 0.28), transparent 28%),
-            radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 24%),
-            linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(12, 18, 34, 0.98));
-        box-shadow: 0 22px 60px rgba(2, 6, 23, 0.45);
-    }
-
-    .dfd-setup-shell::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
-        background-size: 36px 36px;
-        pointer-events: none;
-        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 100%);
-    }
-
-    .setup-panel,
-    .preview-panel {
-        position: relative;
-        z-index: 1;
-    }
-
-    .setup-panel {
-        padding: 2rem;
-    }
-
-    .preview-panel {
-        height: 100%;
-        min-height: 100%;
-        padding: 2rem;
-        border-left: 1px solid rgba(148, 163, 184, 0.12);
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.75));
-    }
-
-    .section-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.75rem;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: #93c5fd;
-    }
-
-    .setup-title {
-        max-width: 760px;
-        margin-top: 1rem;
-        font-size: clamp(2rem, 3vw, 2.8rem);
-        line-height: 1.05;
-    }
-
-    .setup-subtitle {
-        max-width: 760px;
-        margin-top: 1rem;
-        color: #cbd5e1;
-        font-size: 1.02rem;
-    }
-
-    .setup-grid {
-        margin-top: 2rem;
-    }
-
-    .section-card {
-        height: 100%;
-        padding: 1.4rem;
-        border: 1px solid rgba(148, 163, 184, 0.14);
-        border-radius: 18px;
-        background: rgba(15, 23, 42, 0.62);
-        backdrop-filter: blur(14px);
-    }
-
-    .section-card h5 {
-        margin-bottom: 1rem;
-    }
-
-    .mode-chip,
-    .option-chip {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.9rem 1rem;
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        border-radius: 14px;
-        background: rgba(15, 23, 42, 0.74);
-    }
-
-    .mode-chip + .mode-chip,
-    .option-chip + .option-chip {
-        margin-top: 0.85rem;
-    }
-
-    .mode-chip .form-check,
-    .option-chip .form-check {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .mode-chip .form-check-label,
-    .option-chip .form-check-label {
-        color: #e2e8f0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.15rem;
-    }
-
-    .mode-chip small,
-    .option-chip small {
-        color: #94a3b8;
-    }
-
-    .preview-stack {
-        display: grid;
-        gap: 1rem;
-        margin-top: 1.25rem;
-    }
-
-    .preview-card {
-        padding: 1rem 1.1rem;
-        border: 1px solid rgba(148, 163, 184, 0.14);
+    .extractor-shell {
+        border: 1px solid rgba(148, 163, 184, 0.18);
         border-radius: 16px;
-        background: rgba(8, 15, 30, 0.62);
+        background: #111827;
+        box-shadow: 0 18px 48px rgba(2, 6, 23, 0.36);
+        overflow: hidden;
     }
 
-    .preview-card strong {
-        display: block;
-        margin-bottom: 0.25rem;
+    .extractor-header {
+        padding: 1.75rem 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        background: #172033;
+    }
+
+    .extractor-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .extractor-header p {
+        margin: 0.75rem 0 0;
+        max-width: 780px;
+        color: #cbd5e1;
+    }
+
+    .llm-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 1.25rem 0 0;
+        padding: 0.9rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.72);
+    }
+
+    .llm-status strong {
         color: #f8fafc;
     }
 
-    .preview-card span {
-        color: #94a3b8;
-        font-size: 0.95rem;
-    }
-
-    .status-strip {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-top: 2rem;
-    }
-
-    .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.65rem 0.9rem;
+    .llm-status-pill {
+        min-width: 7rem;
+        padding: 0.35rem 0.7rem;
         border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        background: rgba(15, 23, 42, 0.55);
-        color: #cbd5e1;
-        font-size: 0.88rem;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: #334155;
+        color: #e2e8f0;
+    }
+
+    .llm-status-pill.ready {
+        background: rgba(16, 185, 129, 0.18);
+        color: #86efac;
+    }
+
+    .llm-status-pill.error {
+        background: rgba(239, 68, 68, 0.18);
+        color: #fecaca;
+    }
+
+    .extractor-body {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+        min-height: 620px;
+    }
+
+    .extractor-form-panel,
+    .extractor-result-panel {
+        padding: 2rem;
+    }
+
+    .extractor-form-panel {
+        border-right: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .panel-title {
+        margin-bottom: 1rem;
+        font-size: 1.05rem;
+        color: #f8fafc;
+    }
+
+    .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .field-span {
+        grid-column: 1 / -1;
     }
 
     .generate-btn {
-        margin-top: 1.75rem;
-        min-height: 56px;
-        font-size: 1rem;
+        width: 100%;
+        min-height: 52px;
+        margin-top: 1.25rem;
         font-weight: 600;
-        background: linear-gradient(135deg, #2563eb, #0ea5e9);
     }
 
-    .generate-btn:disabled {
-        opacity: 0.7;
+    .result-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .result-filename {
+        min-height: 1.5rem;
+        color: #93c5fd;
+        font-size: 0.92rem;
+        overflow-wrap: anywhere;
+    }
+
+    .result-status {
+        margin-bottom: 1rem;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 8px;
+        background: #0f172a;
+        color: #cbd5e1;
+    }
+
+    .result-status.error {
+        border-color: rgba(248, 113, 113, 0.42);
+        color: #fecaca;
+    }
+
+    .result-status.success {
+        border-color: rgba(52, 211, 153, 0.38);
+        color: #bbf7d0;
+    }
+
+    .extract-output {
+        width: 100%;
+        min-height: 430px;
+        resize: vertical;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.86rem;
+        line-height: 1.5;
+        white-space: pre;
     }
 
     @media (max-width: 991px) {
-        .preview-panel {
-            border-left: none;
-            border-top: 1px solid rgba(148, 163, 184, 0.12);
+        .extractor-body {
+            grid-template-columns: 1fr;
+        }
+
+        .extractor-form-panel {
+            border-right: none;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        }
+    }
+
+    @media (max-width: 575px) {
+        .extractor-header,
+        .extractor-form-panel,
+        .extractor-result-panel {
+            padding: 1.25rem;
+        }
+
+        .field-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
 {% endblock %}
 {% block content %}
-<div class="dfd-setup-shell">
-    <div class="row g-0">
-        <div class="col-lg-8">
-            <div class="setup-panel">
-                <span class="section-label">DFD Workflow</span>
-                <h1 class="setup-title">Threat model setup for a future-ready DFD generation pipeline.</h1>
-                <p class="setup-subtitle">
-                    Configure the model metadata, choose a saved survey response, and generate a mock DFD now.
-                    The same backend contract is ready to accept local LLM output later.
-                </p>
-
-                <form id="dfd-generation-form" class="setup-grid">
-                    <div class="row g-4">
-                        <div class="col-12">
-                            <div class="section-card">
-                                <h5>Model Metadata</h5>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="modelTitle" class="form-label">Model Title</label>
-                                        <input id="modelTitle" name="model_title" class="form-control" required placeholder="Customer Portal Threat Model">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="projectName" class="form-label">Project Name</label>
-                                        <input id="projectName" name="project_name" class="form-control" required placeholder="LLM Sentinel">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="owner" class="form-label">Owner</label>
-                                        <input id="owner" name="owner" class="form-control" placeholder="Security Engineering">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="reviewer" class="form-label">Reviewer</label>
-                                        <input id="reviewer" name="reviewer" class="form-control" placeholder="Thesis Supervisor">
-                                    </div>
-                                    <div class="col-12">
-                                        <label for="description" class="form-label">Description</label>
-                                        <textarea id="description" name="description" rows="4" class="form-control" placeholder="Describe the system scope, critical assets, integrations, and assumptions."></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="section-card">
-                                <h5>Environment & Source</h5>
-                                <div class="mb-4">
-                                    <label class="form-label d-block">Environment</label>
-                                    <div class="mode-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="environment" id="envProduction" value="Production" required>
-                                            <label class="form-check-label" for="envProduction">
-                                                Production
-                                                <small>Live operational environment with real users and data.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="mode-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="environment" id="envDevelopment" value="Development" checked>
-                                            <label class="form-check-label" for="envDevelopment">
-                                                Development
-                                                <small>Current iteration environment for design-time modeling.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="mode-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="environment" id="envTest" value="Test">
-                                            <label class="form-check-label" for="envTest">
-                                                Test
-                                                <small>Pre-production validation environment.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="responseFile" class="form-label">Survey Response File</label>
-                                    <select id="responseFile" name="response_file" class="form-select" required>
-                                        <option value="" selected disabled>Select a response file from /responses</option>
-                                        {% for file in response_files %}
-                                        <option value="{{ file }}">{{ file }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <div class="form-text">This is populated automatically from the local `responses` folder.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="section-card">
-                                <h5>Generation Controls</h5>
-                                <div class="mb-4">
-                                    <label class="form-label d-block">Generation Mode</label>
-                                    <div class="mode-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="generation_mode" id="modeFast" value="Fast" checked>
-                                            <label class="form-check-label" for="modeFast">
-                                                Fast
-                                                <small>Generate a concise starter model quickly.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="mode-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="generation_mode" id="modeDetailed" value="Detailed">
-                                            <label class="form-check-label" for="modeDetailed">
-                                                Detailed
-                                                <small>Add richer metadata and annotations for review.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="mode-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="generation_mode" id="modeStrict" value="Strict">
-                                            <label class="form-check-label" for="modeStrict">
-                                                Strict
-                                                <small>Preserve explicit structure for future automated checks.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="form-label d-block">Options</label>
-                                    <div class="option-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="include_trust_boundaries" id="includeTrustBoundaries" checked>
-                                            <label class="form-check-label" for="includeTrustBoundaries">
-                                                Include Trust Boundaries
-                                                <small>Add logical trust zones to the initial model.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="option-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="include_risk_tags" id="includeRiskTags" checked>
-                                            <label class="form-check-label" for="includeRiskTags">
-                                                Include Risk Tags
-                                                <small>Seed the canvas with a risk context note.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="option-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="auto_layout" id="autoLayout" checked>
-                                            <label class="form-check-label" for="autoLayout">
-                                                Auto Layout
-                                                <small>Start from a pre-arranged canvas that can still be edited.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="option-chip">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="editable_canvas" id="editableCanvas" checked>
-                                            <label class="form-check-label" for="editableCanvas">
-                                                Editable Canvas
-                                                <small>Open the generated result directly in the editor.</small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="generateButton" type="submit" class="btn btn-primary w-100 generate-btn">
-                        Generate Threat Model &amp; DFD
-                    </button>
-                </form>
+<div class="extractor-shell">
+    <div class="extractor-header">
+        <h1>Extractor</h1>
+        <p>
+            Enter threat model details, select a saved questionnaire response, and generate the LLM extract.
+            The extract is saved automatically under LLM_Extracts with the response date preserved in the filename.
+        </p>
+        <p class="text-muted small mb-0">
+            Local Ollama integration using <code>{{ ollama_model }}</code> at <code>{{ ollama_host }}</code>.
+        </p>
+        <div class="llm-status" aria-live="polite">
+            <div>
+                <strong>Ollama</strong>
+                <div class="text-muted small" id="llmStatusDetail">Checking local model availability...</div>
             </div>
+            <span class="llm-status-pill" id="llmStatusPill">Checking</span>
+        </div>
+    </div>
+
+    <div class="extractor-body">
+        <div class="extractor-form-panel">
+            <h2 class="panel-title">Threat Model Details</h2>
+            <form id="extractor-form">
+                <div class="field-grid">
+                    <div>
+                        <label for="modelTitle" class="form-label">Model Title</label>
+                        <input id="modelTitle" name="model_title" class="form-control" required placeholder="Customer Portal Threat Model">
+                    </div>
+                    <div>
+                        <label for="projectName" class="form-label">Project Name</label>
+                        <input id="projectName" name="project_name" class="form-control" required placeholder="LLM Sentinel">
+                    </div>
+                    <div>
+                        <label for="owner" class="form-label">Modeler</label>
+                        <input id="owner" name="owner" class="form-control" placeholder="Security Engineering">
+                    </div>
+                    <div>
+                        <label for="reviewer" class="form-label">Reviewer</label>
+                        <input id="reviewer" name="reviewer" class="form-control" placeholder="Reviewer name">
+                    </div>
+                    <div>
+                        <label for="environment" class="form-label">Environment</label>
+                        <select id="environment" name="environment" class="form-select">
+                            <option value="Development" selected>Development</option>
+                            <option value="Test">Test</option>
+                            <option value="Production">Production</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="responseFile" class="form-label">Response File</label>
+                        <select id="responseFile" name="response_file" class="form-select" required>
+                            <option value="" selected disabled>Select a response file</option>
+                            {% for file in response_files %}
+                            <option value="{{ file }}">{{ file }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field-span">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" rows="5" class="form-control" placeholder="Scope, assumptions, critical assets, integrations, and notes for the extract."></textarea>
+                    </div>
+                </div>
+
+                <button id="generateButton" type="submit" class="btn btn-primary generate-btn">
+                    Generate Extract
+                </button>
+            </form>
         </div>
 
-        <div class="col-lg-4">
-            <div class="preview-panel">
-                <span class="section-label">Workflow Preview</span>
-                <div class="preview-stack">
-                    <div class="preview-card">
-                        <strong>Stage 1</strong>
-                        <span>Capture model metadata, generation preferences, and survey-response source.</span>
-                    </div>
-                    <div class="preview-card">
-                        <strong>Stage 2</strong>
-                        <span>Open a React Flow canvas with editable nodes, edges, exports, and save support.</span>
-                    </div>
-                    <div class="preview-card">
-                        <strong>Future Integration</strong>
-                        <span>Mock JSON is stored now, and `services/llm_generator.py` can later return the same schema from a local LLM.</span>
-                    </div>
-                </div>
-
-                <div class="status-strip">
-                    <span class="status-pill">Stored to `generated_models/`</span>
-                    <span class="status-pill">No live LLM call yet</span>
-                    <span class="status-pill">OWASP-style setup flow</span>
+        <div class="extractor-result-panel">
+            <div class="result-toolbar">
+                <div>
+                    <h2 class="panel-title mb-1">Generated Extract</h2>
+                    <div id="resultFilename" class="result-filename"></div>
                 </div>
             </div>
+            <div id="resultStatus" class="result-status">
+                Fill the form and generate an extract to preview it here.
+            </div>
+            <textarea id="extractOutput" class="form-control extract-output" readonly spellcheck="false"></textarea>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block extra_scripts %}
 <script>
-    const dfdForm = document.getElementById("dfd-generation-form");
+    const extractorForm = document.getElementById("extractor-form");
     const generateButton = document.getElementById("generateButton");
+    const resultStatus = document.getElementById("resultStatus");
+    const resultFilename = document.getElementById("resultFilename");
+    const extractOutput = document.getElementById("extractOutput");
+    const llmStatusPill = document.getElementById("llmStatusPill");
+    const llmStatusDetail = document.getElementById("llmStatusDetail");
+    const defaultButtonText = "Generate Extract";
 
-    dfdForm.addEventListener("submit", async (event) => {
+    function setStatus(message, type = "") {
+        resultStatus.textContent = message;
+        resultStatus.classList.toggle("success", type === "success");
+        resultStatus.classList.toggle("error", type === "error");
+    }
+
+    function setLlmStatus(kind, label, detail) {
+        llmStatusPill.className = `llm-status-pill ${kind}`;
+        llmStatusPill.textContent = label;
+        llmStatusDetail.textContent = detail;
+    }
+
+    async function checkLlmStatus() {
+        try {
+            const response = await fetch("{{ url_for('main.llm_status') }}");
+            const payload = await response.json();
+            if (!response.ok || !payload.ok) {
+                const models = payload.available_models && payload.available_models.length
+                    ? ` Available: ${payload.available_models.join(", ")}.`
+                    : "";
+                setLlmStatus("error", "Not ready", payload.error || `Model ${payload.model} was not found.${models}`);
+                return;
+            }
+            setLlmStatus("ready", "Ready", `Connected to ${payload.model}.`);
+        } catch (error) {
+            setLlmStatus("error", "Not ready", error.message);
+        }
+    }
+
+    extractorForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        const formData = new FormData(dfdForm);
+        const formData = new FormData(extractorForm);
         const payload = Object.fromEntries(formData.entries());
-        payload.include_trust_boundaries = formData.has("include_trust_boundaries");
-        payload.include_risk_tags = formData.has("include_risk_tags");
-        payload.auto_layout = formData.has("auto_layout");
-        payload.editable_canvas = formData.has("editable_canvas");
 
         generateButton.disabled = true;
-        generateButton.textContent = "Generating Threat Model...";
+        generateButton.textContent = "Generating Extract...";
+        resultFilename.textContent = "";
+        extractOutput.value = "";
+        setStatus("Sending response answers and extract format to the LLM...");
 
         try {
-            const response = await fetch("{{ url_for('main.generate_dfd') }}", {
+            const response = await fetch("{{ url_for('main.generate_extract') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -412,15 +318,22 @@
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error(result.error || "Unable to generate the DFD.");
+                throw new Error(result.error || "Unable to generate the extract.");
             }
 
-            window.location.href = result.redirect_url;
+            resultFilename.textContent = result.filename;
+            extractOutput.value = result.parsed
+                ? JSON.stringify(result.parsed, null, 2)
+                : (result.raw || "");
+            setStatus("Extract generated and saved to LLM_Extracts.", "success");
         } catch (error) {
+            setStatus(error.message, "error");
+        } finally {
             generateButton.disabled = false;
-            generateButton.textContent = "Generate Threat Model & DFD";
-            window.alert(error.message);
+            generateButton.textContent = defaultButtonText;
         }
     });
+
+    checkLlmStatus();
 </script>
 {% endblock %}

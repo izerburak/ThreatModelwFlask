@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from pathlib import Path
 from flask import current_app
 
 
@@ -76,12 +77,13 @@ def save_adaptive_llm_sec_answers(answer_map, question_catalog):
         "answers_by_flow_id": answer_map,
     }
 
-    os.makedirs("responses", exist_ok=True)
+    responses_dir = Path(current_app.root_path).parent / "responses"
+    responses_dir.mkdir(parents=True, exist_ok=True)
     timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     filename = f"llmsec_{timestamp_str}.json"
-    filepath = os.path.join("responses", filename)
+    filepath = responses_dir / filename
 
-    with open(filepath, "w", encoding="utf-8") as f:
+    with filepath.open("w", encoding="utf-8") as f:
         json.dump(record, f, ensure_ascii=False, indent=2)
 
-    return filepath
+    return str(filepath)

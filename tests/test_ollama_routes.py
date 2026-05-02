@@ -22,11 +22,19 @@ class OllamaRoutesTests(unittest.TestCase):
         response = self.client.get("/llm")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"qwen3:latest", response.data)
+        self.assertIn(b"qwen3:8b", response.data)
+
+    def test_llm_page_normalizes_bind_host_for_client_requests(self):
+        self.app.config["OLLAMA_HOST"] = "0.0.0.0:11434"
+
+        response = self.client.get("/llm")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"http://127.0.0.1:11434", response.data)
 
     @patch("app.routes.list_models")
     def test_llm_status_reports_available_model(self, list_models_mock):
-        list_models_mock.return_value = [{"name": "qwen3:latest"}]
+        list_models_mock.return_value = [{"name": "qwen3:8b"}]
 
         response = self.client.get("/api/llm/status")
 
@@ -36,7 +44,7 @@ class OllamaRoutesTests(unittest.TestCase):
     @patch("app.routes.ollama_chat")
     def test_llm_chat_accepts_messages(self, chat_mock):
         chat_mock.return_value = {
-            "model": "qwen3:latest",
+            "model": "qwen3:8b",
             "message": {"role": "assistant", "content": "pong"},
             "done": True,
         }
