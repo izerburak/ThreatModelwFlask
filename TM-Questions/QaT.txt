@@ -1,4 +1,4 @@
-version: 1
+version: 3
 
 start: Q1
 
@@ -16,13 +16,15 @@ questions:
           - Q3
           - Q25
           - Q26
+          - Q41
           - Q34
-        next_after: Q4
+        next_after: Q40
       - else:
           - Q3
           - Q25
           - Q26
-        next_after: Q4
+          - Q41
+        next_after: Q40
 
   Q3:
     next: null
@@ -30,8 +32,13 @@ questions:
     next: null
   Q26:
     next: null
+  Q41:
+    next: null
   Q34:
     next: null
+
+  Q40:
+    next: Q4
 
   Q4:
     conditions:
@@ -81,14 +88,17 @@ questions:
           - Q36
           - Q20
           - Q32
+          - Q43
         next_after: Q9
       - else:
-          - []
+          - Q43
         next_after: Q9
 
   Q27:
     next: null
   Q36:
+    next: null
+  Q43:
     next: null
 
   Q9:
@@ -100,10 +110,14 @@ questions:
           not_equals: "No"
         then:
           - Q32
+          - Q46
         next_after: Q11
       - else:
           - []
         next_after: Q11
+
+  Q46:
+    next: null
 
   Q11:
     conditions:
@@ -129,9 +143,9 @@ questions:
           - Q13
           - Q14
           - Q15
-        next_after: Q17
+        next_after: Q44
       - else:
-          - []
+          - Q45
         next_after: Q17
 
   Q13:
@@ -152,10 +166,10 @@ questions:
           - Q28
           - Q16
           - Q39
-        next_after: Q17
+        next_after: Q44
       - else:
           - []
-        next_after: Q17
+        next_after: Q44
 
   Q31:
     next: null
@@ -166,6 +180,12 @@ questions:
   Q39:
     next: null
 
+  Q44:
+    next: Q45
+
+  Q45:
+    next: Q17
+
   Q17:
     next: Q35
 
@@ -173,6 +193,9 @@ questions:
     next: Q19
 
   Q19:
+    next: Q42
+
+  Q42:
     next: Q20
 
   Q20:
@@ -202,6 +225,9 @@ questions:
     next: Q33
 
   Q33:
+    next: Q47
+
+  Q47:
     next: Q37
 
   Q37:

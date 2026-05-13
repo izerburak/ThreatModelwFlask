@@ -21,7 +21,7 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q2": ["Anonymous public internet users", "Authenticated public users"],
         }
 
-        self.assertEqual(_pending(answers), ["Q3", "Q25", "Q26", "Q34", "Q4"])
+        self.assertEqual(_pending(answers), ["Q3", "Q25", "Q26", "Q41", "Q34", "Q40"])
 
     def test_q4_yes_branch_appends_q24_then_q5(self):
         answers = {
@@ -30,6 +30,8 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "Yes",
         }
 
@@ -42,6 +44,8 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": ["File uploads"],
@@ -56,6 +60,8 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": "Structured application data only",
@@ -63,7 +69,7 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q8": "Vector database retrieval",
         }
 
-        self.assertEqual(_pending(answers), ["Q27", "Q36", "Q20", "Q32", "Q9"])
+        self.assertEqual(_pending(answers), ["Q27", "Q36", "Q20", "Q32", "Q43", "Q9"])
 
     def test_q10_not_no_branch_appends_q32_then_q11(self):
         answers = {
@@ -72,16 +78,19 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": "Structured application data only",
             "Q7": "answered",
             "Q8": "No RAG",
+            "Q43": "answered",
             "Q9": "answered",
             "Q10": "Yes",
         }
 
-        self.assertEqual(_pending(answers), ["Q32", "Q11"])
+        self.assertEqual(_pending(answers), ["Q32", "Q46", "Q11"])
 
     def test_q11_not_any_of_branch_appends_q18_then_q12(self):
         answers = {
@@ -90,11 +99,14 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": "Structured application data only",
             "Q7": "answered",
             "Q8": "No RAG",
+            "Q43": "answered",
             "Q9": "answered",
             "Q10": "No",
             "Q11": ["Model firewall"],
@@ -109,18 +121,21 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": "Structured application data only",
             "Q7": "answered",
             "Q8": "No RAG",
+            "Q43": "answered",
             "Q9": "answered",
             "Q10": "No",
             "Q11": "None",
             "Q12": ["Read internal knowledge", "Create or update tickets/records"],
         }
 
-        self.assertEqual(_pending(answers), ["Q13", "Q14", "Q15", "Q17"])
+        self.assertEqual(_pending(answers), ["Q13", "Q14", "Q15", "Q44"])
 
     def test_q15_matching_branch_appends_all_then_q17(self):
         answers = {
@@ -129,11 +144,14 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": "Structured application data only",
             "Q7": "answered",
             "Q8": "No RAG",
+            "Q43": "answered",
             "Q9": "answered",
             "Q10": "No",
             "Q11": "None",
@@ -143,7 +161,7 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q15": ["Send emails or notifications"],
         }
 
-        self.assertEqual(_pending(answers), ["Q31", "Q28", "Q16", "Q39", "Q17"])
+        self.assertEqual(_pending(answers), ["Q31", "Q28", "Q16", "Q39", "Q44"])
 
     def test_q22_does_not_append_duplicate_answered_questions(self):
         answers = {
@@ -152,11 +170,14 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q3": "answered",
             "Q25": "answered",
             "Q26": "answered",
+            "Q41": "answered",
+            "Q40": "answered",
             "Q4": "No",
             "Q5": "answered",
             "Q6": "Structured application data only",
             "Q7": "answered",
             "Q8": "No RAG",
+            "Q43": "answered",
             "Q9": "answered",
             "Q10": "No",
             "Q11": "None",
@@ -168,9 +189,12 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q28": "answered",
             "Q16": "answered",
             "Q39": "answered",
+            "Q44": "answered",
+            "Q45": "answered",
             "Q17": "answered",
             "Q35": "answered",
             "Q19": "answered",
+            "Q42": "answered",
             "Q20": "answered",
             "Q21": "answered",
             "Q22": "API response consumed by other systems",
@@ -185,7 +209,7 @@ class QuestionnaireFlowTests(unittest.TestCase):
 
         self.assertEqual(
             question_flow._get_follow_up_questions(node, answers["Q2"]),
-            ["Q3", "Q25", "Q26", "Q34", "Q4"],
+            ["Q3", "Q25", "Q26", "Q41", "Q34", "Q40"],
         )
 
 

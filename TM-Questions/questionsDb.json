@@ -947,5 +947,141 @@
       "decision_thresholds",
       "fallback_controls"
     ]
+  },
+  {
+    "id": 40,
+    "text": "Is the system single-tenant or multi-tenant?",
+    "type": "single",
+    "options": [
+      "Single-tenant system",
+      "Multi-tenant with strong isolation",
+      "Multi-tenant with weak or unclear isolation",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM02"
+    ],
+    "severity_weight": 5,
+    "confidence_weight": 4
+  },
+  {
+    "id": 41,
+    "text": "How is user identity propagated across system components (LLM, tools, retrieval)?",
+    "type": "single",
+    "options": [
+      "No identity propagation",
+      "Shared system identity only",
+      "User identity partially propagated",
+      "User identity consistently enforced end-to-end",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM06",
+      "LLM02"
+    ],
+    "severity_weight": 5,
+    "confidence_weight": 5
+  },
+  {
+    "id": 42,
+    "text": "Who can modify prompts, policies, or retrieval sources?",
+    "type": "multi",
+    "options": [
+      "No one (static configuration)",
+      "Developers only",
+      "Administrators via admin panel",
+      "Automated systems or pipelines",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM03",
+      "LLM07"
+    ],
+    "severity_weight": 4,
+    "confidence_weight": 5
+  },
+  {
+    "id": 43,
+    "text": "Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?",
+    "type": "single",
+    "options": [
+      "No reuse",
+      "Yes, for indexing only",
+      "Yes, for training or fine-tuning",
+      "Yes, both indexing and training",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM04",
+      "LLM02"
+    ],
+    "severity_weight": 5,
+    "confidence_weight": 5
+  },
+  {
+    "id": 44,
+    "text": "Are LLM tool permissions separated by action type (read, write, admin, destructive)?",
+    "type": "single",
+    "options": [
+      "No separation of permissions",
+      "Basic separation (read vs write)",
+      "Granular permissions including admin or destructive actions",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM06"
+    ],
+    "severity_weight": 5,
+    "confidence_weight": 5
+  },
+  {
+    "id": 45,
+    "text": "Can the LLM access secrets, credentials, or hidden system instructions at runtime?",
+    "type": "single",
+    "options": [
+      "No access to secrets or hidden data",
+      "Access to limited non-sensitive configuration",
+      "Access to sensitive data such as API keys or credentials",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM02",
+      "LLM07"
+    ],
+    "severity_weight": 5,
+    "confidence_weight": 5
+  },
+  {
+    "id": 46,
+    "text": "Is conversation or memory data isolated per user, session, or tenant?",
+    "type": "single",
+    "options": [
+      "No isolation",
+      "Session-level isolation only",
+      "User-level isolation",
+      "Tenant-level isolation",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM02"
+    ],
+    "severity_weight": 5,
+    "confidence_weight": 5
+  },
+  {
+    "id": 47,
+    "text": "Do logs or monitoring systems store full prompts, responses, or sensitive content?",
+    "type": "single",
+    "options": [
+      "No logging of LLM data",
+      "Logs contain non-sensitive metadata only",
+      "Logs contain full prompts and responses",
+      "Unknown"
+    ],
+    "owasp_llm": [
+      "LLM02"
+    ],
+    "severity_weight": 4,
+    "confidence_weight": 5
   }
 ]

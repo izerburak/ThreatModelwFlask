@@ -11,3 +11,5 @@ data/
 .idea/
 responses/
 .directory
+venv-win/
+.tmp-test
