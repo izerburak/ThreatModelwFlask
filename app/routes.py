@@ -29,6 +29,7 @@ from app.services.llm_generator import build_mock_dfd_payload
 from app.services.ollama_client import OllamaError, chat as ollama_chat, get_ollama_config, list_models
 from app.services.extract_to_reactflow import extract_to_reactflow
 from app.services.llm_extract_service import generate_llm_extract
+from app.services.pipeline_orchestrator import PIPELINE_STEPS, PipelineOrchestrator
 from app.services.risk_analysis_service import build_risk_analysis, suggested_extract_filename
 from app.services.garak_service import garak_report_path, garak_status
 from app.utils.save_utils import (
@@ -152,6 +153,102 @@ def garak_report(report_path):
         abort(404, description="Garak report not found.")
 
     return send_file(report_file)
+
+
+@main.route("/pipeline")
+def pipeline_index():
+    orchestrator = _pipeline_orchestrator()
+    return render_template(
+        "pipeline_index.html",
+        active_tab="pipeline",
+        response_files=list_response_files(current_app.root_path),
+        pipelines=orchestrator.list_pipelines(),
+    )
+
+
+@main.route("/pipeline/start", methods=["POST"])
+def pipeline_start():
+    response_filename = request.form.get("response_filename") or ""
+    orchestrator = _pipeline_orchestrator()
+
+    try:
+        manifest = orchestrator.create_pipeline(response_filename)
+    except FileNotFoundError:
+        flash("Selected questionnaire response was not found.", "danger")
+        return redirect(url_for("main.pipeline_index"))
+    except ValueError as exc:
+        flash(str(exc), "danger")
+        return redirect(url_for("main.pipeline_index"))
+
+    try:
+        manifest = orchestrator.run_until_risk_analysis(manifest["pipeline_id"])
+        flash("Pipeline created and risk analysis completed.", "success")
+    except Exception as exc:
+        flash(f"Pipeline workspace was created, but automation stopped: {exc}", "warning")
+
+    return redirect(url_for("main.pipeline_detail", pipeline_id=manifest["pipeline_id"]))
+
+
+@main.route("/pipeline/<pipeline_id>")
+def pipeline_detail(pipeline_id):
+    orchestrator = _pipeline_orchestrator()
+    try:
+        manifest = orchestrator.get_manifest(pipeline_id)
+    except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        abort(404, description="Pipeline not found.")
+
+    artifacts = []
+    artifact_order = list(PIPELINE_STEPS.values())
+    for artifact_name in artifact_order:
+        exists = orchestrator.artifact_exists(pipeline_id, artifact_name)
+        artifacts.append(
+            {
+                "name": artifact_name,
+                "exists": exists,
+                "url": url_for("main.pipeline_artifact", pipeline_id=pipeline_id, artifact_name=artifact_name)
+                if exists
+                else None,
+            }
+        )
+
+    return render_template(
+        "pipeline_detail.html",
+        active_tab="pipeline",
+        manifest=manifest,
+        artifacts=artifacts,
+    )
+
+
+@main.route("/pipeline/<pipeline_id>/garak-plan", methods=["POST"])
+def pipeline_garak_plan(pipeline_id):
+    orchestrator = _pipeline_orchestrator()
+    try:
+        orchestrator.create_garak_plan(pipeline_id)
+        flash("Garak plan created from saved OWASP risks.", "success")
+    except FileNotFoundError:
+        flash("Risk analysis artifact is required before creating a Garak plan.", "danger")
+    except (ValueError, json.JSONDecodeError) as exc:
+        flash(str(exc), "danger")
+
+    return redirect(url_for("main.pipeline_detail", pipeline_id=pipeline_id))
+
+
+@main.route("/api/pipeline/<pipeline_id>/manifest")
+def pipeline_manifest_api(pipeline_id):
+    orchestrator = _pipeline_orchestrator()
+    try:
+        return jsonify(orchestrator.get_manifest(pipeline_id))
+    except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        abort(404, description="Pipeline not found.")
+
+
+@main.route("/api/pipeline/<pipeline_id>/artifact/<artifact_name>")
+def pipeline_artifact(pipeline_id, artifact_name):
+    orchestrator = _pipeline_orchestrator()
+    try:
+        return jsonify(orchestrator.load_artifact(pipeline_id, artifact_name))
+    except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        abort(404, description="Pipeline artifact not found.")
 
 
 @main.route("/api/llm/status")
@@ -620,6 +717,10 @@ def _load_extract_payload(filename):
     if parse_error:
         raise ValueError(parse_error)
     return parsed
+
+
+def _pipeline_orchestrator():
+    return PipelineOrchestrator(current_app.root_path, current_app.config)
 
 
 def _answers_by_flow_id(response_payload):

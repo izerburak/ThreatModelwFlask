@@ -221,8 +221,8 @@ def _resolve_qat_path(root_path):
 
 def _resolve_questions_path(root_path):
     candidate_paths = [
-        root_path / "TM-Questions" / "questionsDb.json",
         root_path / "app" / "questions" / "questionsDb.json",
+        root_path / "TM-Questions" / "questionsDb.json",
         root_path / "questions" / "questionsDb.json",
     ]
     for candidate_path in candidate_paths:
@@ -270,7 +270,7 @@ def _normalize_flow_definition(raw_flow):
         for raw_condition in node.get("conditions") or []:
             normalized_node["conditions"].append(
                 {
-                    "if": _normalize_condition(raw_condition.get("if")),
+                    "if": _normalize_condition(_condition_value(raw_condition, "if")),
                     "then": _normalize_question_list(raw_condition.get("then", [])),
                     "else": _normalize_question_list(raw_condition.get("else", [])),
                     "next_after": _normalize_flow_target(raw_condition.get("next_after")),
@@ -296,6 +296,16 @@ def _normalize_condition(condition):
         else:
             normalized_condition[key] = _parse_scalar(value)
     return normalized_condition
+
+
+def _condition_value(raw_condition, key):
+    if not isinstance(raw_condition, dict):
+        return None
+    if key in raw_condition:
+        return raw_condition.get(key)
+    if key == "if":
+        return raw_condition.get(True)
+    return None
 
 
 def _collect_question_ids(flow_definition):
@@ -535,7 +545,7 @@ def _parse_graph_qat_without_yaml(text):
         if current_condition is None:
             continue
 
-        if indent == 8:
+        if indent >= 8:
             if stripped.startswith("then:"):
                 current_condition["then"] = []
                 current_list_target = ("condition", "then")

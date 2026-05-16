@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+{% block extra_head %}
+<style>
+    .pipeline-detail-shell {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .pipeline-detail-header,
+    .artifact-panel,
+    .status-panel {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        background: #111827;
+    }
+
+    .pipeline-detail-header {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .pipeline-detail-header h1 {
+        margin: 0;
+        font-size: 1.65rem;
+    }
+
+    .pipeline-meta {
+        margin-top: 0.45rem;
+        color: #cbd5e1;
+    }
+
+    .pipeline-detail-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .panel-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        background: #172033;
+    }
+
+    .panel-header h2 {
+        margin: 0;
+        font-size: 1.05rem;
+    }
+
+    .panel-body {
+        padding: 1.25rem;
+    }
+
+    .artifact-list,
+    .status-list {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .artifact-row,
+    .status-row {
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 8px;
+        background: #0f172a;
+        padding: 0.9rem;
+    }
+
+    .artifact-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .artifact-title,
+    .status-title {
+        font-weight: 700;
+        color: #f8fafc;
+    }
+
+    .artifact-name,
+    .status-meta {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    .status-row {
+        display: grid;
+        gap: 0.35rem;
+    }
+
+    .status-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .status-error {
+        color: #fecaca;
+        font-size: 0.9rem;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    @media (max-width: 991px) {
+        .pipeline-detail-header,
+        .pipeline-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .pipeline-detail-header {
+            display: grid;
+        }
+
+        .detail-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+{% set risks_done = manifest.steps.risk_analysis_completed.done %}
+<div class="pipeline-detail-shell">
+    <section class="pipeline-detail-header">
+        <div>
+            <h1>Pipeline <code>{{ manifest.pipeline_id }}</code></h1>
+            <div class="pipeline-meta">
+                Source: {{ manifest.source_response }}<br>
+                Created: {{ manifest.created_at }} | Updated: {{ manifest.updated_at }}
+            </div>
+        </div>
+        <div class="detail-actions">
+            <a class="btn btn-outline-primary" href="{{ url_for('main.pipeline_manifest_api', pipeline_id=manifest.pipeline_id) }}">Manifest JSON</a>
+            <form method="post" action="{{ url_for('main.pipeline_garak_plan', pipeline_id=manifest.pipeline_id) }}">
+                <button class="btn btn-primary" type="submit" {% if not risks_done %}disabled{% endif %}>Create Garak Plan</button>
+            </form>
+        </div>
+    </section>
+
+    <div class="pipeline-detail-grid">
+        <section class="artifact-panel">
+            <div class="panel-header">
+                <h2>Artifacts</h2>
+            </div>
+            <div class="panel-body">
+                <div class="artifact-list">
+                    {% for artifact in artifacts %}
+                    <div class="artifact-row">
+                        <div>
+                            <div class="artifact-title">{{ artifact.name }}</div>
+                            <div class="artifact-name">
+                                {% if artifact.exists %}
+                                Saved in this pipeline workspace.
+                                {% else %}
+                                Not created yet.
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            {% if artifact.exists %}
+                            <a class="btn btn-outline-primary btn-sm" href="{{ artifact.url }}">Open JSON</a>
+                            {% else %}
+                            <span class="badge text-bg-secondary">pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <aside class="status-panel">
+            <div class="panel-header">
+                <h2>Pipeline Status</h2>
+            </div>
+            <div class="panel-body">
+                <div class="mb-3">
+                    <span class="badge text-bg-info">{{ manifest.status }}</span>
+                </div>
+                <div class="status-list">
+                    {% for step_name, step in manifest.steps.items() %}
+                    {% set failed = step.error %}
+                    {% set completed = step.done %}
+                    <div class="status-row">
+                        <div class="status-top">
+                            <div class="status-title">{{ step_name|replace("_", " ")|title }}</div>
+                            {% if failed %}
+                            <span class="badge text-bg-danger">failed</span>
+                            {% elif completed %}
+                            <span class="badge text-bg-success">completed</span>
+                            {% else %}
+                            <span class="badge text-bg-secondary">pending</span>
+                            {% endif %}
+                        </div>
+                        <div class="status-meta">
+                            Artifact: {{ step.artifact }}
+                            {% if step.timestamp %}<br>Timestamp: {{ step.timestamp }}{% endif %}
+                        </div>
+                        {% if failed %}
+                        <div class="status-error">{{ step.error }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -301,11 +301,11 @@ def _normalize_root_path(root_path):
 
 
 def _resolve_primary_questions_path(root_path):
-    preferred_path = root_path / "TM-Questions" / "questionsDb.json"
+    preferred_path = root_path / "app" / "questions" / "questionsDb.json"
     if preferred_path.exists():
         return preferred_path
 
-    fallback_path = root_path / "app" / "questions" / "questionsDb.json"
+    fallback_path = root_path / "TM-Questions" / "questionsDb.json"
     if fallback_path.exists():
         return fallback_path
 
@@ -419,7 +419,7 @@ def _normalize_graph_qat(qat_data):
 
         for raw_condition in node.get("conditions") or []:
             normalized_condition = {
-                "if": _normalize_condition_clause(raw_condition.get("if")),
+                "if": _normalize_condition_clause(_condition_value(raw_condition, "if")),
                 "then": _normalize_question_list(raw_condition.get("then", [])),
                 "else": _normalize_question_list(raw_condition.get("else", [])),
                 "next_after": _normalize_flow_target(raw_condition.get("next_after")),
@@ -565,6 +565,16 @@ def _normalize_condition_clause(condition_clause):
     return normalized
 
 
+def _condition_value(raw_condition, key):
+    if not isinstance(raw_condition, dict):
+        return None
+    if key in raw_condition:
+        return raw_condition.get(key)
+    if key == "if":
+        return raw_condition.get(True)
+    return None
+
+
 def _normalize_flow_target(value):
     parsed_value = _parse_scalar(value)
     if parsed_value in (None, ""):
@@ -685,7 +695,7 @@ def _parse_graph_qat_without_yaml(text):
         if current_condition is None:
             continue
 
-        if indent == 8:
+        if indent >= 8:
             if stripped.startswith("then:"):
                 inline_value = stripped.split(":", 1)[1].strip()
                 current_condition["then"] = _parse_inline_list_or_scalar(inline_value, normalize_questions=True)

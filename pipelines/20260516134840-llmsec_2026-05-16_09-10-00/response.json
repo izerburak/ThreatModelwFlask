@@ -1,0 +1,130 @@
+{
+  "schema_version": "llmsec.adaptive.v1",
+  "project_id": "MOCK_HEALTHCARE_PORTAL",
+  "system_id": "PATIENT_SUPPORT_RAG_ASSISTANT",
+  "scenario_name": "Patient portal support assistant with RAG over care-plan and billing documents",
+  "timestamp_utc": "2026-05-16T09:10:00Z",
+  "answers_by_flow_id": {
+    "Q1": "Customer support assistant",
+    "Q2": [
+      "Authenticated public users",
+      "Administrators only"
+    ],
+    "Q3": [
+      "Web-based chat interface",
+      "REST API endpoint"
+    ],
+    "Q4": "Yes",
+    "Q5": [
+      "Direct user prompts",
+      "Uploaded files",
+      "Retrieved internal documents",
+      "API or database records"
+    ],
+    "Q6": [
+      "User text input only",
+      "File uploads",
+      "Email or ticket data"
+    ],
+    "Q7": [
+      "Input filtering",
+      "Prompt templating",
+      "RAG augmentation",
+      "Routing/classification"
+    ],
+    "Q8": [
+      "Internal knowledge base",
+      "Documentation",
+      "Customer data"
+    ],
+    "Q9": [
+      "Frontend",
+      "Backend API",
+      "Auth service"
+    ],
+    "Q10": "Per user",
+    "Q11": "Framework",
+    "Q12": [
+      "Search",
+      "Database",
+      "Internal APIs"
+    ],
+    "Q13": [
+      "Vector DB",
+      "SQL/NoSQL",
+      "Cloud storage"
+    ],
+    "Q14": "Via backend",
+    "Q15": [
+      "Generate text responses only",
+      "Create or update tickets/records",
+      "Send emails or notifications"
+    ],
+    "Q16": "No, human approval is always required",
+    "Q17": "Third-party cloud API",
+    "Q18": "Yes, different models for separate tasks",
+    "Q19": "Managed through database or admin panel",
+    "Q20": "Yes, through retrieved documents or memory",
+    "Q21": [
+      "Plain text only",
+      "Markdown or rich text",
+      "Structured JSON"
+    ],
+    "Q22": [
+      "User-facing web interface",
+      "Internal admin dashboard",
+      "API response consumed by other systems",
+      "Email, messaging, or notification channel"
+    ],
+    "Q23": [
+      "Public internet to web application",
+      "Web application to internal API",
+      "Internal API to model service",
+      "Cross-tenant or cross-user context boundary"
+    ],
+    "Q24": [
+      "Personally identifiable information (PII)",
+      "Internal operational documents",
+      "Customer support records"
+    ],
+    "Q25": "Single sign-on (SSO)",
+    "Q26": "Role-based access control (RBAC)",
+    "Q27": "Partially enforced",
+    "Q28": "Partially limited",
+    "Q29": [
+      "Public chat interface",
+      "RAG or document ingestion pipeline",
+      "Model hosting or API integration layer"
+    ],
+    "Q30": "Context isolation and instruction hierarchy controls",
+    "Q31": "Rule-based or schema validation",
+    "Q32": "DLP or content inspection mechanisms",
+    "Q33": "Security monitoring with alerts",
+    "Q34": "Rate limits plus abuse/anomaly detection",
+    "Q35": "Security review and supply chain controls",
+    "Q36": "Partially protected",
+    "Q37": [
+      "Prompt injection to override instructions",
+      "Sensitive data extraction",
+      "Misinformation or unsafe recommendations",
+      "Denial of service or excessive usage"
+    ],
+    "Q38": [
+      "Insufficient monitoring",
+      "Poor prompt/change management",
+      "Weak access control hygiene"
+    ],
+    "Q39": "Yes, moderate-impact decisions",
+    "Q40": "Multi-tenant with strong isolation",
+    "Q41": "User identity partially propagated",
+    "Q42": [
+      "Developers only",
+      "Administrators via admin panel"
+    ],
+    "Q43": "Yes, for indexing only",
+    "Q44": "Basic separation (read vs write)",
+    "Q45": "No access to secrets or hidden data",
+    "Q46": "Tenant-level isolation",
+    "Q47": "Logs contain non-sensitive metadata only"
+  }
+}
