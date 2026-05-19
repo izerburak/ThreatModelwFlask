@@ -45,20 +45,52 @@
 
     .pipeline-start-form {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
         align-items: end;
     }
 
+    .pipeline-start-form .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .pipeline-start-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
     .pipeline-table {
+        --bs-table-bg: #0f172a;
+        --bs-table-color: #f8fafc;
+        --bs-table-border-color: rgba(148, 163, 184, 0.18);
+        --bs-table-striped-bg: #111827;
+        --bs-table-hover-bg: #172033;
         margin: 0;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 8px;
+        overflow: hidden;
     }
 
     .pipeline-table td,
     .pipeline-table th {
+        background-color: #0f172a;
         color: #f8fafc;
         border-color: rgba(148, 163, 184, 0.18);
         vertical-align: middle;
+    }
+
+    .pipeline-table thead th {
+        background-color: #172033;
+        color: #e2e8f0;
+        font-weight: 700;
+    }
+
+    .pipeline-table tbody tr:hover td {
+        background-color: #172033;
+    }
+
+    .pipeline-table code {
+        color: #f472b6;
     }
 
     .empty-state {
@@ -90,7 +122,7 @@
         <div class="pipeline-panel-body">
             {% if response_files %}
             <form class="pipeline-start-form" method="post" action="{{ url_for('main.pipeline_start') }}">
-                <div>
+                <div class="full-width">
                     <label for="responseFilename" class="form-label">Saved Questionnaire Response</label>
                     <select id="responseFilename" class="form-select" name="response_filename" required>
                         <option value="" disabled selected>Select a response file</option>
@@ -99,7 +131,24 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button class="btn btn-primary" type="submit">Start Pipeline</button>
+                <div>
+                    <label for="projectName" class="form-label">Project Name</label>
+                    <input id="projectName" class="form-control" name="project_name" type="text"
+                        placeholder="Example: Customer Support Copilot" required>
+                </div>
+                <div>
+                    <label for="dfdName" class="form-label">DFD Name</label>
+                    <input id="dfdName" class="form-control" name="dfd_name" type="text"
+                        placeholder="Example: Support Copilot Threat Model" required>
+                </div>
+                <div>
+                    <label for="auditorName" class="form-label">Auditor</label>
+                    <input id="auditorName" class="form-control" name="auditor_name" type="text"
+                        placeholder="Auditor or reviewer name">
+                </div>
+                <div class="pipeline-start-actions">
+                    <button class="btn btn-primary" type="submit">Start Pipeline</button>
+                </div>
             </form>
             {% else %}
             <div class="empty-state">No saved questionnaire responses were found.</div>
@@ -118,7 +167,9 @@
                     <thead>
                         <tr>
                             <th>Pipeline</th>
+                            <th>Project</th>
                             <th>Source Response</th>
+                            <th>Auditor</th>
                             <th>Status</th>
                             <th>Updated</th>
                             <th></th>
@@ -128,7 +179,9 @@
                         {% for pipeline in pipelines %}
                         <tr>
                             <td><code>{{ pipeline.pipeline_id }}</code></td>
+                            <td>{{ pipeline.project_name or "-" }}</td>
                             <td>{{ pipeline.source_response }}</td>
+                            <td>{{ pipeline.auditor_name or "-" }}</td>
                             <td><span class="badge text-bg-secondary">{{ pipeline.status }}</span></td>
                             <td>{{ pipeline.updated_at }}</td>
                             <td class="text-end">
@@ -146,4 +199,22 @@
         </div>
     </section>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    const projectNameInput = document.getElementById("projectName");
+    const dfdNameInput = document.getElementById("dfdName");
+
+    if (projectNameInput && dfdNameInput) {
+        projectNameInput.addEventListener("input", () => {
+            if (dfdNameInput.dataset.edited === "true") return;
+            const projectName = projectNameInput.value.trim();
+            dfdNameInput.value = projectName ? `${projectName} Threat Model` : "";
+        });
+
+        dfdNameInput.addEventListener("input", () => {
+            dfdNameInput.dataset.edited = "true";
+        });
+    }
+</script>
 {% endblock %}

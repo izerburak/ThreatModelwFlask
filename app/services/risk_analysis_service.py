@@ -27,16 +27,63 @@ def build_risk_analysis(app_root_path, response_payload, extract_payload=None):
 
     mapped_risks = _mapped_question_risks(questions, answers)
     extract_risks = _extract_risks(extract_payload)
-    status = _overall_status(extract_payload, mapped_risks, extract_risks)
+    unified_risks = unify_risks(extract_risks, mapped_risks)
+    status = _overall_status(extract_payload, unified_risks)
 
     return {
         "overall_status": status,
-        "status_source": "LLM extract" if _normalize_level(extract_payload.get("overall_posture")) else "Question mapping",
+        "status_source": "Combined risk model",
         "mapped_risks": mapped_risks,
         "extract_risks": extract_risks,
+        "unified_risks": unified_risks,
         "quick_wins": _string_list(extract_payload.get("quick_wins")),
         "answers_analyzed": len(answers),
     }
+
+
+def unify_risks(extract_risks, mapped_risks):
+    merged = {}
+
+    for risk in extract_risks or []:
+        if not isinstance(risk, dict):
+            continue
+        code = str(risk.get("code") or "").strip().upper()
+        if not code:
+            continue
+        bucket = merged.setdefault(code, _unified_risk_bucket(code, risk.get("name")))
+        _merge_risk_level(bucket, risk.get("risk_level"))
+        bucket["sources"].add("LLM extract")
+        bucket["why"].append(str(risk.get("why") or "").strip())
+        bucket["extract_evidence"].extend(_string_list(risk.get("evidence")))
+        if risk.get("mitigation"):
+            bucket["mitigations"].append(str(risk.get("mitigation")).strip())
+
+    for risk in mapped_risks or []:
+        if not isinstance(risk, dict):
+            continue
+        code = str(risk.get("code") or "").strip().upper()
+        if not code:
+            continue
+        bucket = merged.setdefault(code, _unified_risk_bucket(code, risk.get("name")))
+        _merge_risk_level(bucket, risk.get("risk_level"))
+        bucket["sources"].add("Questionnaire")
+        if risk.get("score") is not None:
+            bucket["score"] = max(bucket.get("score") or 0, risk.get("score") or 0)
+        evidence = risk.get("evidence") if isinstance(risk.get("evidence"), list) else []
+        bucket["question_evidence"].extend(item for item in evidence if isinstance(item, dict))
+
+    unified = []
+    for bucket in merged.values():
+        bucket["sources"] = sorted(bucket["sources"])
+        bucket["why"] = _unique_strings(bucket["why"])
+        bucket["extract_evidence"] = _unique_strings(bucket["extract_evidence"])
+        bucket["mitigations"] = _unique_strings(bucket["mitigations"])
+        unified.append(bucket)
+
+    return sorted(
+        unified,
+        key=lambda item: (-RISK_RANK.get(item.get("risk_level"), 0), -(item.get("score") or 0), item.get("code", "")),
+    )
 
 
 def suggested_extract_filename(response_file):
@@ -120,24 +167,55 @@ def _extract_risks(extract_payload):
     return sorted(risks, key=lambda item: (-RISK_RANK.get(item["risk_level"], 0), item["code"]))
 
 
-def _overall_status(extract_payload, mapped_risks, extract_risks):
+def _overall_status(extract_payload, unified_risks):
+    levels = [risk.get("risk_level") for risk in unified_risks if isinstance(risk, dict)]
     extract_status = _normalize_level(extract_payload.get("overall_posture"))
     if extract_status:
-        return extract_status
-
-    levels = [risk.get("risk_level") for risk in mapped_risks + extract_risks]
+        levels.append(extract_status)
     ranked = [level for level in levels if level in RISK_RANK]
     if not ranked:
         return "Low"
     return max(ranked, key=lambda level: RISK_RANK[level])
 
 
+def _unified_risk_bucket(code, name):
+    return {
+        "code": code,
+        "name": str(name or OWASP_LLM_2025.get(code) or code).strip(),
+        "risk_level": "Low",
+        "score": 0,
+        "sources": set(),
+        "why": [],
+        "extract_evidence": [],
+        "question_evidence": [],
+        "mitigations": [],
+    }
+
+
+def _merge_risk_level(bucket, level):
+    normalized = _normalize_level(level) or "Medium"
+    current_rank = RISK_RANK.get(bucket.get("risk_level"), 0)
+    if RISK_RANK.get(normalized, 0) > current_rank:
+        bucket["risk_level"] = normalized
+
+
+def _unique_strings(values):
+    seen = set()
+    result = []
+    for value in values:
+        text = str(value or "").strip()
+        if text and text not in seen:
+            seen.add(text)
+            result.append(text)
+    return result
+
+
 def _level_from_weights(severity, score):
-    if severity >= 5 and score >= 50:
+    if severity >= 5 and score >= 100:
         return "Critical"
-    if severity >= 5 or score >= 35:
+    if severity >= 5 or score >= 60:
         return "High"
-    if severity >= 3 or score >= 15:
+    if severity >= 3 or score >= 25:
         return "Medium"
     return "Low"
 

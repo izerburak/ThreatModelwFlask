@@ -1,8 +1,36 @@
-import os
 import json
-from datetime import datetime
 from pathlib import Path
 from flask import current_app
+
+
+def append_question_to_catalog(question_text: str, options: list):
+    qpath = Path(current_app.root_path) / "questions" / "questionsDb.json"
+    questions = json.loads(qpath.read_text(encoding="utf-8")) if qpath.exists() else []
+    if not isinstance(questions, list):
+        questions = []
+
+    max_id = 0
+    for question in questions:
+        if not isinstance(question, dict):
+            continue
+        try:
+            max_id = max(max_id, int(question.get("id", 0)))
+        except (TypeError, ValueError):
+            continue
+
+    clean_options = [str(option).strip() for option in options or [] if str(option).strip()]
+    new_question = {
+        "id": max_id + 1,
+        "text": question_text,
+        "type": "multi" if len(clean_options) > 1 else "single",
+        "options": clean_options,
+        "owasp_llm": [],
+        "severity_weight": 1,
+        "confidence_weight": 1,
+    }
+    questions.append(new_question)
+    qpath.write_text(json.dumps(questions, ensure_ascii=False, indent=2), encoding="utf-8")
+    return str(qpath), new_question
 
 
 

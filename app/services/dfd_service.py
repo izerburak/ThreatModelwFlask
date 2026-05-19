@@ -1,5 +1,6 @@
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -13,6 +14,60 @@ def list_response_files(app_root_path):
 def load_response_payload(app_root_path, filename):
     response_path = _safe_json_path(Path(app_root_path).parent / "responses", filename)
     return json.loads(response_path.read_text(encoding="utf-8"))
+
+
+def archive_dfd_graph(app_root_path, graph, source_name=None, metadata=None):
+    archive_dir = _ensure_dfd_archive_dir(app_root_path)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    safe_source = _safe_slug(Path(str(source_name or "dfd")).stem)
+    archive_id = f"{timestamp}-{safe_source}"
+    archive_path = archive_dir / f"{archive_id}.json"
+    suffix = 2
+    while archive_path.exists():
+        archive_path = archive_dir / f"{archive_id}-{suffix}.json"
+        suffix += 1
+
+    payload = dict(graph) if isinstance(graph, dict) else {}
+    payload["metadata"] = {
+        **(payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}),
+        **(metadata if isinstance(metadata, dict) else {}),
+        "archive_id": archive_path.stem,
+        "source_name": source_name,
+        "archived_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    }
+    archive_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    return archive_path
+
+
+def list_dfd_archives(app_root_path):
+    archive_dir = _ensure_dfd_archive_dir(app_root_path)
+    archives = []
+    for archive_path in archive_dir.glob("*.json"):
+        try:
+            payload = json.loads(archive_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        metadata = payload.get("metadata") if isinstance(payload, dict) else {}
+        if not isinstance(metadata, dict):
+            metadata = {}
+        archives.append(
+            {
+                "filename": archive_path.name,
+                "archive_id": archive_path.stem,
+                "label": metadata.get("display_name") or metadata.get("pipeline_id") or archive_path.stem,
+                "source_name": metadata.get("source_name"),
+                "pipeline_id": metadata.get("pipeline_id"),
+                "archived_at": metadata.get("archived_at"),
+                "node_count": len(payload.get("nodes") or []) if isinstance(payload, dict) else 0,
+                "edge_count": len(payload.get("edges") or []) if isinstance(payload, dict) else 0,
+            }
+        )
+    return sorted(archives, key=lambda item: item.get("archived_at") or item["filename"], reverse=True)
+
+
+def load_dfd_archive(app_root_path, filename):
+    archive_path = _safe_json_path(_ensure_dfd_archive_dir(app_root_path), filename)
+    return json.loads(archive_path.read_text(encoding="utf-8"))
 
 
 def save_model_record(app_root_path, model_id, record):
@@ -81,6 +136,12 @@ def _ensure_generated_models_dir(app_root_path):
     return generated_dir
 
 
+def _ensure_dfd_archive_dir(app_root_path):
+    archive_dir = _ensure_generated_models_dir(app_root_path) / "dfd_runs"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    return archive_dir
+
+
 def _model_record_path(app_root_path, model_id):
     if not re.fullmatch(r"[a-zA-Z0-9_-]+", model_id):
         raise ValueError("Invalid model id.")
@@ -94,6 +155,11 @@ def _safe_json_path(base_dir, filename):
     if not candidate.exists():
         raise FileNotFoundError(filename)
     return candidate
+
+
+def _safe_slug(value):
+    slug = re.sub(r"[^a-zA-Z0-9_.-]+", "-", str(value or "")).strip("-._")
+    return slug or "dfd"
 
 
 def _escape_label(value):

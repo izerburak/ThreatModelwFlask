@@ -6,11 +6,16 @@
         gap: 1rem;
     }
 
-    .risk-hero {
-        padding: 1.5rem;
+    .risk-hero,
+    .risk-panel,
+    .risk-selector {
         border: 1px solid rgba(148, 163, 184, 0.18);
         border-radius: 12px;
         background: #111827;
+    }
+
+    .risk-hero {
+        padding: 1.5rem;
     }
 
     .risk-hero h1 {
@@ -18,22 +23,16 @@
         font-size: 1.8rem;
     }
 
-    .risk-hero p {
-        max-width: 820px;
-        margin: 0.6rem 0 0;
+    .risk-hero p,
+    .risk-meta,
+    .risk-muted {
         color: #cbd5e1;
     }
 
-    .risk-form {
+    .risk-selector {
         padding: 1.25rem;
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 12px;
-        background: #172033;
-    }
-
-    .risk-form-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 1rem;
         align-items: end;
     }
@@ -73,16 +72,27 @@
         color: #fecaca;
     }
 
-    .risk-grid {
+    .risk-summary-grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
     }
 
+    .risk-stat {
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 8px;
+        padding: 1rem;
+        background: #0f172a;
+    }
+
+    .risk-stat strong {
+        display: block;
+        color: #f8fafc;
+        font-size: 1.4rem;
+        line-height: 1.1;
+    }
+
     .risk-panel {
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 12px;
-        background: #111827;
         overflow: hidden;
     }
 
@@ -108,6 +118,7 @@
         border: 1px solid rgba(148, 163, 184, 0.16);
         border-radius: 8px;
         background: #0f172a;
+        min-width: 0;
     }
 
     .risk-item-top {
@@ -121,20 +132,55 @@
     .risk-code {
         font-weight: 700;
         color: #93c5fd;
+        overflow-wrap: anywhere;
     }
 
     .risk-level {
         flex: 0 0 auto;
-        color: #f8fafc;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 999px;
+        padding: 0.34rem 0.62rem;
         font-size: 0.82rem;
         font-weight: 700;
         text-transform: uppercase;
     }
 
-    .risk-evidence {
+    .risk-level.low {
+        background: rgba(34, 197, 94, 0.16);
+        border-color: rgba(34, 197, 94, 0.36);
+        color: #bbf7d0;
+    }
+
+    .risk-level.medium {
+        background: rgba(245, 158, 11, 0.17);
+        border-color: rgba(245, 158, 11, 0.38);
+        color: #fde68a;
+    }
+
+    .risk-level.high {
+        background: rgba(249, 115, 22, 0.18);
+        border-color: rgba(249, 115, 22, 0.42);
+        color: #fed7aa;
+    }
+
+    .risk-level.critical {
+        background: rgba(239, 68, 68, 0.22);
+        border-color: rgba(239, 68, 68, 0.48);
+        color: #fecaca;
+    }
+
+    .risk-evidence,
+    .risk-mitigation {
         margin-top: 0.7rem;
         color: #cbd5e1;
         font-size: 0.9rem;
+        overflow-wrap: anywhere;
+    }
+
+    .risk-mitigation {
+        border-left: 3px solid #22c55e;
+        padding-left: 0.75rem;
+        color: #dcfce7;
     }
 
     .risk-evidence ul {
@@ -148,12 +194,9 @@
     }
 
     @media (max-width: 991px) {
-        .risk-form-grid,
-        .risk-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .status-card {
+        .risk-selector,
+        .status-card,
+        .risk-summary-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -162,40 +205,26 @@
 {% block content %}
 <div class="risk-shell">
     <div class="risk-hero">
-        <h1>Risk Analysis</h1>
+        <h1>Risk Analysis &amp; Mitigation</h1>
         <p>
-            Analyze a saved questionnaire response against the local OWASP LLM Top 10 mapping.
-            If an LLM extract is selected, its overall posture is used as the top-level status.
+            Review pipeline-generated OWASP LLM risks, quick wins, and mitigation guidance.
+            Garak planning remains optional after this analysis is reviewed.
         </p>
     </div>
 
-    <form method="post" class="risk-form">
-        <div class="risk-form-grid">
-            <div>
-                <label for="responseFile" class="form-label">Survey Response File</label>
-                <select class="form-select" id="responseFile" name="response_file" required>
-                    <option value="" disabled {% if not selected_file %}selected{% endif %}>Select a response file</option>
-                    {% for file in response_files %}
-                    <option value="{{ file }}" {% if file == selected_file %}selected{% endif %}>{{ file }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="extractFile" class="form-label">LLM Extract</label>
-                <select class="form-select" id="extractFile" name="extract_file">
-                    <option value="" {% if not selected_extract %}selected{% endif %}>No extract selected</option>
-                    {% for file in extract_files %}
-                    <option value="{{ file }}" {% if file == selected_extract %}selected{% endif %}>{{ file }}</option>
-                    {% endfor %}
-                </select>
-                {% if suggested_extract %}
-                <div class="form-text">Suggested matching extract: {{ suggested_extract }}</div>
-                {% endif %}
-            </div>
-            <div>
-                <button type="submit" class="btn btn-warning">Run Analysis</button>
-            </div>
+    <form method="get" action="{{ url_for('main.risk') }}" class="risk-selector">
+        <div>
+            <label for="pipelineSelect" class="form-label">Risk Analysis</label>
+            <select class="form-select" id="pipelineSelect" name="pipeline" required>
+                <option value="" disabled {% if not selected_pipeline %}selected{% endif %}>Select a pipeline risk analysis</option>
+                {% for run in risk_runs %}
+                <option value="{{ run.pipeline_id }}" {% if run.pipeline_id == selected_pipeline %}selected{% endif %}>
+                    {{ run.label }}{% if run.dfd_name %} - {{ run.dfd_name }}{% endif %} ({{ run.overall_status }})
+                </option>
+                {% endfor %}
+            </select>
         </div>
+        <button class="btn btn-primary" type="submit">Show Analysis</button>
     </form>
 
     {% if analysis_error %}
@@ -207,75 +236,30 @@
     <div class="status-card">
         <div class="status-pill {{ status_class }}">{{ analysis.overall_status }}</div>
         <div>
-            <h2 class="h5 mb-1">Your system has {{ analysis.overall_status }} LLM security risk.</h2>
-            <div class="text-muted">
+            <h2 class="h5 mb-1">
+                {{ selected_manifest.project_name if selected_manifest else "Selected pipeline" }}
+            </h2>
+            <div class="risk-meta">
+                {% if selected_manifest %}
+                Analysis: {{ selected_manifest.dfd_name or selected_manifest.pipeline_id }}<br>
+                {% if selected_manifest.auditor_name %}Auditor: {{ selected_manifest.auditor_name }}<br>{% endif %}
+                Pipeline: <code>{{ selected_manifest.pipeline_id }}</code><br>
+                {% endif %}
                 Status source: {{ analysis.status_source }}.
                 {{ analysis.answers_analyzed }} questionnaire answers analyzed.
             </div>
         </div>
     </div>
 
-    <div class="risk-grid">
-        <section class="risk-panel">
-            <div class="risk-panel-header">
-                <h2>LLM Extract Risks</h2>
-            </div>
-            {% if analysis.extract_risks %}
-            <div class="risk-list">
-                {% for risk in analysis.extract_risks %}
-                <article class="risk-item">
-                    <div class="risk-item-top">
-                        <div>
-                            <div class="risk-code">{{ risk.code }} · {{ risk.name }}</div>
-                            {% if risk.why %}<div class="text-muted">{{ risk.why }}</div>{% endif %}
-                        </div>
-                        <div class="risk-level">{{ risk.risk_level }}</div>
-                    </div>
-                    {% if risk.evidence %}
-                    <div class="risk-evidence">Evidence: {{ risk.evidence|join(", ") }}</div>
-                    {% endif %}
-                    {% if risk.mitigation %}
-                    <div class="risk-evidence">Mitigation: {{ risk.mitigation }}</div>
-                    {% endif %}
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-panel">No extract risk list is available for this run.</div>
-            {% endif %}
-        </section>
-
-        <section class="risk-panel">
-            <div class="risk-panel-header">
-                <h2>Question Mapping Risks</h2>
-            </div>
-            {% if analysis.mapped_risks %}
-            <div class="risk-list">
-                {% for risk in analysis.mapped_risks %}
-                <article class="risk-item">
-                    <div class="risk-item-top">
-                        <div>
-                            <div class="risk-code">{{ risk.code }} · {{ risk.name }}</div>
-                            <div class="text-muted">Mapped from questionnaire metadata. Score: {{ risk.score }}</div>
-                        </div>
-                        <div class="risk-level">{{ risk.risk_level }}</div>
-                    </div>
-                    <div class="risk-evidence">
-                        <ul>
-                            {% for evidence in risk.evidence[:4] %}
-                            <li>
-                                <strong>{{ evidence.question }}</strong>: {{ evidence.answer }}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-panel">No OWASP mappings were found in the answered questions.</div>
-            {% endif %}
-        </section>
+    <div class="risk-summary-grid">
+        <div class="risk-stat">
+            <strong>{{ analysis.unified_risks|length }}</strong>
+            <span class="risk-muted">Consolidated risks</span>
+        </div>
+        <div class="risk-stat">
+            <strong>{{ analysis.quick_wins|length }}</strong>
+            <span class="risk-muted">Quick wins</span>
+        </div>
     </div>
 
     {% if analysis.quick_wins %}
@@ -290,31 +274,74 @@
         </div>
     </section>
     {% endif %}
+
+    <section class="risk-panel">
+        <div class="risk-panel-header">
+            <h2>Mitigations</h2>
+        </div>
+        {% set mitigations = analysis.unified_risks|selectattr("mitigations")|list %}
+        {% if mitigations %}
+        <div class="risk-list">
+            {% for risk in mitigations %}
+            <article class="risk-item">
+                <div class="risk-code">{{ risk.code }} - {{ risk.name }}</div>
+                {% for mitigation in risk.mitigations %}
+                <div class="risk-mitigation">{{ mitigation }}</div>
+                {% endfor %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-panel">No mitigation guidance is available in this risk artifact.</div>
+        {% endif %}
+    </section>
+
+    <section class="risk-panel">
+        <div class="risk-panel-header">
+            <h2>Risks</h2>
+        </div>
+        {% if analysis.unified_risks %}
+        <div class="risk-list">
+            {% for risk in analysis.unified_risks %}
+            <article class="risk-item">
+                <div class="risk-item-top">
+                    <div>
+                        <div class="risk-code">{{ risk.code }} - {{ risk.name }}</div>
+                        <div class="risk-muted">
+                            Sources: {{ risk.sources|join(", ") }}
+                        </div>
+                    </div>
+                    <div class="risk-level {{ risk.risk_level|lower }}">{{ risk.risk_level }}</div>
+                </div>
+                {% if risk.why %}
+                <div class="risk-evidence">{{ risk.why|join(" ") }}</div>
+                {% endif %}
+                {% if risk.extract_evidence %}
+                <div class="risk-evidence">Extract evidence: {{ risk.extract_evidence|join(", ") }}</div>
+                {% endif %}
+                {% if risk.question_evidence %}
+                <div class="risk-evidence">
+                    <ul>
+                        {% for evidence in risk.question_evidence[:5] %}
+                        <li><strong>{{ evidence.question }}</strong>: {{ evidence.answer }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% for mitigation in risk.mitigations %}
+                <div class="risk-mitigation">{{ mitigation }}</div>
+                {% endfor %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-panel">No risks were found for this pipeline.</div>
+        {% endif %}
+    </section>
+    {% elif not analysis_error %}
+    <div class="risk-panel">
+        <div class="empty-panel">Select a completed pipeline risk analysis to review mitigations.</div>
+    </div>
     {% endif %}
 </div>
-{% endblock %}
-{% block extra_scripts %}
-<script>
-    const responseSelect = document.getElementById("responseFile");
-    const extractSelect = document.getElementById("extractFile");
-
-    function extractNameForResponse(responseFile) {
-        if (!responseFile || !responseFile.endsWith(".json")) {
-            return "";
-        }
-        return `${responseFile.slice(0, -5)}-extract.json`;
-    }
-
-    responseSelect.addEventListener("change", () => {
-        if (extractSelect.value) {
-            return;
-        }
-
-        const suggested = extractNameForResponse(responseSelect.value);
-        const match = Array.from(extractSelect.options).find((option) => option.value === suggested);
-        if (match) {
-            extractSelect.value = suggested;
-        }
-    });
-</script>
 {% endblock %}

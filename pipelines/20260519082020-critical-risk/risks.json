@@ -1,0 +1,769 @@
+{
+  "overall_status": "Medium",
+  "status_source": "LLM extract",
+  "mapped_risks": [
+    {
+      "code": "LLM02",
+      "name": "Sensitive Information Disclosure",
+      "risk_level": "Critical",
+      "score": 396,
+      "evidence": [
+        {
+          "question": "Q4",
+          "text": "Does the LLM process sensitive or business-critical data?",
+          "answer": "Yes",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q8",
+          "text": "Which data sources are connected via RAG?",
+          "answer": [
+            "Internal knowledge base",
+            "Customer data"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q10",
+          "text": "Does the system store conversation history?",
+          "answer": "Global",
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q13",
+          "text": "Which storage systems are accessible?",
+          "answer": [
+            "SQL/NoSQL",
+            "Cloud storage"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q23",
+          "text": "Which trust boundaries does user input cross before reaching the LLM?",
+          "answer": [
+            "Internal API to model service",
+            "Cross-tenant or cross-user context boundary"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q24",
+          "text": "Which sensitive data categories are accessible to the LLM?",
+          "answer": [
+            "Personally identifiable information (PII)",
+            "API keys or credentials",
+            "Customer support records"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q26",
+          "text": "How is authorization enforced for LLM access?",
+          "answer": "Attribute- or policy-based controls",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q27",
+          "text": "Is role-based filtering applied to retrieved documents or data?",
+          "answer": "Partially enforced",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q28",
+          "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?",
+          "answer": "Partially limited",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q32",
+          "text": "Are safeguards implemented to prevent sensitive data leakage?",
+          "answer": "DLP or content inspection mechanisms",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q37",
+          "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+          "answer": [
+            "Unauthorized action triggering",
+            "Sensitive data extraction",
+            "Denial of service or excessive usage"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q40",
+          "text": "Is the system single-tenant or multi-tenant?",
+          "answer": "Multi-tenant with weak or unclear isolation",
+          "severity_weight": 5,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q41",
+          "text": "How is user identity propagated across system components (LLM, tools, retrieval)?",
+          "answer": "User identity partially propagated",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q43",
+          "text": "Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?",
+          "answer": "Yes, both indexing and training",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q45",
+          "text": "Can the LLM access secrets, credentials, or hidden system instructions at runtime?",
+          "answer": "Access to sensitive data such as API keys or credentials",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q46",
+          "text": "Is conversation or memory data isolated per user, session, or tenant?",
+          "answer": "Tenant-level isolation",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q47",
+          "text": "Do logs or monitoring systems store full prompts, responses, or sensitive content?",
+          "answer": "Logs contain full prompts and responses",
+          "severity_weight": 4,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM06",
+      "name": "Excessive Agency",
+      "risk_level": "Critical",
+      "score": 293,
+      "evidence": [
+        {
+          "question": "Q9",
+          "text": "Which internal services can call the LLM?",
+          "answer": [
+            "Backend API",
+            "Monitoring service"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q11",
+          "text": "Is there an orchestration layer?",
+          "answer": "Agent workflow",
+          "severity_weight": 3,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q12",
+          "text": "Does the LLM have access to tools?",
+          "answer": [
+            "Database",
+            "Internal APIs",
+            "Admin tools"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q14",
+          "text": "Can the LLM call external APIs?",
+          "answer": "Via backend",
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q15",
+          "text": "What actions can the LLM trigger?",
+          "answer": [
+            "Create or update tickets/records",
+            "Send emails or notifications",
+            "Execute workflows or transactions"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q16",
+          "text": "Can the LLM affect real-world state or business processes without human approval?",
+          "answer": "Yes, in business-critical actions",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q22",
+          "text": "Where is LLM output rendered or consumed?",
+          "answer": [
+            "Directly used in backend automation",
+            "API response consumed by other systems"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q26",
+          "text": "How is authorization enforced for LLM access?",
+          "answer": "Attribute- or policy-based controls",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q28",
+          "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?",
+          "answer": "Partially limited",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q29",
+          "text": "Which components expose the largest LLM-related attack surface?",
+          "answer": [
+            "Tool-calling or agent framework",
+            "Model hosting or API integration layer"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q37",
+          "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+          "answer": [
+            "Unauthorized action triggering",
+            "Sensitive data extraction",
+            "Denial of service or excessive usage"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q41",
+          "text": "How is user identity propagated across system components (LLM, tools, retrieval)?",
+          "answer": "User identity partially propagated",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q44",
+          "text": "Are LLM tool permissions separated by action type (read, write, admin, destructive)?",
+          "answer": "Granular permissions including admin or destructive actions",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM01",
+      "name": "Prompt Injection",
+      "risk_level": "Critical",
+      "score": 217,
+      "evidence": [
+        {
+          "question": "Q2",
+          "text": "Who can directly interact with the LLM system?",
+          "answer": [
+            "Internal employees only",
+            "Administrators only"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q3",
+          "text": "Through which interfaces is the LLM accessible?",
+          "answer": [
+            "REST API endpoint",
+            "Internal service-to-service calls"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q5",
+          "text": "What are the primary sources of input data for the LLM?",
+          "answer": [
+            "API or database records",
+            "Retrieved internal documents"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q6",
+          "text": "What types of external or untrusted content can be ingested by the LLM?",
+          "answer": [
+            "Email or ticket data"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q7",
+          "text": "What processing steps occur before user input reaches the LLM?",
+          "answer": [
+            "Routing/classification",
+            "Prompt templating"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q20",
+          "text": "Can users influence system prompts or instructions indirectly?",
+          "answer": "Yes, through tool outputs or metadata",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q23",
+          "text": "Which trust boundaries does user input cross before reaching the LLM?",
+          "answer": [
+            "Internal API to model service",
+            "Cross-tenant or cross-user context boundary"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q29",
+          "text": "Which components expose the largest LLM-related attack surface?",
+          "answer": [
+            "Tool-calling or agent framework",
+            "Model hosting or API integration layer"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q30",
+          "text": "Are safeguards implemented against prompt injection attacks?",
+          "answer": "Prompt injection detection or scanning",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q37",
+          "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+          "answer": [
+            "Unauthorized action triggering",
+            "Sensitive data extraction",
+            "Denial of service or excessive usage"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM10",
+      "name": "Unbounded Consumption",
+      "risk_level": "Critical",
+      "score": 126,
+      "evidence": [
+        {
+          "question": "Q2",
+          "text": "Who can directly interact with the LLM system?",
+          "answer": [
+            "Internal employees only",
+            "Administrators only"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q3",
+          "text": "Through which interfaces is the LLM accessible?",
+          "answer": [
+            "REST API endpoint",
+            "Internal service-to-service calls"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q25",
+          "text": "How are users authenticated before interacting with the LLM?",
+          "answer": "Single sign-on (SSO)",
+          "severity_weight": 4,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q29",
+          "text": "Which components expose the largest LLM-related attack surface?",
+          "answer": [
+            "Tool-calling or agent framework",
+            "Model hosting or API integration layer"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q34",
+          "text": "Are rate limits or abuse protections applied to the LLM interface?",
+          "answer": "Rate limits plus abuse/anomaly detection",
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q37",
+          "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+          "answer": [
+            "Unauthorized action triggering",
+            "Sensitive data extraction",
+            "Denial of service or excessive usage"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM08",
+      "name": "Vector and Embedding Weaknesses",
+      "risk_level": "Critical",
+      "score": 115,
+      "evidence": [
+        {
+          "question": "Q8",
+          "text": "Which data sources are connected via RAG?",
+          "answer": [
+            "Internal knowledge base",
+            "Customer data"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q13",
+          "text": "Which storage systems are accessible?",
+          "answer": [
+            "SQL/NoSQL",
+            "Cloud storage"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q27",
+          "text": "Is role-based filtering applied to retrieved documents or data?",
+          "answer": "Partially enforced",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q29",
+          "text": "Which components expose the largest LLM-related attack surface?",
+          "answer": [
+            "Tool-calling or agent framework",
+            "Model hosting or API integration layer"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q36",
+          "text": "Are embeddings or vector databases protected against unauthorized access?",
+          "answer": "Yes, strongly protected",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM04",
+      "name": "Data and Model Poisoning",
+      "risk_level": "Critical",
+      "score": 95,
+      "evidence": [
+        {
+          "question": "Q5",
+          "text": "What are the primary sources of input data for the LLM?",
+          "answer": [
+            "API or database records",
+            "Retrieved internal documents"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q6",
+          "text": "What types of external or untrusted content can be ingested by the LLM?",
+          "answer": [
+            "Email or ticket data"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q8",
+          "text": "Which data sources are connected via RAG?",
+          "answer": [
+            "Internal knowledge base",
+            "Customer data"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q43",
+          "text": "Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?",
+          "answer": "Yes, both indexing and training",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM05",
+      "name": "Improper Output Handling",
+      "risk_level": "Critical",
+      "score": 95,
+      "evidence": [
+        {
+          "question": "Q15",
+          "text": "What actions can the LLM trigger?",
+          "answer": [
+            "Create or update tickets/records",
+            "Send emails or notifications",
+            "Execute workflows or transactions"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q21",
+          "text": "What output formats are produced by the LLM?",
+          "answer": [
+            "Structured JSON"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q22",
+          "text": "Where is LLM output rendered or consumed?",
+          "answer": [
+            "Directly used in backend automation",
+            "API response consumed by other systems"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q31",
+          "text": "Is LLM output validated before being used by other systems?",
+          "answer": "Human-in-the-loop plus technical validation",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM07",
+      "name": "System Prompt Leakage",
+      "risk_level": "Critical",
+      "score": 90,
+      "evidence": [
+        {
+          "question": "Q19",
+          "text": "How are LLM prompts or system instructions managed?",
+          "answer": "Dynamically generated at runtime",
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q20",
+          "text": "Can users influence system prompts or instructions indirectly?",
+          "answer": "Yes, through tool outputs or metadata",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q42",
+          "text": "Who can modify prompts, policies, or retrieval sources?",
+          "answer": [
+            "Developers only",
+            "Automated systems or pipelines"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q45",
+          "text": "Can the LLM access secrets, credentials, or hidden system instructions at runtime?",
+          "answer": "Access to sensitive data such as API keys or credentials",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM03",
+      "name": "Supply Chain",
+      "risk_level": "Critical",
+      "score": 74,
+      "evidence": [
+        {
+          "question": "Q17",
+          "text": "Where is the LLM hosted?",
+          "answer": "Hybrid deployment",
+          "severity_weight": 4,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q18",
+          "text": "Does the system use multiple LLM models for different tasks?",
+          "answer": "Yes, different models for separate tasks",
+          "severity_weight": 3,
+          "confidence_weight": 3
+        },
+        {
+          "question": "Q35",
+          "text": "How are external models or dependencies validated?",
+          "answer": "Security review and supply chain controls",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q42",
+          "text": "Who can modify prompts, policies, or retrieval sources?",
+          "answer": [
+            "Developers only",
+            "Automated systems or pipelines"
+          ],
+          "severity_weight": 4,
+          "confidence_weight": 5
+        }
+      ]
+    },
+    {
+      "code": "LLM09",
+      "name": "Misinformation",
+      "risk_level": "Critical",
+      "score": 67,
+      "evidence": [
+        {
+          "question": "Q1",
+          "text": "What is the primary purpose of the LLM in this system?",
+          "answer": "Agent or workflow automation component",
+          "severity_weight": 2,
+          "confidence_weight": 4
+        },
+        {
+          "question": "Q18",
+          "text": "Does the system use multiple LLM models for different tasks?",
+          "answer": "Yes, different models for separate tasks",
+          "severity_weight": 3,
+          "confidence_weight": 3
+        },
+        {
+          "question": "Q37",
+          "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+          "answer": [
+            "Unauthorized action triggering",
+            "Sensitive data extraction",
+            "Denial of service or excessive usage"
+          ],
+          "severity_weight": 5,
+          "confidence_weight": 5
+        },
+        {
+          "question": "Q39",
+          "text": "Does the system rely on LLM responses for automated decision making?",
+          "answer": "Yes, high-impact or business-critical decisions",
+          "severity_weight": 5,
+          "confidence_weight": 5
+        }
+      ]
+    }
+  ],
+  "extract_risks": [
+    {
+      "code": "LLM01",
+      "name": "Prompt Injection",
+      "risk_level": "High",
+      "why": "Prompt influence paths and lack of full mitigation for prompt injection",
+      "evidence": [
+        "Q20",
+        "Q30"
+      ],
+      "mitigation": "Enhance prompt injection detection and scanning, and enforce stricter input validation"
+    },
+    {
+      "code": "LLM02",
+      "name": "Sensitive Information Disclosure",
+      "risk_level": "High",
+      "why": "Handling of sensitive data such as PII, API keys, and customer records with partial enforcement of controls",
+      "evidence": [
+        "Q4",
+        "Q24",
+        "Q45"
+      ],
+      "mitigation": "Implement stronger DLP and content inspection mechanisms, and ensure full enforcement of data handling controls"
+    },
+    {
+      "code": "LLM06",
+      "name": "Improper Output Handling",
+      "risk_level": "High",
+      "why": "Outputs used by systems with no validation and tool/action access",
+      "evidence": [
+        "Q22",
+        "Q15",
+        "Q28"
+      ],
+      "mitigation": "Enforce output validation and limit tool/action access to business-critical actions only"
+    },
+    {
+      "code": "LLM07",
+      "name": "System Prompt Leakage",
+      "risk_level": "High",
+      "why": "Logs contain full prompts and responses, increasing risk of system prompt leakage",
+      "evidence": [
+        "Q47"
+      ],
+      "mitigation": "Restrict log content to avoid exposing system prompts and responses"
+    },
+    {
+      "code": "LLM09",
+      "name": "Misinformation / Overreliance",
+      "risk_level": "Medium",
+      "why": "Automated decisions made by high-impact or business-critical decisions",
+      "evidence": [
+        "Q39"
+      ],
+      "mitigation": "Implement human-in-the-loop validation for critical decisions"
+    },
+    {
+      "code": "LLM10",
+      "name": "Unbounded Consumption / Abuse",
+      "risk_level": "Medium",
+      "why": "Weak rate limiting and potential for denial of service or excessive usage",
+      "evidence": [
+        "Q34",
+        "Q37"
+      ],
+      "mitigation": "Strengthen rate limits and anomaly detection to prevent abuse"
+    }
+  ],
+  "quick_wins": [
+    "Implement stronger DLP and content inspection mechanisms",
+    "Enhance prompt injection detection and scanning",
+    "Enforce stricter input validation and output handling",
+    "Restrict log content to avoid exposing system prompts and responses"
+  ],
+  "answers_analyzed": 47
+}

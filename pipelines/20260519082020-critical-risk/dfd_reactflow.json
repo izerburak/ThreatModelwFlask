@@ -1,0 +1,335 @@
+{
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "internal_user",
+      "position": {
+        "x": 80,
+        "y": 100
+      },
+      "data": {
+        "label": "Internal employees",
+        "notes": "Generated from architecture.actors"
+      }
+    },
+    {
+      "id": "node_2",
+      "type": "admin",
+      "position": {
+        "x": 80,
+        "y": 240
+      },
+      "data": {
+        "label": "Administrators",
+        "notes": "Generated from architecture.actors"
+      }
+    },
+    {
+      "id": "node_3",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 100
+      },
+      "data": {
+        "label": "Automated systems or pipelines",
+        "notes": "Generated from architecture.actors"
+      }
+    },
+    {
+      "id": "node_4",
+      "type": "api_service",
+      "position": {
+        "x": 350,
+        "y": 100
+      },
+      "data": {
+        "label": "REST API endpoint",
+        "notes": "Generated from architecture.interfaces"
+      }
+    },
+    {
+      "id": "node_5",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 240
+      },
+      "data": {
+        "label": "Internal service-to-service calls",
+        "notes": "Generated from architecture.interfaces"
+      }
+    },
+    {
+      "id": "node_6",
+      "type": "api_service",
+      "position": {
+        "x": 350,
+        "y": 240
+      },
+      "data": {
+        "label": "Backend API",
+        "notes": "Generated from architecture.interfaces"
+      }
+    },
+    {
+      "id": "node_7",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 380
+      },
+      "data": {
+        "label": "Monitoring service",
+        "notes": "Generated from architecture.interfaces"
+      }
+    },
+    {
+      "id": "node_8",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 520
+      },
+      "data": {
+        "label": "Routing/classification",
+        "notes": "Generated from architecture.tools"
+      }
+    },
+    {
+      "id": "node_9",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 660
+      },
+      "data": {
+        "label": "Prompt templating",
+        "notes": "Generated from architecture.tools"
+      }
+    },
+    {
+      "id": "node_10",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 800
+      },
+      "data": {
+        "label": "Tool-calling or agent framework",
+        "notes": "Generated from architecture.tools"
+      }
+    },
+    {
+      "id": "node_11",
+      "type": "llm",
+      "position": {
+        "x": 650,
+        "y": 940
+      },
+      "data": {
+        "label": "Model hosting or API integration layer",
+        "notes": "Generated from architecture.tools"
+      }
+    },
+    {
+      "id": "node_12",
+      "type": "database",
+      "position": {
+        "x": 950,
+        "y": 100
+      },
+      "data": {
+        "label": "API or database records",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_13",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 1080
+      },
+      "data": {
+        "label": "Retrieved internal documents",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_14",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 1220
+      },
+      "data": {
+        "label": "Email or ticket data",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_15",
+      "type": "vector_db",
+      "position": {
+        "x": 950,
+        "y": 240
+      },
+      "data": {
+        "label": "Internal knowledge base",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_16",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 1360
+      },
+      "data": {
+        "label": "Customer data",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_17",
+      "type": "database",
+      "position": {
+        "x": 950,
+        "y": 380
+      },
+      "data": {
+        "label": "Database",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_18",
+      "type": "process",
+      "position": {
+        "x": 650,
+        "y": 1500
+      },
+      "data": {
+        "label": "Cloud storage",
+        "notes": "Generated from architecture.data_sources"
+      }
+    },
+    {
+      "id": "node_19",
+      "type": "trust_boundary",
+      "position": {
+        "x": 1200,
+        "y": 100
+      },
+      "data": {
+        "label": "Internal API to model service",
+        "notes": "Generated from system_summary.trust_boundaries"
+      }
+    },
+    {
+      "id": "node_20",
+      "type": "trust_boundary",
+      "position": {
+        "x": 1200,
+        "y": 240
+      },
+      "data": {
+        "label": "Cross-tenant or cross-user context boundary",
+        "notes": "Generated from system_summary.trust_boundaries"
+      }
+    },
+    {
+      "id": "node_21",
+      "type": "text_note",
+      "position": {
+        "x": 1450,
+        "y": 100
+      },
+      "data": {
+        "label": "System Summary",
+        "notes": "Purpose: Agent or workflow automation component\nExposure: Internal employees and administrators only via REST API and internal service-to-service calls"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_1",
+      "source": "node_1",
+      "target": "node_4",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_2",
+      "source": "node_1",
+      "target": "node_6",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_3",
+      "source": "node_2",
+      "target": "node_4",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_4",
+      "source": "node_2",
+      "target": "node_6",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_5",
+      "source": "node_4",
+      "target": "node_11",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_6",
+      "source": "node_6",
+      "target": "node_11",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_7",
+      "source": "node_11",
+      "target": "node_12",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_8",
+      "source": "node_11",
+      "target": "node_17",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_9",
+      "source": "node_4",
+      "target": "node_12",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_10",
+      "source": "node_4",
+      "target": "node_17",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_11",
+      "source": "node_6",
+      "target": "node_12",
+      "label": "Uses"
+    },
+    {
+      "id": "edge_12",
+      "source": "node_6",
+      "target": "node_17",
+      "label": "Uses"
+    }
+  ],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 0.9
+  }
+}

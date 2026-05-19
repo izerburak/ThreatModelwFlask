@@ -7,6 +7,7 @@
     }
 
     .pipeline-detail-header,
+    .output-panel,
     .artifact-panel,
     .status-panel {
         border: 1px solid rgba(148, 163, 184, 0.18);
@@ -37,6 +38,10 @@
         grid-template-columns: minmax(0, 1fr) 360px;
         gap: 1rem;
         align-items: start;
+    }
+
+    .pipeline-detail-grid > * {
+        min-width: 0;
     }
 
     .panel-header {
@@ -85,11 +90,95 @@
     .status-meta {
         color: #94a3b8;
         font-size: 0.9rem;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .output-panel {
+        overflow: hidden;
+    }
+
+    .output-path {
+        padding: 0.85rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 8px;
+        background: #0f172a;
+        color: #cbd5e1;
+        font-size: 0.92rem;
+        overflow-wrap: anywhere;
+    }
+
+    .dfd-preview {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .dfd-preview-stats {
+        display: flex;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .dfd-stat {
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        border-radius: 8px;
+        padding: 0.55rem 0.75rem;
+        color: #dbeafe;
+        background: rgba(59, 130, 246, 0.08);
+        font-weight: 700;
+    }
+
+    .dfd-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .dfd-preview-column {
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 8px;
+        background: #0f172a;
+        padding: 0.95rem;
+        min-width: 0;
+    }
+
+    .dfd-preview-column h3 {
+        margin: 0 0 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .dfd-chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .dfd-chip {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 999px;
+        padding: 0.35rem 0.6rem;
+        color: #e2e8f0;
+        background: rgba(15, 23, 42, 0.8);
+        font-size: 0.84rem;
+        max-width: 100%;
+    }
+
+    .dfd-flow-list {
+        display: grid;
+        gap: 0.45rem;
+        color: #cbd5e1;
+        font-size: 0.86rem;
+    }
+
+    .dfd-flow-list code {
+        color: #bfdbfe;
     }
 
     .status-row {
         display: grid;
         gap: 0.35rem;
+        min-width: 0;
     }
 
     .status-top {
@@ -97,11 +186,26 @@
         justify-content: space-between;
         gap: 0.75rem;
         align-items: center;
+        min-width: 0;
+    }
+
+    .status-title {
+        min-width: 0;
+        overflow-wrap: anywhere;
     }
 
     .status-error {
         color: #fecaca;
         font-size: 0.9rem;
+    }
+
+    .status-artifact-link {
+        display: inline-flex;
+        width: fit-content;
+        margin-top: 0.45rem;
+        max-width: 100%;
+        justify-content: center;
+        white-space: normal;
     }
 
     .detail-actions {
@@ -113,7 +217,8 @@
 
     @media (max-width: 991px) {
         .pipeline-detail-header,
-        .pipeline-detail-grid {
+        .pipeline-detail-grid,
+        .dfd-preview-grid {
             grid-template-columns: 1fr;
         }
 
@@ -132,8 +237,11 @@
 <div class="pipeline-detail-shell">
     <section class="pipeline-detail-header">
         <div>
-            <h1>Pipeline <code>{{ manifest.pipeline_id }}</code></h1>
+            <h1>{{ manifest.project_name or "Pipeline" }}</h1>
             <div class="pipeline-meta">
+                Pipeline: <code>{{ manifest.pipeline_id }}</code><br>
+                DFD: {{ manifest.dfd_name or "Generated DFD" }}<br>
+                {% if manifest.auditor_name %}Auditor: {{ manifest.auditor_name }}<br>{% endif %}
                 Source: {{ manifest.source_response }}<br>
                 Created: {{ manifest.created_at }} | Updated: {{ manifest.updated_at }}
             </div>
@@ -143,6 +251,76 @@
             <form method="post" action="{{ url_for('main.pipeline_garak_plan', pipeline_id=manifest.pipeline_id) }}">
                 <button class="btn btn-primary" type="submit" {% if not risks_done %}disabled{% endif %}>Create Garak Plan</button>
             </form>
+        </div>
+    </section>
+
+    <section class="output-panel">
+        <div class="panel-header">
+            <h2>Outputs</h2>
+        </div>
+        <div class="panel-body">
+            <div class="mb-3">
+                <div class="artifact-title mb-2">Pipeline workspace</div>
+                <div class="output-path">{{ pipeline_workspace }}</div>
+            </div>
+            {% if dfd_preview %}
+            <div class="dfd-preview">
+                <div class="d-flex justify-content-between gap-3 align-items-start flex-wrap">
+                    <div>
+                        <div class="artifact-title">{{ manifest.dfd_name or "Generated DFD" }}</div>
+                        <div class="artifact-name">Saved as <code>dfd_reactflow.json</code> in this workspace.</div>
+                    </div>
+                    {% if dfd_view_url %}
+                    <a class="btn btn-outline-primary btn-sm" href="{{ dfd_view_url }}">Show DFD</a>
+                    {% else %}
+                    <a class="btn btn-outline-primary btn-sm"
+                        href="{{ url_for('main.pipeline_artifact', pipeline_id=manifest.pipeline_id, artifact_name='dfd_reactflow.json') }}">Open DFD JSON</a>
+                    {% endif %}
+                </div>
+                <div class="dfd-preview-stats">
+                    <div class="dfd-stat">{{ dfd_preview.node_count }} nodes</div>
+                    <div class="dfd-stat">{{ dfd_preview.edge_count }} flows</div>
+                </div>
+                <div class="dfd-preview-grid">
+                    <div class="dfd-preview-column">
+                        <h3>Nodes</h3>
+                        <div class="dfd-chip-list">
+                            {% for node in dfd_preview.nodes %}
+                            <span class="dfd-chip">{{ node.label }} · {{ node.type }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="dfd-preview-column">
+                        <h3>Flows</h3>
+                        <div class="dfd-flow-list">
+                            {% for edge in dfd_preview.edges %}
+                            <div><code>{{ edge.source }}</code> -> <code>{{ edge.target }}</code> · {{ edge.label }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="artifact-name">DFD has not been generated yet. When it is ready, it will appear here as <code>dfd_reactflow.json</code>.</div>
+            {% endif %}
+            {% if risk_preview %}
+            <div class="dfd-preview">
+                <div class="d-flex justify-content-between gap-3 align-items-start flex-wrap">
+                    <div>
+                        <div class="artifact-title">Risk Analysis &amp; Mitigation</div>
+                        <div class="artifact-name">
+                            {{ risk_preview.risk_count }} risks,
+                            {{ risk_preview.mitigation_count }} mitigations,
+                            {{ risk_preview.quick_win_count }} quick wins.
+                        </div>
+                    </div>
+                    <a class="btn btn-outline-primary btn-sm" href="{{ risk_view_url }}">See Risks &amp; Mitigation</a>
+                </div>
+                <div class="dfd-preview-stats">
+                    <div class="dfd-stat">{{ risk_preview.overall_status }} status</div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -159,7 +337,7 @@
                             <div class="artifact-title">{{ artifact.name }}</div>
                             <div class="artifact-name">
                                 {% if artifact.exists %}
-                                Saved in this pipeline workspace.
+                                {{ artifact.path }}
                                 {% else %}
                                 Not created yet.
                                 {% endif %}
@@ -167,7 +345,13 @@
                         </div>
                         <div>
                             {% if artifact.exists %}
+                            {% if artifact.name == "dfd_reactflow.json" and dfd_view_url %}
+                            <a class="btn btn-outline-primary btn-sm" href="{{ dfd_view_url }}">Show DFD</a>
+                            {% elif artifact.name == "risks.json" and risk_view_url %}
+                            <a class="btn btn-outline-primary btn-sm" href="{{ risk_view_url }}">See Risks</a>
+                            {% else %}
                             <a class="btn btn-outline-primary btn-sm" href="{{ artifact.url }}">Open JSON</a>
+                            {% endif %}
                             {% else %}
                             <span class="badge text-bg-secondary">pending</span>
                             {% endif %}
@@ -190,6 +374,7 @@
                     {% for step_name, step in manifest.steps.items() %}
                     {% set failed = step.error %}
                     {% set completed = step.done %}
+                    {% set artifact = artifacts_by_name.get(step.artifact) %}
                     <div class="status-row">
                         <div class="status-top">
                             <div class="status-title">{{ step_name|replace("_", " ")|title }}</div>
@@ -203,8 +388,17 @@
                         </div>
                         <div class="status-meta">
                             Artifact: {{ step.artifact }}
+                            {% if artifact and artifact.exists %}
+                            <br>Path: {{ artifact.path }}
+                            {% endif %}
                             {% if step.timestamp %}<br>Timestamp: {{ step.timestamp }}{% endif %}
                         </div>
+                        {% if artifact and artifact.exists %}
+                        <a class="btn btn-outline-primary btn-sm status-artifact-link"
+                            href="{% if step.artifact == 'dfd_reactflow.json' and dfd_view_url %}{{ dfd_view_url }}{% elif step.artifact == 'risks.json' and risk_view_url %}{{ risk_view_url }}{% else %}{{ artifact.url }}{% endif %}">
+                            {% if step.artifact == "dfd_reactflow.json" and dfd_view_url %}Show DFD{% elif step.artifact == "risks.json" and risk_view_url %}See Risks{% else %}Open JSON{% endif %}
+                        </a>
+                        {% endif %}
                         {% if failed %}
                         <div class="status-error">{{ step.error }}</div>
                         {% endif %}

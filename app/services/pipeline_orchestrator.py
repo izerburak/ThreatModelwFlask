@@ -4,7 +4,7 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
-from app.services.dfd_service import list_response_files, load_response_payload
+from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
 from app.services.extract_to_reactflow import extract_to_reactflow
 from app.services.llm_extract_service import generate_llm_extract, parse_extract_json
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis
@@ -68,13 +68,16 @@ class PipelineOrchestrator:
         self.pipelines_dir = self.workspace_root / "pipelines"
         self.app_config = app_config
 
-    def create_pipeline(self, response_filename):
+    def create_pipeline(self, response_filename, project_name=None, dfd_name=None, auditor_name=None):
         response_name = Path(str(response_filename or "")).name
         if response_name not in list_response_files(self.app_root_path):
             raise FileNotFoundError(response_filename)
 
         response_payload = load_response_payload(self.app_root_path, response_name)
-        pipeline_id = self._new_pipeline_id(response_name)
+        project = _clean_metadata_value(project_name) or Path(response_name).stem
+        dfd = _clean_metadata_value(dfd_name) or f"{project} DFD"
+        auditor = _clean_metadata_value(auditor_name)
+        pipeline_id = self._new_pipeline_id(project)
         pipeline_dir = self._pipeline_dir(pipeline_id, must_exist=False)
         pipeline_dir.mkdir(parents=True, exist_ok=False)
 
@@ -84,6 +87,9 @@ class PipelineOrchestrator:
         now = _utc_now()
         manifest = {
             "pipeline_id": pipeline_id,
+            "project_name": project,
+            "dfd_name": dfd,
+            "auditor_name": auditor,
             "source_response": response_name,
             "created_at": now,
             "updated_at": now,
@@ -103,12 +109,17 @@ class PipelineOrchestrator:
     def get_manifest(self, pipeline_id):
         return self._load_manifest(pipeline_id)
 
+    def pipeline_workspace(self, pipeline_id):
+        return self._pipeline_dir(pipeline_id)
+
     def generate_extraction(self, pipeline_id):
         manifest = self._load_manifest(pipeline_id)
         self._mark_running(manifest, "extraction_generated")
         try:
             metadata = {
-                "project_name": Path(manifest["source_response"]).stem,
+                "project_name": manifest.get("project_name") or Path(manifest["source_response"]).stem,
+                "dfd_name": manifest.get("dfd_name"),
+                "auditor_name": manifest.get("auditor_name"),
                 "description": "Pipeline-generated LLM extraction.",
             }
             extract = generate_llm_extract(
@@ -155,6 +166,19 @@ class PipelineOrchestrator:
                 extract_payload = self._load_optional_artifact(pipeline_id, "extraction_raw.json")
             graph = extract_to_reactflow(extract_payload if isinstance(extract_payload, dict) else {})
             self._write_artifact(pipeline_id, "dfd_reactflow.json", graph)
+            archive_path = archive_dfd_graph(
+                self.app_root_path,
+                graph,
+                manifest.get("dfd_name") or manifest.get("source_response"),
+                {
+                    "pipeline_id": pipeline_id,
+                    "display_name": manifest.get("dfd_name") or f"{Path(manifest.get('source_response') or pipeline_id).stem} DFD",
+                    "project_name": manifest.get("project_name"),
+                    "auditor_name": manifest.get("auditor_name"),
+                    "pipeline_workspace": str(self._pipeline_dir(pipeline_id)),
+                },
+            )
+            manifest["dfd_archive"] = archive_path.name
             self._mark_step_done(manifest, "dfd_generated")
             return graph
         except Exception as exc:
@@ -253,10 +277,10 @@ class PipelineOrchestrator:
     def load_artifact(self, pipeline_id, artifact_name):
         return self._load_artifact(pipeline_id, artifact_name)
 
-    def _new_pipeline_id(self, response_filename):
-        safe_stem = re.sub(r"[^a-zA-Z0-9_.-]+", "-", Path(response_filename).stem).strip("-._")
+    def _new_pipeline_id(self, name):
+        safe_stem = re.sub(r"[^a-zA-Z0-9_.-]+", "-", str(name or "")).strip("-._")
         if not safe_stem:
-            safe_stem = "response"
+            safe_stem = "pipeline"
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
         base_id = f"{timestamp}-{safe_stem}"
         pipeline_id = base_id
@@ -363,6 +387,11 @@ def _initial_steps(timestamp):
 
 def _utc_now():
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _clean_metadata_value(value):
+    text = str(value or "").strip()
+    return re.sub(r"\s+", " ", text)[:120]
 
 
 def _manifest_status(manifest):

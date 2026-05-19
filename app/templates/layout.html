@@ -90,9 +90,11 @@
             /* slate-400 */
             font-weight: 500;
             font-size: 0.95rem;
-            padding: 0.6rem 1rem !important;
+            line-height: 1.2;
+            padding: 0.65rem 0.85rem !important;
             border-radius: var(--radius-md);
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .custom-navbar .nav-link:hover {
@@ -332,7 +334,7 @@
                 <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto gap-2">
+                <ul class="navbar-nav ms-auto gap-1 align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'home' %}active{% endif %}"
                             href="{{ url_for('main.home') }}">Home</a>
@@ -346,20 +348,12 @@
                             href="{{ url_for('main.add_question') }}">Add Question</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if active_tab == 'llm' %}active{% endif %}"
-                            href="{{ url_for('main.llm_chat') }}">LLM</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if active_tab == 'dfd' %}active{% endif %}"
-                            href="{{ url_for('main.dfd') }}">Extractor</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'reactflow_test' %}active{% endif %}"
                             href="{{ url_for('main.reactflow_test') }}">React Flow Lab</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'dfd_mapper_lab' %}active{% endif %}"
-                            href="{{ url_for('main.dfd_mapper_lab') }}">DFD Mapper Lab</a>
+                            href="{{ url_for('main.dfd_mapper_lab') }}">Threat Model</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'garak' %}active{% endif %}"
@@ -371,7 +365,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'risk' %}active{% endif %}"
-                            href="{{ url_for('main.risk') }}">Risk Analysis</a>
+                            href="{{ url_for('main.risk') }}">Risks &amp; Mitigations</a>
                     </li>
                 </ul>
             </div>

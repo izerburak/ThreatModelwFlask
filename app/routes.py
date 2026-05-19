@@ -18,9 +18,12 @@ from flask import (
 
 from app.question_flow import clear_question_flow_caches, get_question_flow_engine
 from app.services.dfd_service import (
+    archive_dfd_graph,
     export_diagram_as_mermaid,
     export_diagram_as_plantuml,
+    list_dfd_archives,
     list_response_files,
+    load_dfd_archive,
     load_model_record,
     load_response_payload,
     save_model_record,
@@ -30,10 +33,10 @@ from app.services.ollama_client import OllamaError, chat as ollama_chat, get_oll
 from app.services.extract_to_reactflow import extract_to_reactflow
 from app.services.llm_extract_service import generate_llm_extract
 from app.services.pipeline_orchestrator import PIPELINE_STEPS, PipelineOrchestrator
-from app.services.risk_analysis_service import build_risk_analysis, suggested_extract_filename
+from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis, suggested_extract_filename, unify_risks
 from app.services.garak_service import garak_report_path, garak_status
 from app.utils.save_utils import (
-    append_question_to_layer,
+    append_question_to_catalog,
     save_adaptive_llm_sec_answers,
 )
 
@@ -60,15 +63,14 @@ def add_question():
             return jsonify({"ok": False, "error": "Expected JSON"}), 400
 
         payload = request.get_json()
-        layer = payload.get("layer")
         text = payload.get("text", "").strip()
         options = payload.get("options", []) or []
 
-        if not layer or not text:
-            return jsonify({"ok": False, "error": "layer and text required"}), 400
+        if not text:
+            return jsonify({"ok": False, "error": "question text required"}), 400
 
         try:
-            qpath, new_q = append_question_to_layer(layer, text, options)
+            qpath, new_q = append_question_to_catalog(text, options)
             clear_question_flow_caches()
         except Exception as e:
             return jsonify({"ok": False, "error": str(e)}), 500
@@ -122,6 +124,8 @@ def dfd_mapper_lab():
         "dfd_mapper_lab.html",
         active_tab="dfd_mapper_lab",
         response_files=list_response_files(current_app.root_path),
+        dfd_files=list_dfd_archives(current_app.root_path),
+        selected_dfd=request.args.get("dfd") or "",
     )
 
 
@@ -169,10 +173,18 @@ def pipeline_index():
 @main.route("/pipeline/start", methods=["POST"])
 def pipeline_start():
     response_filename = request.form.get("response_filename") or ""
+    project_name = request.form.get("project_name") or ""
+    dfd_name = request.form.get("dfd_name") or ""
+    auditor_name = request.form.get("auditor_name") or ""
     orchestrator = _pipeline_orchestrator()
 
     try:
-        manifest = orchestrator.create_pipeline(response_filename)
+        manifest = orchestrator.create_pipeline(
+            response_filename,
+            project_name=project_name,
+            dfd_name=dfd_name,
+            auditor_name=auditor_name,
+        )
     except FileNotFoundError:
         flash("Selected questionnaire response was not found.", "danger")
         return redirect(url_for("main.pipeline_index"))
@@ -198,24 +210,52 @@ def pipeline_detail(pipeline_id):
         abort(404, description="Pipeline not found.")
 
     artifacts = []
+    artifacts_by_name = {}
+    pipeline_workspace = orchestrator.pipeline_workspace(pipeline_id)
+    dfd_preview = None
+    risk_preview = None
     artifact_order = list(PIPELINE_STEPS.values())
     for artifact_name in artifact_order:
         exists = orchestrator.artifact_exists(pipeline_id, artifact_name)
-        artifacts.append(
-            {
-                "name": artifact_name,
-                "exists": exists,
-                "url": url_for("main.pipeline_artifact", pipeline_id=pipeline_id, artifact_name=artifact_name)
-                if exists
-                else None,
-            }
-        )
+        artifact_path = pipeline_workspace / artifact_name
+        artifact = {
+            "name": artifact_name,
+            "exists": exists,
+            "path": str(artifact_path),
+            "url": url_for("main.pipeline_artifact", pipeline_id=pipeline_id, artifact_name=artifact_name)
+            if exists
+            else None,
+        }
+        artifacts.append(artifact)
+        artifacts_by_name[artifact_name] = artifact
+        if artifact_name == "dfd_reactflow.json" and exists:
+            try:
+                dfd_payload = orchestrator.load_artifact(pipeline_id, artifact_name)
+                dfd_preview = _dfd_preview_payload(dfd_payload)
+            except (FileNotFoundError, ValueError, json.JSONDecodeError):
+                dfd_preview = None
+        if artifact_name == "risks.json" and exists:
+            try:
+                risk_payload = orchestrator.load_artifact(pipeline_id, artifact_name)
+                risk_preview = _risk_preview_payload(risk_payload)
+            except (FileNotFoundError, ValueError, json.JSONDecodeError):
+                risk_preview = None
 
     return render_template(
         "pipeline_detail.html",
         active_tab="pipeline",
         manifest=manifest,
         artifacts=artifacts,
+        artifacts_by_name=artifacts_by_name,
+        pipeline_workspace=str(pipeline_workspace),
+        dfd_preview=dfd_preview,
+        risk_preview=risk_preview,
+        dfd_view_url=url_for("main.dfd_mapper_lab", dfd=manifest.get("dfd_archive"))
+        if manifest.get("dfd_archive")
+        else None,
+        risk_view_url=url_for("main.risk", pipeline=manifest["pipeline_id"])
+        if risk_preview
+        else None,
     )
 
 
@@ -339,6 +379,21 @@ def get_response(filename):
     )
 
 
+@main.route("/api/dfd-graphs")
+def list_dfd_graphs():
+    return jsonify({"files": list_dfd_archives(current_app.root_path)})
+
+
+@main.route("/api/dfd-graphs/<filename>")
+def get_dfd_graph(filename):
+    try:
+        payload = load_dfd_archive(current_app.root_path, filename)
+    except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        abort(404, description="DFD graph not found.")
+
+    return jsonify({"filename": filename, "graph": payload})
+
+
 @main.route("/api/reactflow/from-extract", methods=["POST"])
 def reactflow_from_extract():
     payload = request.get_json(silent=True) or {}
@@ -458,14 +513,23 @@ def export_dfd_plantuml(model_id):
 
 @main.route("/risk", methods=["GET", "POST"])
 def risk():
-    response_files = list_response_files(current_app.root_path)
-    extract_files = _list_llm_extract_files(current_app.root_path)
+    orchestrator = _pipeline_orchestrator()
+    risk_runs = _pipeline_risk_runs(orchestrator)
+    selected_pipeline = request.args.get("pipeline") or ""
+    selected_manifest = None
     selected_file = None
     selected_extract = None
     analysis = None
     analysis_error = None
 
-    if request.method == "POST":
+    if selected_pipeline:
+        try:
+            selected_manifest = orchestrator.get_manifest(selected_pipeline)
+            analysis = orchestrator.load_artifact(selected_pipeline, "risks.json")
+            analysis = _with_unified_risks(analysis)
+        except (FileNotFoundError, ValueError, json.JSONDecodeError):
+            analysis_error = "Selected pipeline risk analysis was not found."
+    elif request.method == "POST":
         selected_file = request.form.get("response_file")
         selected_extract = request.form.get("extract_file") or ""
 
@@ -473,6 +537,7 @@ def risk():
             response_payload = load_response_payload(current_app.root_path, selected_file)
             extract_payload = _load_extract_payload(selected_extract) if selected_extract else None
             analysis = build_risk_analysis(current_app.root_path, response_payload, extract_payload)
+            analysis = _with_unified_risks(analysis)
         except FileNotFoundError:
             analysis_error = "Selected response or extract file was not found."
         except ValueError as exc:
@@ -483,8 +548,9 @@ def risk():
     return render_template(
         "risk.html",
         active_tab="risk",
-        response_files=response_files,
-        extract_files=extract_files,
+        risk_runs=risk_runs,
+        selected_pipeline=selected_pipeline,
+        selected_manifest=selected_manifest,
         selected_file=selected_file,
         selected_extract=selected_extract,
         suggested_extract=suggested_extract,
@@ -721,6 +787,106 @@ def _load_extract_payload(filename):
 
 def _pipeline_orchestrator():
     return PipelineOrchestrator(current_app.root_path, current_app.config)
+
+
+def _dfd_preview_payload(payload):
+    if not isinstance(payload, dict):
+        return None
+
+    nodes = payload.get("nodes") if isinstance(payload.get("nodes"), list) else []
+    edges = payload.get("edges") if isinstance(payload.get("edges"), list) else []
+
+    return {
+        "node_count": len(nodes),
+        "edge_count": len(edges),
+        "nodes": [
+            {
+                "id": node.get("id"),
+                "type": node.get("type") or "process",
+                "label": (node.get("data") or {}).get("label") or node.get("id") or "Unnamed node",
+            }
+            for node in nodes[:12]
+            if isinstance(node, dict)
+        ],
+        "edges": [
+            {
+                "source": edge.get("source"),
+                "target": edge.get("target"),
+                "label": edge.get("label") or "flow",
+            }
+            for edge in edges[:12]
+            if isinstance(edge, dict)
+        ],
+    }
+
+
+def _risk_preview_payload(payload):
+    if not isinstance(payload, dict):
+        return None
+
+    payload = _with_unified_risks(payload)
+    extract_risks = payload.get("extract_risks") if isinstance(payload.get("extract_risks"), list) else []
+    mapped_risks = payload.get("mapped_risks") if isinstance(payload.get("mapped_risks"), list) else []
+    unified_risks = payload.get("unified_risks") if isinstance(payload.get("unified_risks"), list) else []
+    quick_wins = payload.get("quick_wins") if isinstance(payload.get("quick_wins"), list) else []
+
+    return {
+        "overall_status": payload.get("overall_status") or "Unknown",
+        "risk_count": len(unified_risks),
+        "mitigation_count": sum(
+            1
+            for risk in unified_risks
+            if isinstance(risk, dict) and risk.get("mitigations")
+        )
+        or len([risk for risk in extract_risks if isinstance(risk, dict) and risk.get("mitigation")]),
+        "quick_win_count": len(quick_wins),
+    }
+
+
+def _with_unified_risks(analysis):
+    if not isinstance(analysis, dict):
+        return analysis
+    enriched = dict(analysis)
+    if not isinstance(enriched.get("unified_risks"), list):
+        enriched["unified_risks"] = unify_risks(
+            enriched.get("extract_risks") if isinstance(enriched.get("extract_risks"), list) else [],
+            enriched.get("mapped_risks") if isinstance(enriched.get("mapped_risks"), list) else [],
+        )
+    unified_levels = [
+        risk.get("risk_level")
+        for risk in enriched.get("unified_risks", [])
+        if isinstance(risk, dict) and risk.get("risk_level")
+    ]
+    if unified_levels:
+        enriched["overall_status"] = max(unified_levels, key=lambda level: RISK_RANK.get(level, 0))
+        enriched["status_source"] = "Combined risk model"
+    return enriched
+
+
+def _pipeline_risk_runs(orchestrator):
+    runs = []
+    for manifest in orchestrator.list_pipelines():
+        pipeline_id = manifest.get("pipeline_id")
+        if not pipeline_id:
+            continue
+        try:
+            if not orchestrator.artifact_exists(pipeline_id, "risks.json"):
+                continue
+            risks = orchestrator.load_artifact(pipeline_id, "risks.json")
+        except (FileNotFoundError, ValueError, json.JSONDecodeError):
+            continue
+        preview = _risk_preview_payload(risks) or {}
+        runs.append(
+            {
+                "pipeline_id": pipeline_id,
+                "label": manifest.get("project_name") or manifest.get("source_response") or pipeline_id,
+                "dfd_name": manifest.get("dfd_name"),
+                "auditor_name": manifest.get("auditor_name"),
+                "updated_at": manifest.get("updated_at"),
+                **preview,
+            }
+        )
+    return runs
 
 
 def _answers_by_flow_id(response_payload):

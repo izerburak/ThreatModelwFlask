@@ -128,6 +128,8 @@ def _clean_metadata(metadata):
     allowed_keys = {
         "model_title",
         "project_name",
+        "dfd_name",
+        "auditor_name",
         "owner",
         "reviewer",
         "description",
