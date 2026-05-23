@@ -6,10 +6,12 @@ from unittest.mock import patch
 
 try:
     from app import create_app
+    from app.services.llm_extract_service import parse_extract_json
 except ModuleNotFoundError as exc:  # pragma: no cover
     if exc.name != "flask":
         raise
     create_app = None
+    parse_extract_json = None
 
 
 class LlmExtractRoutesTests(unittest.TestCase):
@@ -114,6 +116,99 @@ class LlmExtractRoutesTests(unittest.TestCase):
             payload["parsed"]["system_summary"]["purpose"],
             "Customer support assistant",
         )
+
+    def test_parse_extract_json_recovers_fenced_json_with_trailing_commas(self):
+        raw = """
+        Here is the extract:
+        ```json
+        {
+          "system_summary": {
+            "purpose": "Docs assistant",
+          },
+          "dfd": {
+            "actors": [],
+          },
+        }
+        ```
+        """
+
+        parsed = parse_extract_json(raw)
+
+        self.assertEqual(parsed["system_summary"]["purpose"], "Docs assistant")
+        self.assertEqual(parsed["dfd"]["actors"], [])
+
+    def test_generate_extract_falls_back_when_llm_returns_non_json(self):
+        responses_dir = self.root / "responses"
+        prompts_dir = self.root / "LLM-Prompts"
+        responses_dir.mkdir()
+        prompts_dir.mkdir()
+        (prompts_dir / "Response-Extractor-prompt.txt").write_text("Return JSON only.", encoding="utf-8")
+        (responses_dir / "llmsec_bad_json.json").write_text(
+            json.dumps({"answers_by_flow_id": {"Q1": "Docs assistant", "Q2": ["Internal users"]}}),
+            encoding="utf-8",
+        )
+
+        with patch("app.services.llm_extract_service.chat") as mock_chat:
+            mock_chat.return_value = {
+                "model": "test-model",
+                "message": {"role": "assistant", "content": "I cannot produce JSON for this request."},
+            }
+
+            response = self.client.post(
+                "/api/generate-extract",
+                json={"response_file": "llmsec_bad_json.json", "project_name": "Docs"},
+            )
+
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["parsed"]["system_summary"]["purpose"], "Docs assistant")
+        self.assertEqual(
+            payload["parsed"]["llm_parse_error"],
+            "LLM returned a response that could not be parsed as JSON.",
+        )
+        self.assertTrue((self.extract_dir / "llmsec_bad_json-extract.raw.txt").exists())
+        self.assertTrue((self.extract_dir / "llmsec_bad_json-extract.json").exists())
+
+    def test_generate_extract_preserves_valid_json_even_when_schema_is_legacy(self):
+        responses_dir = self.root / "responses"
+        prompts_dir = self.root / "LLM-Prompts"
+        responses_dir.mkdir()
+        prompts_dir.mkdir()
+        (prompts_dir / "Response-Extractor-prompt.txt").write_text("Return JSON only.", encoding="utf-8")
+        (responses_dir / "llmsec_legacy_extract.json").write_text(
+            json.dumps({"answers_by_flow_id": {"Q1": "Docs assistant", "Q3": ["Web-based chat interface"]}}),
+            encoding="utf-8",
+        )
+        legacy_extract = {
+            "system": {
+                "name": "DocsAI",
+                "description": "Documentation assistant",
+            },
+            "llm_components": {
+                "model": "Large Language Model",
+            },
+        }
+
+        with patch("app.services.llm_extract_service.chat") as mock_chat:
+            mock_chat.return_value = {
+                "model": "test-model",
+                "message": {"role": "assistant", "content": json.dumps(legacy_extract)},
+            }
+
+            response = self.client.post(
+                "/api/generate-extract",
+                json={"response_file": "llmsec_legacy_extract.json", "project_name": "Docs"},
+            )
+
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["parsed"], legacy_extract)
+        self.assertIsNone(payload["parse_warning"])
+        self.assertTrue((self.extract_dir / "llmsec_legacy_extract-extract.json").exists())
 
 
 if __name__ == "__main__":

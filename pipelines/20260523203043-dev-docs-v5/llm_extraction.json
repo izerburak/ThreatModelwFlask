@@ -1,0 +1,34 @@
+{
+  "system_summary": {
+    "purpose": "Developer documentation assistant",
+    "exposure": "Internal employees only, Administrators only",
+    "architecture_style": "Web-based chat interface, Internal service-to-service calls, CLI or local scripts",
+    "overall_dfd_confidence": "Low"
+  },
+  "dfd": {
+    "actors": [],
+    "interfaces": [],
+    "processes": [],
+    "data_stores": [],
+    "external_systems": [],
+    "tools": [],
+    "trust_boundaries": [],
+    "data_flows": []
+  },
+  "applicable_owasp_llm_risks": [],
+  "dfd_notes": [
+    "LLM returned an empty or unrecognized extraction JSON object. This fallback extract was generated from questionnaire answers.",
+    "The React Flow DFD mapper can still derive architecture nodes from answers_by_flow_id."
+  ],
+  "missing_information": [
+    "Review the raw LLM output or regenerate extraction for a model-authored DFD summary."
+  ],
+  "llm_parse_error": "LLM returned an empty or unrecognized extraction JSON object.",
+  "response_file": "llmsec_2026-05-23_15-42-35_02_internal_developer_docs_assistant.json",
+  "metadata": {
+    "auditor_name": "burak",
+    "project_name": "dev docs v5",
+    "dfd_name": "dev docs v5 Threat Model",
+    "description": "Pipeline-generated LLM extraction."
+  }
+}

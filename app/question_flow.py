@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from functools import lru_cache
 from pathlib import Path
@@ -7,6 +8,9 @@ try:
     import yaml
 except ImportError:  # pragma: no cover
     yaml = None
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class QuestionFlowEngine:
@@ -122,31 +126,60 @@ class QuestionFlowEngine:
                 "pending_question_ids": [],
             }
 
-        processing_queue = [start_question_id]
-        scheduled_question_ids = {start_question_id}
+        processing_queue = [_flow_step(start_question_id, allow_linear_next=True)]
+        processed_answered_contexts = set()
         visited_question_ids = []
         pending_question_ids = []
+        pending_question_id_set = set()
+        max_steps = max(1000, len(self.flow_definition.get("questions") or {}) * 20)
+        step_count = 0
 
         while processing_queue:
-            question_id = processing_queue.pop(0)
-            visited_question_ids.append(question_id)
+            step_count += 1
+            if step_count > max_steps:
+                LOGGER.warning("Question flow stopped after %s steps to avoid a loop.", max_steps)
+                break
+
+            flow_step = processing_queue.pop(0)
+            question_id = flow_step["question_id"]
+            allow_linear_next = flow_step["allow_linear_next"]
+
+            if not question_id or question_id == "END":
+                LOGGER.debug("Question flow reached END.")
+                continue
+
+            is_duplicate_visit = question_id in visited_question_ids
+            if not is_duplicate_visit:
+                visited_question_ids.append(question_id)
 
             if question_id not in answered_question_ids:
-                pending_question_ids.append(question_id)
+                if question_id not in pending_question_id_set:
+                    pending_question_ids.append(question_id)
+                    pending_question_id_set.add(question_id)
+                    LOGGER.debug("Question flow pending question: %s", question_id)
+                else:
+                    LOGGER.debug("Question flow skipped duplicate pending question: %s", question_id)
                 continue
+
+            if is_duplicate_visit:
+                LOGGER.debug("Question flow skipped already answered duplicate question: %s", question_id)
+
+            context_key = (question_id, allow_linear_next)
+            if context_key in processed_answered_contexts:
+                LOGGER.debug(
+                    "Question flow skipped already processed context: %s allow_linear_next=%s",
+                    question_id,
+                    allow_linear_next,
+                )
+                continue
+            processed_answered_contexts.add(context_key)
 
             node = (self.flow_definition.get("questions") or {}).get(question_id, {})
             answer_value = normalized_answers.get(question_id)
-            follow_up_question_ids = _get_follow_up_questions(node, answer_value)
+            follow_up_steps = _get_follow_up_steps(node, answer_value, allow_linear_next, question_id)
 
-            for next_question_id in reversed(follow_up_question_ids):
-                if next_question_id in processing_queue:
-                    processing_queue.remove(next_question_id)
-                elif next_question_id in scheduled_question_ids:
-                    continue
-
-                processing_queue.insert(0, next_question_id)
-                scheduled_question_ids.add(next_question_id)
+            for follow_up_step in reversed(follow_up_steps):
+                processing_queue.insert(0, follow_up_step)
 
         return {
             "visited_question_ids": visited_question_ids,
@@ -180,7 +213,16 @@ def _load_question_catalog(root_path_str):
     flow_question_ids = _collect_question_ids(flow_definition)
 
     question_catalog = {}
+    for source_question in all_questions:
+        flow_question_id = _normalize_flow_id(source_question.get("id"))
+        if not flow_question_id:
+            continue
+        question_catalog[flow_question_id] = _question_record(flow_question_id, source_question, questions_path)
+
     for flow_question_id in flow_question_ids:
+        if flow_question_id in question_catalog:
+            continue
+
         source_question = next(
             (
                 question
@@ -189,19 +231,8 @@ def _load_question_catalog(root_path_str):
             ),
             None,
         )
-        if source_question is None:
-            continue
-
-        question_catalog[flow_question_id] = {
-            "flow_id": flow_question_id,
-            "id": str(source_question.get("id", flow_question_id)),
-            "source_id": str(source_question.get("id", flow_question_id)),
-            "layer": source_question.get("layer", 1),
-            "text": source_question.get("text", flow_question_id),
-            "type": source_question.get("type", "single"),
-            "options": list(source_question.get("options", [])),
-            "source_file": questions_path.name,
-        }
+        if source_question is not None:
+            question_catalog[flow_question_id] = _question_record(flow_question_id, source_question, questions_path)
 
     return question_catalog
 
@@ -221,8 +252,8 @@ def _resolve_qat_path(root_path):
 
 def _resolve_questions_path(root_path):
     candidate_paths = [
-        root_path / "app" / "questions" / "questionsDb.json",
         root_path / "TM-Questions" / "questionsDb.json",
+        root_path / "app" / "questions" / "questionsDb.json",
         root_path / "questions" / "questionsDb.json",
     ]
     for candidate_path in candidate_paths:
@@ -332,30 +363,73 @@ def _collect_question_ids(flow_definition):
     return question_ids
 
 
+def _question_record(flow_question_id, source_question, questions_path):
+    record = {
+        "flow_id": flow_question_id,
+        "id": str(source_question.get("id", flow_question_id)),
+        "source_id": str(source_question.get("id", flow_question_id)),
+        "layer": source_question.get("layer", 1),
+        "text": source_question.get("text", flow_question_id),
+        "type": source_question.get("type", "single"),
+        "options": list(source_question.get("options", [])),
+        "source_file": questions_path.name,
+    }
+    for key, value in source_question.items():
+        if key not in record:
+            record[key] = value
+    return record
+
+
 def _get_follow_up_questions(node, answer_value):
+    return [
+        step["question_id"]
+        for step in _get_follow_up_steps(node, answer_value, allow_linear_next=True)
+    ]
+
+
+def _get_follow_up_steps(node, answer_value, allow_linear_next=True, question_id=None):
     conditions = node.get("conditions") or []
     if conditions:
-        branch = _resolve_condition_branch(conditions, answer_value)
+        branch = _resolve_condition_branch(conditions, answer_value, question_id)
         if branch is None:
             return []
 
-        follow_up_question_ids = list(branch.get("ask", []))
+        follow_up_steps = [
+            _flow_step(branch_question_id, allow_linear_next=False)
+            for branch_question_id in branch.get("ask", [])
+        ]
         next_after = branch.get("next_after")
         if next_after and next_after != "END":
-            follow_up_question_ids.append(next_after)
-        return _normalize_question_list(follow_up_question_ids)
+            follow_up_steps.append(_flow_step(next_after, allow_linear_next=True))
+        elif next_after == "END":
+            LOGGER.debug("Question flow selected next_after END for %s.", question_id or "unknown question")
+        return _dedupe_steps(follow_up_steps)
 
     next_question_id = node.get("next")
-    if next_question_id and next_question_id != "END":
-        return [next_question_id]
+    if allow_linear_next and next_question_id and next_question_id != "END":
+        return [_flow_step(next_question_id, allow_linear_next=True)]
+    if allow_linear_next and next_question_id == "END":
+        LOGGER.debug("Question flow reached END after %s.", question_id or "unknown question")
+    elif not allow_linear_next and next_question_id:
+        LOGGER.debug(
+            "Question flow suppressed branch item's linear next from %s to %s.",
+            question_id or "unknown question",
+            next_question_id,
+        )
 
     return []
 
 
-def _resolve_condition_branch(conditions, answer_value):
-    for condition in conditions:
+def _resolve_condition_branch(conditions, answer_value, question_id=None):
+    for index, condition in enumerate(conditions):
         condition_clause = condition.get("if")
         if condition_clause is None:
+            LOGGER.debug(
+                "Question flow matched else for %s; queued then questions=%s; next_after=%s.",
+                question_id or "unknown question",
+                condition.get("else", []),
+                condition.get("next_after"),
+            )
             return {
                 "ask": condition.get("else", []),
                 "next_after": condition.get("next_after"),
@@ -365,6 +439,13 @@ def _resolve_condition_branch(conditions, answer_value):
         if deferred:
             return None
         if matched:
+            LOGGER.debug(
+                "Question flow matched condition %s for %s; queued then questions=%s; next_after=%s.",
+                index,
+                question_id or "unknown question",
+                condition.get("then", []),
+                condition.get("next_after"),
+            )
             return {
                 "ask": condition.get("then", []),
                 "next_after": condition.get("next_after"),
@@ -377,30 +458,63 @@ def _evaluate_condition(condition_clause, answer_value):
     if not _is_answered_value(answer_value):
         return False, True
 
-    answer_values = answer_value if isinstance(answer_value, list) else [answer_value]
-    normalized_answers = [_normalize_text(value) for value in answer_values]
-
     if "equals" in condition_clause:
-        expected_value = _normalize_text(condition_clause["equals"])
-        return expected_value in normalized_answers, False
+        return _answers_equal(answer_value, condition_clause["equals"]), False
 
     if "not_equals" in condition_clause:
-        expected_value = _normalize_text(condition_clause["not_equals"])
-        return expected_value not in normalized_answers, False
+        return not _answers_equal(answer_value, condition_clause["not_equals"]), False
 
     if "any_of" in condition_clause:
+        normalized_answers = [_normalize_text(value) for value in _answer_values(answer_value)]
         expected_values = [_normalize_text(value) for value in condition_clause["any_of"]]
         return any(value in normalized_answers for value in expected_values), False
 
     if "not_any_of" in condition_clause:
+        normalized_answers = [_normalize_text(value) for value in _answer_values(answer_value)]
         expected_values = [_normalize_text(value) for value in condition_clause["not_any_of"]]
         return not any(value in normalized_answers for value in expected_values), False
 
     if "not_includes" in condition_clause:
         expected_value = _normalize_text(condition_clause["not_includes"])
-        return not any(expected_value in answer for answer in normalized_answers), False
+        return not any(expected_value == answer or expected_value in answer for answer in _normalized_answer_values(answer_value)), False
 
     return True, False
+
+
+def _flow_step(question_id, allow_linear_next=True):
+    return {
+        "question_id": _normalize_flow_target(question_id),
+        "allow_linear_next": bool(allow_linear_next),
+    }
+
+
+def _dedupe_steps(steps):
+    deduped_steps = []
+    seen = set()
+    for step in steps:
+        key = (step.get("question_id"), step.get("allow_linear_next"))
+        if step.get("question_id") and key not in seen:
+            deduped_steps.append(step)
+            seen.add(key)
+    return deduped_steps
+
+
+def _answer_values(answer_value):
+    return answer_value if isinstance(answer_value, list) else [answer_value]
+
+
+def _normalized_answer_values(answer_value):
+    return [_normalize_text(value) for value in _answer_values(answer_value)]
+
+
+def _answers_equal(answer_value, expected_value):
+    if isinstance(answer_value, list) or isinstance(expected_value, list):
+        if not isinstance(answer_value, list) or not isinstance(expected_value, list):
+            return False
+        return [_normalize_text(value) for value in answer_value] == [
+            _normalize_text(value) for value in expected_value
+        ]
+    return _normalize_text(answer_value) == _normalize_text(expected_value)
 
 
 def _normalize_root_path(root_path):

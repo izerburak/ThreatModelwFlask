@@ -1,0 +1,48 @@
+{
+  "pipeline_id": "20260523184402-Docs-Assistant-v3",
+  "project_name": "Docs Assistant v3",
+  "dfd_name": "Docs Assistant v3 Threat Model",
+  "auditor_name": "burak",
+  "source_response": "llmsec_2026-05-23_15-42-35_02_internal_developer_docs_assistant.json",
+  "created_at": "2026-05-23T18:44:02Z",
+  "updated_at": "2026-05-23T18:44:28Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-05-23T18:44:02Z",
+      "artifact": "response.json"
+    },
+    "extraction_generated": {
+      "done": true,
+      "timestamp": "2026-05-23T18:44:28Z",
+      "artifact": "extraction_raw.json",
+      "error": null
+    },
+    "extraction_reviewed": {
+      "done": true,
+      "timestamp": "2026-05-23T18:44:28Z",
+      "artifact": "extraction_reviewed.json",
+      "error": null
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-05-23T18:44:28Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-05-23T18:44:28Z",
+      "artifact": "risks.json",
+      "error": null
+    },
+    "garak_plan_created": {
+      "done": false,
+      "timestamp": null,
+      "artifact": "garak_plan.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260523184428-Docs-Assistant-v3-Threat-Model.json"
+}

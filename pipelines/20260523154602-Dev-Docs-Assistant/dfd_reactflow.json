@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "text_note",
+      "position": {
+        "x": 1450,
+        "y": 100
+      },
+      "data": {
+        "label": "System Summary",
+        "notes": "Purpose: Not specified\nExposure: Not specified"
+      }
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 0.9
+  }
+}

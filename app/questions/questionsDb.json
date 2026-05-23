@@ -1,671 +1,82 @@
 [
-  {
-    "id": 1,
-    "text": "What is the primary purpose of the LLM in this system?",
-    "type": "single",
-    "options": [
-      "Customer support assistant",
-      "Developer documentation assistant",
-      "Internal productivity assistant",
-      "Automated data analysis or summarization",
-      "Agent or workflow automation component",
-      "Experimental or research feature"
-    ],
-    "owasp_llm": ["LLM09"],
-    "severity_weight": 2,
-    "confidence_weight": 4
-  },
-  {
-    "id": 2,
-    "text": "Who can directly interact with the LLM system?",
-    "type": "multi",
-    "options": [
-      "Anonymous public internet users",
-      "Authenticated public users",
-      "Internal employees only",
-      "Administrators only",
-      "Local system processes only"
-    ],
-    "owasp_llm": ["LLM01", "LLM10"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 3,
-    "text": "Through which interfaces is the LLM accessible?",
-    "type": "multi",
-    "options": [
-      "Web-based chat interface",
-      "REST API endpoint",
-      "Internal service-to-service calls",
-      "CLI or local scripts",
-      "Third-party integration"
-    ],
-    "owasp_llm": ["LLM01", "LLM10"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 4,
-    "text": "Does the LLM process sensitive or business-critical data?",
-    "type": "single",
-    "options": ["Yes", "No", "Unknown"],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 5,
-    "text": "What are the primary sources of input data for the LLM?",
-    "type": "multi",
-    "options": [
-      "Direct user prompts",
-      "Uploaded files",
-      "Retrieved internal documents",
-      "External web content",
-      "API or database records"
-    ],
-    "owasp_llm": ["LLM01", "LLM04"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 6,
-    "text": "What types of external or untrusted content can be ingested by the LLM?",
-    "type": "multi",
-    "options": [
-      "User text input only",
-      "File uploads",
-      "Web URLs",
-      "Email or ticket data",
-      "Public repositories"
-    ],
-    "owasp_llm": ["LLM01", "LLM04"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 7,
-    "text": "What processing steps occur before user input reaches the LLM?",
-    "type": "multi",
-    "options": [
-      "No preprocessing",
-      "Input filtering",
-      "Prompt templating",
-      "RAG augmentation",
-      "Routing/classification"
-    ],
-    "owasp_llm": ["LLM01"],
-    "severity_weight": 4,
-    "confidence_weight": 4
-  },
-  {
-    "id": 8,
-    "text": "Which data sources are connected via RAG?",
-    "type": "multi",
-    "options": [
-      "Internal knowledge base",
-      "Documentation",
-      "Customer data",
-      "Source code",
-      "No RAG"
-    ],
-    "owasp_llm": ["LLM02", "LLM04", "LLM08"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 9,
-    "text": "Which internal services can call the LLM?",
-    "type": "multi",
-    "options": [
-      "Frontend",
-      "Backend API",
-      "Auth service",
-      "Monitoring service",
-      "None"
-    ],
-    "owasp_llm": ["LLM06"],
-    "severity_weight": 4,
-    "confidence_weight": 4
-  },
-  {
-    "id": 10,
-    "text": "Does the system store conversation history?",
-    "type": "single",
-    "options": [
-      "No",
-      "Session only",
-      "Per user",
-      "Global",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 11,
-    "text": "Is there an orchestration layer?",
-    "type": "single",
-    "options": ["None", "Basic logic", "Framework", "Agent workflow", "Unknown"],
-    "owasp_llm": ["LLM06"],
-    "severity_weight": 3,
-    "confidence_weight": 4
-  },
-  {
-    "id": 12,
-    "text": "Does the LLM have access to tools?",
-    "type": "multi",
-    "options": ["Search", "Database", "Internal APIs", "Admin tools", "None"],
-    "owasp_llm": ["LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 13,
-    "text": "Which storage systems are accessible?",
-    "type": "multi",
-    "options": ["Vector DB", "SQL/NoSQL", "File storage", "Cloud storage", "None"],
-    "owasp_llm": ["LLM02", "LLM08"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 14,
-    "text": "Can the LLM call external APIs?",
-    "type": "single",
-    "options": ["No", "Directly", "Via backend", "Unknown"],
-    "owasp_llm": ["LLM06"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 15,
-    "text": "What actions can the LLM trigger?",
-    "type": "multi",
-    "options": [
-      "Generate text responses only",
-      "Create or update tickets/records",
-      "Send emails or notifications",
-      "Execute workflows or transactions",
-      "Modify system configurations"
-    ],
-    "owasp_llm": ["LLM05", "LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 16,
-    "text": "Can the LLM affect real-world state or business processes without human approval?",
-    "type": "single",
-    "options": [
-      "No, human approval is always required",
-      "Yes, in low-risk actions only",
-      "Yes, in business-critical actions",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 17,
-    "text": "Where is the LLM hosted?",
-    "type": "single",
-    "options": [
-      "Third-party cloud API",
-      "Self-hosted on internal infrastructure",
-      "Hosted by external vendor in private environment",
-      "Hybrid deployment",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM03"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 18,
-    "text": "Does the system use multiple LLM models for different tasks?",
-    "type": "single",
-    "options": [
-      "No, a single model is used",
-      "Yes, different models for separate tasks",
-      "Yes, fallback or routing between models",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM03", "LLM09"],
-    "severity_weight": 3,
-    "confidence_weight": 3
-  },
-  {
-    "id": 19,
-    "text": "How are LLM prompts or system instructions managed?",
-    "type": "single",
-    "options": [
-      "Hardcoded in application logic",
-      "Stored in configuration files",
-      "Managed through database or admin panel",
-      "Dynamically generated at runtime",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM07"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 20,
-    "text": "Can users influence system prompts or instructions indirectly?",
-    "type": "single",
-    "options": [
-      "No",
-      "Yes, through retrieved documents or memory",
-      "Yes, through tool outputs or metadata",
-      "Yes, through prompt templates or variables",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM01", "LLM07"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 21,
-    "text": "What output formats are produced by the LLM?",
-    "type": "multi",
-    "options": [
-      "Plain text only",
-      "Markdown or rich text",
-      "Structured JSON",
-      "Code or scripts",
-      "HTML or rendered content"
-    ],
-    "owasp_llm": ["LLM05"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 22,
-    "text": "Where is LLM output rendered or consumed?",
-    "type": "multi",
-    "options": [
-      "User-facing web interface",
-      "Internal admin dashboard",
-      "API response consumed by other systems",
-      "Email, messaging, or notification channel",
-      "Directly used in backend automation"
-    ],
-    "owasp_llm": ["LLM05", "LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 23,
-    "text": "Which trust boundaries does user input cross before reaching the LLM?",
-    "type": "multi",
-    "options": [
-      "Public internet to web application",
-      "Web application to internal API",
-      "Internal API to model service",
-      "Cross-tenant or cross-user context boundary",
-      "No significant trust boundary"
-    ],
-    "owasp_llm": ["LLM01", "LLM02"],
-    "severity_weight": 4,
-    "confidence_weight": 4
-  },
-  {
-    "id": 24,
-    "text": "Which sensitive data categories are accessible to the LLM?",
-    "type": "multi",
-    "options": [
-      "Personally identifiable information (PII)",
-      "API keys or credentials",
-      "Internal operational documents",
-      "Customer support records",
-      "No sensitive data"
-    ],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 25,
-    "text": "How are users authenticated before interacting with the LLM?",
-    "type": "single",
-    "options": [
-      "No authentication required",
-      "Username/password login",
-      "Single sign-on (SSO)",
-      "API keys or tokens",
-      "Internal network authentication"
-    ],
-    "owasp_llm": ["LLM10"],
-    "severity_weight": 4,
-    "confidence_weight": 4
-  },
-  {
-    "id": 26,
-    "text": "How is authorization enforced for LLM access?",
-    "type": "single",
-    "options": [
-      "No authorization controls",
-      "Role-based access control (RBAC)",
-      "Attribute- or policy-based controls",
-      "Hardcoded application logic",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02", "LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 27,
-    "text": "Is role-based filtering applied to retrieved documents or data?",
-    "type": "single",
-    "options": [
-      "Yes, consistently enforced",
-      "Partially enforced",
-      "No filtering applied",
-      "Not applicable",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02", "LLM08"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 28,
-    "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?",
-    "type": "single",
-    "options": [
-      "Yes, strongly limited",
-      "Partially limited",
-      "No, same behavior for all users",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02", "LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 29,
-    "text": "Which components expose the largest LLM-related attack surface?",
-    "type": "multi",
-    "options": [
-      "Public chat interface",
-      "RAG or document ingestion pipeline",
-      "Tool-calling or agent framework",
-      "Admin or internal operator interface",
-      "Model hosting or API integration layer"
-    ],
-    "owasp_llm": ["LLM01", "LLM06", "LLM08", "LLM10"],
-    "severity_weight": 5,
-    "confidence_weight": 4
-  },
-  {
-    "id": 30,
-    "text": "Are safeguards implemented against prompt injection attacks?",
-    "type": "single",
-    "options": [
-      "No safeguards",
-      "Basic input filtering only",
-      "Context isolation and instruction hierarchy controls",
-      "Prompt injection detection or scanning",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM01"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 31,
-    "text": "Is LLM output validated before being used by other systems?",
-    "type": "single",
-    "options": [
-      "Not validated",
-      "Manual review only",
-      "Rule-based or schema validation",
-      "Human-in-the-loop plus technical validation",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM05"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 32,
-    "text": "Are safeguards implemented to prevent sensitive data leakage?",
-    "type": "single",
-    "options": [
-      "No safeguards",
-      "Basic redaction or masking",
-      "Access controls and scoped retrieval",
-      "DLP or content inspection mechanisms",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 33,
-    "text": "How are LLM interactions logged and monitored?",
-    "type": "single",
-    "options": [
-      "No logging or monitoring",
-      "Basic application logs only",
-      "Prompt/response logging with monitoring",
-      "Security monitoring with alerts",
-      "Unknown"
-    ],
-    "owasp_llm": [],
-    "severity_weight": 3,
-    "confidence_weight": 3
-  },
-  {
-    "id": 34,
-    "text": "Are rate limits or abuse protections applied to the LLM interface?",
-    "type": "single",
-    "options": [
-      "No protections",
-      "Basic request throttling",
-      "User/account-based rate limiting",
-      "Rate limits plus abuse/anomaly detection",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM10"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 35,
-    "text": "How are external models or dependencies validated?",
-    "type": "single",
-    "options": [
-      "No validation process",
-      "Manual trust in vendor/source",
-      "Version pinning and review",
-      "Security review and supply chain controls",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM03"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 36,
-    "text": "Are embeddings or vector databases protected against unauthorized access?",
-    "type": "single",
-    "options": [
-      "Yes, strongly protected",
-      "Partially protected",
-      "No dedicated protection",
-      "Not applicable",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM08"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 37,
-    "text": "Which misuse scenarios are most plausible for this LLM deployment?",
-    "type": "multi",
-    "options": [
-      "Prompt injection to override instructions",
-      "Sensitive data extraction",
-      "Unauthorized action triggering",
-      "Misinformation or unsafe recommendations",
-      "Denial of service or excessive usage"
-    ],
-    "owasp_llm": ["LLM01", "LLM02", "LLM06", "LLM09", "LLM10"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 38,
-    "text": "What operational weaknesses could increase LLM-related security risks?",
-    "type": "multi",
-    "options": [
-      "Lack of security ownership",
-      "Insufficient monitoring",
-      "Poor prompt/change management",
-      "Weak access control hygiene",
-      "No incident response process for LLM misuse"
-    ],
-    "owasp_llm": [],
-    "severity_weight": 3,
-    "confidence_weight": 3
-  },
-  {
-    "id": 39,
-    "text": "Does the system rely on LLM responses for automated decision making?",
-    "type": "single",
-    "options": [
-      "No, informational use only",
-      "Yes, low-impact decisions",
-      "Yes, moderate-impact decisions",
-      "Yes, high-impact or business-critical decisions",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM09"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 40,
-    "text": "Is the system single-tenant or multi-tenant?",
-    "type": "single",
-    "options": [
-      "Single-tenant system",
-      "Multi-tenant with strong isolation",
-      "Multi-tenant with weak or unclear isolation",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 4
-  },
-  {
-    "id": 41,
-    "text": "How is user identity propagated across system components (LLM, tools, retrieval)?",
-    "type": "single",
-    "options": [
-      "No identity propagation",
-      "Shared system identity only",
-      "User identity partially propagated",
-      "User identity consistently enforced end-to-end",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM06", "LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 42,
-    "text": "Who can modify prompts, policies, or retrieval sources?",
-    "type": "multi",
-    "options": [
-      "No one (static configuration)",
-      "Developers only",
-      "Administrators via admin panel",
-      "Automated systems or pipelines",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM03", "LLM07"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  },
-  {
-    "id": 43,
-    "text": "Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?",
-    "type": "single",
-    "options": [
-      "No reuse",
-      "Yes, for indexing only",
-      "Yes, for training or fine-tuning",
-      "Yes, both indexing and training",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM04", "LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 44,
-    "text": "Are LLM tool permissions separated by action type (read, write, admin, destructive)?",
-    "type": "single",
-    "options": [
-      "No separation of permissions",
-      "Basic separation (read vs write)",
-      "Granular permissions including admin or destructive actions",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM06"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 45,
-    "text": "Can the LLM access secrets, credentials, or hidden system instructions at runtime?",
-    "type": "single",
-    "options": [
-      "No access to secrets or hidden data",
-      "Access to limited non-sensitive configuration",
-      "Access to sensitive data such as API keys or credentials",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02", "LLM07"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 46,
-    "text": "Is conversation or memory data isolated per user, session, or tenant?",
-    "type": "single",
-    "options": [
-      "No isolation",
-      "Session-level isolation only",
-      "User-level isolation",
-      "Tenant-level isolation",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 5,
-    "confidence_weight": 5
-  },
-  {
-    "id": 47,
-    "text": "Do logs or monitoring systems store full prompts, responses, or sensitive content?",
-    "type": "single",
-    "options": [
-      "No logging of LLM data",
-      "Logs contain non-sensitive metadata only",
-      "Logs contain full prompts and responses",
-      "Unknown"
-    ],
-    "owasp_llm": ["LLM02"],
-    "severity_weight": 4,
-    "confidence_weight": 5
-  }
+  {"id":1,"text":"What is the primary purpose of the LLM in this system?","type":"single","options":["Customer support assistant","Developer documentation assistant","Internal productivity assistant","Automated data analysis or summarization","Agent or workflow automation component","Experimental or research feature"],"category":"system_context","scope":["llm"],"owasp_llm":["LLM09"],"owasp_web":[],"owasp_api":[],"severity_weight":2,"confidence_weight":4},
+  {"id":2,"text":"Who can directly interact with the LLM system?","type":"multi","options":["Anonymous public internet users","Authenticated public users","Internal employees only","Administrators only","Local system processes only"],"category":"exposure_and_interfaces","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM10"],"owasp_web":["A01:2025","A07:2025"],"owasp_api":["API2:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":3,"text":"Through which interfaces is the LLM accessible?","type":"multi","options":["Web-based chat interface","REST API endpoint","Internal service-to-service calls","CLI or local scripts","Third-party integration"],"category":"exposure_and_interfaces","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM10"],"owasp_web":["A01:2025","A02:2025"],"owasp_api":["API8:2023","API9:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":4,"text":"Does the LLM process sensitive or business-critical data?","type":"single","options":["Yes","No","Unknown"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM02"],"owasp_web":[],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":5,"text":"What are the primary sources of input data for the LLM?","type":"multi","options":["Direct user prompts","Uploaded files","Retrieved internal documents","External web content","API or database records"],"category":"data_rag_and_memory","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM04"],"owasp_web":["A05:2025"],"owasp_api":["API10:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":6,"text":"What types of external or untrusted content can be ingested by the LLM?","type":"multi","options":["User text input only","File uploads","Web URLs","Email or ticket data","Public repositories"],"category":"data_rag_and_memory","scope":["llm","web"],"owasp_llm":["LLM01","LLM04"],"owasp_web":["A05:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":7,"text":"What processing steps occur before user input reaches the LLM?","type":"multi","options":["No preprocessing","Input filtering","Prompt templating","RAG augmentation","Routing/classification"],"category":"data_rag_and_memory","scope":["llm","web"],"owasp_llm":["LLM01"],"owasp_web":["A05:2025","A06:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":4},
+  {"id":8,"text":"Which data sources are connected via RAG?","type":"multi","options":["Internal knowledge base","Documentation","Customer data","Source code","No RAG"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM02","LLM04","LLM08"],"owasp_web":[],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":9,"text":"Which internal services can call the LLM?","type":"multi","options":["Frontend","Backend API","Auth service","Monitoring service","None"],"category":"exposure_and_interfaces","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":[],"owasp_api":["API5:2023","API9:2023"],"severity_weight":4,"confidence_weight":4},
+  {"id":10,"text":"Does the system store conversation history?","type":"single","options":["No","Session only","Per user","Global","Unknown"],"category":"data_rag_and_memory","scope":["llm","web"],"owasp_llm":["LLM02"],"owasp_web":["A01:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":5},
+  {"id":11,"text":"Is there an orchestration layer?","type":"single","options":["None","Basic logic","Framework","Agent workflow","Unknown"],"category":"tool_calling_and_agency","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":[],"owasp_api":["API5:2023"],"severity_weight":3,"confidence_weight":4},
+  {"id":12,"text":"Does the LLM have access to tools?","type":"multi","options":["Search","Database","Internal APIs","Admin tools","None"],"category":"tool_calling_and_agency","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API5:2023","API6:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":13,"text":"Which storage systems are accessible?","type":"multi","options":["Vector DB","SQL/NoSQL","File storage","Cloud storage","None"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM02","LLM08"],"owasp_web":[],"owasp_api":[],"severity_weight":4,"confidence_weight":5},
+  {"id":14,"text":"Can the LLM call external APIs?","type":"single","options":["No","Directly","Via backend","Unknown"],"category":"api_security","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":[],"owasp_api":["API10:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":15,"text":"What actions can the LLM trigger?","type":"multi","options":["Generate text responses only","Create or update tickets/records","Send emails or notifications","Execute workflows or transactions","Modify system configurations"],"category":"tool_calling_and_agency","scope":["llm","api"],"owasp_llm":["LLM05","LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API5:2023","API6:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":16,"text":"Can the LLM affect real-world state or business processes without human approval?","type":"single","options":["No, human approval is always required","Yes, in low-risk actions only","Yes, in business-critical actions","Unknown"],"category":"tool_calling_and_agency","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":[],"owasp_api":["API6:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":17,"text":"Where is the LLM hosted?","type":"single","options":["Third-party cloud API","Self-hosted on internal infrastructure","Hosted by external vendor in private environment","Hybrid deployment","Unknown"],"category":"supply_chain_and_integrity","scope":["llm"],"owasp_llm":["LLM03"],"owasp_web":["A03:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":5},
+  {"id":18,"text":"Does the system use multiple LLM models for different tasks?","type":"single","options":["No, a single model is used","Yes, different models for separate tasks","Yes, fallback or routing between models","Unknown"],"category":"supply_chain_and_integrity","scope":["llm"],"owasp_llm":["LLM03","LLM09"],"owasp_web":["A03:2025"],"owasp_api":[],"severity_weight":3,"confidence_weight":3},
+  {"id":19,"text":"How are LLM prompts or system instructions managed?","type":"single","options":["Hardcoded in application logic","Stored in configuration files","Managed through database or admin panel","Dynamically generated at runtime","Unknown"],"category":"supply_chain_and_integrity","scope":["llm"],"owasp_llm":["LLM07"],"owasp_web":["A08:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":5},
+  {"id":20,"text":"Can users influence system prompts or instructions indirectly?","type":"single","options":["No","Yes, through retrieved documents or memory","Yes, through tool outputs or metadata","Yes, through prompt templates or variables","Unknown"],"category":"prompt_and_context_integrity","scope":["llm"],"owasp_llm":["LLM01","LLM07"],"owasp_web":["A05:2025","A08:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":21,"text":"What output formats are produced by the LLM?","type":"multi","options":["Plain text only","Markdown or rich text","Structured JSON","Code or scripts","HTML or rendered content"],"category":"output_handling","scope":["llm","web","api"],"owasp_llm":["LLM05"],"owasp_web":["A05:2025"],"owasp_api":["API10:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":22,"text":"Where is LLM output rendered or consumed?","type":"multi","options":["User-facing web interface","Internal admin dashboard","API response consumed by other systems","Email, messaging, or notification channel","Directly used in backend automation"],"category":"output_handling","scope":["llm","web","api"],"owasp_llm":["LLM05","LLM06"],"owasp_web":["A05:2025"],"owasp_api":["API10:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":23,"text":"Which trust boundaries does user input cross before reaching the LLM?","type":"multi","options":["Public internet to web application","Web application to internal API","Internal API to model service","Cross-tenant or cross-user context boundary","No significant trust boundary"],"category":"exposure_and_interfaces","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM02"],"owasp_web":["A01:2025"],"owasp_api":["API5:2023"],"severity_weight":4,"confidence_weight":4},
+  {"id":24,"text":"Which sensitive data categories are accessible to the LLM?","type":"multi","options":["Personally identifiable information (PII)","API keys or credentials","Internal operational documents","Customer support records","No sensitive data"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM02"],"owasp_web":[],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":25,"text":"How are users authenticated before interacting with the LLM?","type":"single","options":["No authentication required","Username/password login","Single sign-on (SSO)","API keys or tokens","Internal network authentication"],"category":"authentication_and_authorization","scope":["llm","web","api"],"owasp_llm":["LLM10"],"owasp_web":["A07:2025"],"owasp_api":["API2:2023"],"severity_weight":4,"confidence_weight":4},
+  {"id":26,"text":"How is authorization enforced for LLM access?","type":"single","options":["No authorization controls","Role-based access control (RBAC)","Attribute- or policy-based controls","Hardcoded application logic","Unknown"],"category":"authentication_and_authorization","scope":["llm","web","api"],"owasp_llm":["LLM02","LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":27,"text":"Is role-based filtering applied to retrieved documents or data?","type":"single","options":["Yes, consistently enforced","Partially enforced","No filtering applied","Not applicable","Unknown"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM02","LLM08"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023","API3:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":28,"text":"Is the LLM's behavior limited by user role, data scope, or task permissions?","type":"single","options":["Yes, strongly limited","Partially limited","No, same behavior for all users","Unknown"],"category":"authentication_and_authorization","scope":["llm","api"],"owasp_llm":["LLM02","LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":29,"text":"Which components expose the largest LLM-related attack surface?","type":"multi","options":["Public chat interface","RAG or document ingestion pipeline","Tool-calling or agent framework","Admin or internal operator interface","Model hosting or API integration layer"],"category":"exposure_and_interfaces","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM06","LLM08","LLM10"],"owasp_web":["A01:2025","A02:2025"],"owasp_api":["API8:2023","API9:2023"],"severity_weight":5,"confidence_weight":4},
+  {"id":30,"text":"Are safeguards implemented against prompt injection attacks?","type":"single","options":["No safeguards","Basic input filtering only","Context isolation and instruction hierarchy controls","Prompt injection detection or scanning","Unknown"],"category":"prompt_and_context_integrity","scope":["llm","web"],"owasp_llm":["LLM01"],"owasp_web":["A05:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":31,"text":"Is LLM output validated before being used by other systems?","type":"single","options":["Not validated","Manual review only","Rule-based or schema validation","Human-in-the-loop plus technical validation","Unknown"],"category":"output_handling","scope":["llm","web","api"],"owasp_llm":["LLM05"],"owasp_web":["A05:2025"],"owasp_api":["API10:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":32,"text":"Are safeguards implemented to prevent sensitive data leakage?","type":"single","options":["No safeguards","Basic redaction or masking","Access controls and scoped retrieval","DLP or content inspection mechanisms","Unknown"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM02"],"owasp_web":["A01:2025"],"owasp_api":["API3:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":33,"text":"How are LLM interactions logged and monitored?","type":"single","options":["No logging or monitoring","Basic application logs only","Prompt/response logging with monitoring","Security monitoring with alerts","Unknown"],"category":"logging_monitoring_and_abuse","scope":["llm","web","api"],"owasp_llm":[],"owasp_web":["A09:2025"],"owasp_api":[],"severity_weight":3,"confidence_weight":3},
+  {"id":34,"text":"Are rate limits or abuse protections applied to the LLM interface?","type":"single","options":["No protections","Basic request throttling","User/account-based rate limiting","Rate limits plus abuse/anomaly detection","Unknown"],"category":"logging_monitoring_and_abuse","scope":["llm","web","api"],"owasp_llm":["LLM10"],"owasp_web":[],"owasp_api":["API4:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":35,"text":"How are external models or dependencies validated?","type":"single","options":["No validation process","Manual trust in vendor/source","Version pinning and review","Security review and supply chain controls","Unknown"],"category":"supply_chain_and_integrity","scope":["llm"],"owasp_llm":["LLM03"],"owasp_web":["A03:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":36,"text":"Are embeddings or vector databases protected against unauthorized access?","type":"single","options":["Yes, strongly protected","Partially protected","No dedicated protection","Not applicable","Unknown"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM08"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023","API3:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":37,"text":"Which misuse scenarios are most plausible for this LLM deployment?","type":"multi","options":["Prompt injection to override instructions","Sensitive data extraction","Unauthorized action triggering","Misinformation or unsafe recommendations","Denial of service or excessive usage"],"category":"operations_and_governance","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM02","LLM06","LLM09","LLM10"],"owasp_web":["A06:2025"],"owasp_api":["API6:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":38,"text":"What operational weaknesses could increase LLM-related security risks?","type":"multi","options":["Lack of security ownership","Insufficient monitoring","Poor prompt/change management","Weak access control hygiene","No incident response process for LLM misuse"],"category":"operations_and_governance","scope":["llm","web","api"],"owasp_llm":[],"owasp_web":["A06:2025","A09:2025"],"owasp_api":[],"severity_weight":3,"confidence_weight":3},
+  {"id":39,"text":"Does the system rely on LLM responses for automated decision making?","type":"single","options":["No, informational use only","Yes, low-impact decisions","Yes, moderate-impact decisions","Yes, high-impact or business-critical decisions","Unknown"],"category":"tool_calling_and_agency","scope":["llm"],"owasp_llm":["LLM09"],"owasp_web":["A06:2025"],"owasp_api":["API6:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":40,"text":"Is the system single-tenant or multi-tenant?","type":"single","options":["Single-tenant system","Multi-tenant with strong isolation","Multi-tenant with weak or unclear isolation","Unknown"],"category":"identity_and_tenant_isolation","scope":["llm","web","api"],"owasp_llm":["LLM02"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023","API3:2023"],"severity_weight":5,"confidence_weight":4},
+  {"id":41,"text":"How is user identity propagated across system components (LLM, tools, retrieval)?","type":"single","options":["No identity propagation","Shared system identity only","User identity partially propagated","User identity consistently enforced end-to-end","Unknown"],"category":"identity_and_tenant_isolation","scope":["llm","api"],"owasp_llm":["LLM06","LLM02"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":42,"text":"Who can modify prompts, policies, or retrieval sources?","type":"multi","options":["No one (static configuration)","Developers only","Administrators via admin panel","Automated systems or pipelines","Unknown"],"category":"supply_chain_and_integrity","scope":["llm","web"],"owasp_llm":["LLM03","LLM07"],"owasp_web":["A03:2025","A08:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":5},
+  {"id":43,"text":"Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?","type":"single","options":["No reuse","Yes, for indexing only","Yes, for training or fine-tuning","Yes, both indexing and training","Unknown"],"category":"data_rag_and_memory","scope":["llm"],"owasp_llm":["LLM04","LLM02"],"owasp_web":["A08:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":44,"text":"Are LLM tool permissions separated by action type (read, write, admin, destructive)?","type":"single","options":["No separation of permissions","Basic separation (read vs write)","Granular permissions including admin or destructive actions","Unknown"],"category":"tool_calling_and_agency","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":45,"text":"Can the LLM access secrets, credentials, or hidden system instructions at runtime?","type":"single","options":["No access to secrets or hidden data","Access to limited non-sensitive configuration","Access to sensitive data such as API keys or credentials","Unknown"],"category":"secrets_and_crypto","scope":["llm","api"],"owasp_llm":["LLM02","LLM07"],"owasp_web":["A04:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":46,"text":"Is conversation or memory data isolated per user, session, or tenant?","type":"single","options":["No isolation","Session-level isolation only","User-level isolation","Tenant-level isolation","Unknown"],"category":"identity_and_tenant_isolation","scope":["llm","web"],"owasp_llm":["LLM02"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":47,"text":"Do logs or monitoring systems store full prompts, responses, or sensitive content?","type":"single","options":["No logging of LLM data","Logs contain non-sensitive metadata only","Logs contain full prompts and responses","Unknown"],"category":"logging_monitoring_and_abuse","scope":["llm"],"owasp_llm":["LLM02"],"owasp_web":["A09:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":5},
+  {"id":48,"text":"Which web application entry points can initiate or influence the LLM workflow?","type":"multi","options":["Public chat page","Authenticated user dashboard","Admin/operator panel","Embedded widget or iframe","Webhook or callback endpoint","None"],"category":"web_attack_surface","scope":["llm","web"],"owasp_llm":["LLM01","LLM06","LLM10"],"owasp_web":["A01:2025","A02:2025","A07:2025"],"owasp_api":["API2:2023","API5:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":49,"text":"Are LLM-related routes or endpoints separated from general application functionality with dedicated access controls?","type":"single","options":["Yes, clearly separated and protected","Partially separated","No, shared with general application routes","Unknown"],"category":"web_attack_surface","scope":["llm","web"],"owasp_llm":["LLM06","LLM10"],"owasp_web":["A01:2025","A02:2025"],"owasp_api":["API5:2023","API8:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":50,"text":"Is the user's authenticated session or role revalidated before each LLM request or tool action is processed?","type":"single","options":["Yes, revalidated on every sensitive request","Partially revalidated","No, only checked at initial login","No authentication or session context exists","Unknown"],"category":"identity_and_session_context","scope":["llm","web","api"],"owasp_llm":["LLM02","LLM06"],"owasp_web":["A01:2025","A07:2025"],"owasp_api":["API2:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":51,"text":"Are browser-origin protections applied to LLM-triggered state-changing actions?","type":"single","options":["Yes, CSRF/origin protections are enforced","Partially enforced","No, state-changing actions can be triggered without origin protection","Not applicable","Unknown"],"category":"web_attack_surface","scope":["llm","web"],"owasp_llm":["LLM06"],"owasp_web":["A01:2025","A06:2025"],"owasp_api":[],"severity_weight":4,"confidence_weight":4},
+  {"id":52,"text":"How is cross-origin access controlled for LLM or AI-related API endpoints?","type":"single","options":["Strict allowlist with credentials handled safely","Broad but intentional allowlist","Wildcard or overly permissive CORS","No cross-origin access","Unknown"],"category":"web_api_configuration","scope":["llm","web","api"],"owasp_llm":["LLM10"],"owasp_web":["A02:2025"],"owasp_api":["API8:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":53,"text":"Can LLM tool calls access objects or records using user-controlled identifiers?","type":"single","options":["No object identifiers are user-controlled","Yes, with object-level authorization checks","Yes, with partial authorization checks","Yes, without reliable object-level checks","Unknown"],"category":"api_authorization","scope":["llm","api"],"owasp_llm":["LLM02","LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":54,"text":"Can LLM-generated or LLM-selected parameters control which object fields are read or updated through APIs?","type":"single","options":["No field-level control by the LLM","Yes, with strict field-level authorization","Yes, with partial validation","Yes, fields can be read or updated without strong controls","Unknown"],"category":"api_authorization","scope":["llm","api"],"owasp_llm":["LLM02","LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API3:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":55,"text":"Can the LLM influence API functions with different privilege levels such as user, admin, or operator actions?","type":"single","options":["No privileged API functions are reachable","Yes, but permission checks follow the current user","Yes, through a shared backend service account","Yes, privileged functions may be reachable without strong checks","Unknown"],"category":"api_authorization","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":["A01:2025"],"owasp_api":["API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":56,"text":"Does the LLM or orchestration layer use a shared service account when calling internal APIs?","type":"single","options":["No, calls use user-scoped identity","Yes, but permissions are tightly scoped","Yes, broad shared service account","Unknown"],"category":"identity_and_session_context","scope":["llm","web","api"],"owasp_llm":["LLM06","LLM02"],"owasp_web":["A01:2025"],"owasp_api":["API1:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":57,"text":"Are LLM-accessible API schemas, function definitions, or tool manifests reviewed for excessive capabilities?","type":"single","options":["Yes, reviewed and minimized","Partially reviewed","No formal review","Unknown"],"category":"tool_and_api_design","scope":["llm","api"],"owasp_llm":["LLM06","LLM03"],"owasp_web":["A06:2025"],"owasp_api":["API5:2023","API9:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":58,"text":"Are API endpoints exposed to the LLM inventoried and classified by sensitivity?","type":"single","options":["Yes, complete inventory and classification","Partial inventory","No reliable inventory","Unknown"],"category":"api_inventory","scope":["llm","api"],"owasp_llm":["LLM06"],"owasp_web":["A02:2025"],"owasp_api":["API9:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":59,"text":"Can the LLM access deprecated, debug, staging, or undocumented APIs?","type":"single","options":["No, only approved production APIs","Possibly, but restricted","Yes, some non-production or undocumented APIs are reachable","Unknown"],"category":"api_inventory","scope":["llm","api"],"owasp_llm":["LLM06","LLM02"],"owasp_web":["A02:2025"],"owasp_api":["API8:2023","API9:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":60,"text":"How are third-party API responses handled before being inserted into LLM context?","type":"single","options":["Validated, normalized, and treated as untrusted data","Basic validation only","Inserted directly into prompt context","No third-party API data used","Unknown"],"category":"external_api_consumption","scope":["llm","api"],"owasp_llm":["LLM01","LLM02","LLM07"],"owasp_web":["A05:2025","A08:2025"],"owasp_api":["API10:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":61,"text":"Can external API content or metadata contain instructions that may be interpreted by the LLM?","type":"single","options":["No external API content enters prompt context","Yes, but instruction/data separation is enforced","Yes, with basic filtering only","Yes, inserted without isolation","Unknown"],"category":"external_api_consumption","scope":["llm","api"],"owasp_llm":["LLM01","LLM07"],"owasp_web":["A05:2025","A08:2025"],"owasp_api":["API10:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":62,"text":"Can the LLM request arbitrary URLs or network locations through web browsing, fetch, webhook, or API tools?","type":"single","options":["No arbitrary URL fetching is possible","Only allowlisted domains are reachable","Partially restricted","Arbitrary URLs or internal addresses may be reachable","Unknown"],"category":"external_access_and_ssrf","scope":["llm","api","web"],"owasp_llm":["LLM06","LLM10"],"owasp_web":["A01:2025","A02:2025"],"owasp_api":["API7:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":63,"text":"Are outbound network calls from the LLM tool environment restricted to approved destinations?","type":"single","options":["Yes, strict egress allowlist","Partially restricted","No outbound restrictions","No outbound network access","Unknown"],"category":"external_access_and_ssrf","scope":["llm","api","web"],"owasp_llm":["LLM06"],"owasp_web":["A02:2025"],"owasp_api":["API7:2023","API8:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":64,"text":"Can LLM-generated output be rendered as Markdown, HTML, links, scripts, or rich content in a web interface?","type":"single","options":["Plain text only","Markdown with sanitization","HTML/rich content with sanitization","HTML/rich content without reliable sanitization","Unknown"],"category":"output_rendering","scope":["llm","web"],"owasp_llm":["LLM05"],"owasp_web":["A05:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":65,"text":"Is LLM-generated structured output used to build database queries, search filters, commands, or API requests?","type":"single","options":["No structured output drives downstream operations","Yes, with strict schema and allowlists","Yes, with partial validation","Yes, directly used with minimal validation","Unknown"],"category":"output_to_action","scope":["llm","api","web"],"owasp_llm":["LLM05","LLM06"],"owasp_web":["A05:2025","A06:2025"],"owasp_api":["API3:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":66,"text":"Are dangerous output patterns such as executable code, URLs, SQL fragments, or command fragments blocked before downstream use?","type":"single","options":["Yes, strict blocking or allowlisting","Partially blocked","No dedicated controls","Not applicable","Unknown"],"category":"output_to_action","scope":["llm","api","web"],"owasp_llm":["LLM05","LLM06"],"owasp_web":["A05:2025"],"owasp_api":[],"severity_weight":5,"confidence_weight":5},
+  {"id":67,"text":"How are file uploads for LLM processing validated before parsing, indexing, or retrieval?","type":"single","options":["Strict file type, size, malware, and content validation","Basic type and size validation","Only application-level checks","No validation","No file uploads","Unknown"],"category":"file_and_content_ingestion","scope":["llm","web"],"owasp_llm":["LLM01","LLM04","LLM08"],"owasp_web":["A02:2025","A05:2025"],"owasp_api":["API4:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":68,"text":"Can uploaded or retrieved documents affect future users through shared indexes, caches, or retrieval stores?","type":"single","options":["No shared indexing or cache exists","Yes, with tenant/user isolation and review","Yes, with partial isolation","Yes, shared stores may affect other users","Unknown"],"category":"rag_integrity","scope":["llm","web","api"],"owasp_llm":["LLM04","LLM08","LLM02"],"owasp_web":["A08:2025","A01:2025"],"owasp_api":["API3:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":69,"text":"Are RAG sources protected against unauthorized modification or poisoning through web or API workflows?","type":"single","options":["Yes, strong write controls and review","Partially protected","No dedicated protection","No RAG sources","Unknown"],"category":"rag_integrity","scope":["llm","web","api"],"owasp_llm":["LLM04","LLM08"],"owasp_web":["A01:2025","A08:2025"],"owasp_api":["API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":70,"text":"Can administrators or operators modify LLM prompts, policies, tools, or RAG sources through a web admin interface?","type":"single","options":["No admin interface exists","Yes, with strong authentication and authorization","Yes, with basic controls","Yes, controls are weak or unclear","Unknown"],"category":"admin_and_configuration","scope":["llm","web"],"owasp_llm":["LLM03","LLM07","LLM08"],"owasp_web":["A01:2025","A02:2025","A07:2025"],"owasp_api":["API2:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":71,"text":"Are changes to prompts, policies, tools, and retrieval sources versioned and auditable?","type":"single","options":["Yes, versioned with approval and audit trail","Versioned but no approval workflow","Informally tracked","Not tracked","Unknown"],"category":"admin_and_configuration","scope":["llm","web"],"owasp_llm":["LLM03","LLM07"],"owasp_web":["A03:2025","A08:2025","A09:2025"],"owasp_api":["API9:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":72,"text":"How are secrets used by LLM tools, plugins, or API connectors stored and scoped?","type":"single","options":["Dedicated secret manager with least privilege","Environment/config secrets with limited scope","Shared long-lived credentials","Hardcoded or exposed secrets","Unknown"],"category":"secrets_and_crypto","scope":["llm","api"],"owasp_llm":["LLM02","LLM06","LLM07"],"owasp_web":["A04:2025","A02:2025"],"owasp_api":["API2:2023","API8:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":73,"text":"Is sensitive LLM traffic encrypted between browser, backend, orchestration layer, model provider, and tool APIs?","type":"single","options":["Yes, encryption is enforced end-to-end where applicable","Partially encrypted","No or unclear encryption between some components","Unknown"],"category":"secrets_and_crypto","scope":["llm","api"],"owasp_llm":["LLM02"],"owasp_web":["A04:2025"],"owasp_api":["API8:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":74,"text":"Are LLM prompts, responses, tool calls, and API failures logged as security-relevant events?","type":"single","options":["Yes, with security alerts and privacy controls","Logged without alerting","Basic application logs only","Not logged","Unknown"],"category":"logging_and_detection","scope":["llm","web","api"],"owasp_llm":["LLM01","LLM02","LLM06","LLM10"],"owasp_web":["A09:2025"],"owasp_api":["API10:2023"],"severity_weight":4,"confidence_weight":5},
+  {"id":75,"text":"Can abnormal LLM or API behavior fail open and still complete actions?","type":"single","options":["No, failures are fail-closed","Some non-critical failures may continue safely","Failures may fall back to less restricted behavior","Unknown"],"category":"exception_handling","scope":["llm","web","api"],"owasp_llm":["LLM05","LLM06","LLM09"],"owasp_web":["A10:2025"],"owasp_api":["API8:2023"],"severity_weight":5,"confidence_weight":4},
+  {"id":76,"text":"Are model, tool, or API errors exposed to users in a way that reveals prompts, stack traces, internal endpoints, or secrets?","type":"single","options":["No, sanitized error handling is enforced","Partial sanitization","Detailed internal errors may be exposed","Unknown"],"category":"exception_handling","scope":["llm","web","api"],"owasp_llm":["LLM02","LLM07"],"owasp_web":["A02:2025","A10:2025"],"owasp_api":["API8:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":77,"text":"Are token, cost, request, and tool-execution limits enforced across users, tenants, and API clients?","type":"single","options":["Yes, per user/tenant/client with anomaly detection","Basic global limits only","Partial or inconsistent limits","No effective limits","Unknown"],"category":"resource_consumption","scope":["llm","api"],"owasp_llm":["LLM10"],"owasp_web":["A02:2025"],"owasp_api":["API4:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":78,"text":"Can a user trigger expensive LLM operations, recursive tool calls, large retrievals, or high-volume API workflows?","type":"single","options":["No expensive operations are user-triggerable","Yes, but bounded by quotas and timeouts","Yes, partially bounded","Yes, with weak or unclear limits","Unknown"],"category":"resource_consumption","scope":["llm","api"],"owasp_llm":["LLM10","LLM06"],"owasp_web":["A06:2025"],"owasp_api":["API4:2023","API6:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":79,"text":"Can the LLM trigger sensitive business flows such as refunds, account changes, notifications, approvals, or ticket escalation?","type":"multi","options":["No sensitive business flows","Refunds or payments","Account/profile changes","Notifications or external messages","Approvals or entitlement changes","Ticket escalation or priority changes","Unknown"],"category":"business_flow_abuse","scope":["llm","api"],"owasp_llm":["LLM06","LLM09"],"owasp_web":["A01:2025","A06:2025"],"owasp_api":["API6:2023","API5:2023"],"severity_weight":5,"confidence_weight":5},
+  {"id":80,"text":"Are LLM-triggered business flows protected with confirmation, step-up authentication, or human approval based on risk level?","type":"single","options":["Yes, risk-based approval or step-up controls","Only high-risk actions require approval","Basic confirmation only","No additional controls","Not applicable","Unknown"],"category":"business_flow_abuse","scope":["llm","api"],"owasp_llm":["LLM06","LLM09"],"owasp_web":["A01:2025","A06:2025","A07:2025"],"owasp_api":["API2:2023","API6:2023"],"severity_weight":5,"confidence_weight":5}
 ]

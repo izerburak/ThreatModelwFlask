@@ -1,0 +1,42 @@
+{
+  "pipeline_id": "20260523203952-Dev-docs-v6",
+  "project_name": "Dev docs v6",
+  "dfd_name": "Dev docs v6 Threat Model",
+  "auditor_name": "burak",
+  "source_response": "llmsec_2026-05-23_15-42-35_02_internal_developer_docs_assistant.json",
+  "created_at": "2026-05-23T20:39:52Z",
+  "updated_at": "2026-05-23T20:40:20Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-05-23T20:39:52Z",
+      "artifact": "response.json"
+    },
+    "llm_extraction_generated": {
+      "done": true,
+      "timestamp": "2026-05-23T20:40:20Z",
+      "artifact": "extraction_raw.json",
+      "error": null
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-05-23T20:40:20Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-05-23T20:40:20Z",
+      "artifact": "risks.json",
+      "error": null
+    },
+    "garak_plan_created": {
+      "done": false,
+      "timestamp": null,
+      "artifact": "garak_plan.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260523204020-Dev-docs-v6-Threat-Model.json"
+}

@@ -19,13 +19,45 @@ OWASP_LLM_2025 = {
 
 RISK_RANK = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
 
+LEGACY_RISK_CONTEXT_TO_OWASP_LLM = {
+    "prompt_injection": ["LLM01"],
+    "untrusted_input": ["LLM01"],
+    "malicious_content": ["LLM01"],
+    "data_leakage": ["LLM02"],
+    "data_exposure": ["LLM02"],
+    "privacy": ["LLM02"],
+    "credential_exposure": ["LLM02"],
+    "supply_chain": ["LLM03"],
+    "data_poisoning": ["LLM04"],
+    "vector_poisoning": ["LLM04", "LLM08"],
+    "retrieval_leakage": ["LLM08", "LLM02"],
+    "unsafe_output": ["LLM05"],
+    "output_injection": ["LLM05"],
+    "execution_risk": ["LLM05", "LLM06"],
+    "excessive_agency": ["LLM06"],
+    "unauthorized_actions": ["LLM06"],
+    "privilege_escalation": ["LLM06"],
+    "over_permission": ["LLM06"],
+    "prompt_leakage": ["LLM07"],
+    "misuse": ["LLM09"],
+    "overreliance": ["LLM09"],
+    "dos": ["LLM10"],
+    "abuse": ["LLM10"],
+    "attack_surface": ["LLM10"],
+}
+
 
 def build_risk_analysis(app_root_path, response_payload, extract_payload=None):
     questions = _load_questions(app_root_path)
     answers = _answers_by_flow_id(response_payload)
     extract_payload = extract_payload if isinstance(extract_payload, dict) else {}
 
-    mapped_risks = _mapped_question_risks(questions, answers)
+    mapped_sections = _mapped_question_risks_by_framework(questions, answers)
+    mapped_risks = [
+        risk
+        for framework_key in ("owasp_llm", "owasp_web", "owasp_api")
+        for risk in mapped_sections[framework_key]
+    ]
     extract_risks = _extract_risks(extract_payload)
     unified_risks = unify_risks(extract_risks, mapped_risks)
     status = _overall_status(extract_payload, unified_risks)
@@ -34,6 +66,10 @@ def build_risk_analysis(app_root_path, response_payload, extract_payload=None):
         "overall_status": status,
         "status_source": "Combined risk model",
         "mapped_risks": mapped_risks,
+        "mapped_risks_by_framework": mapped_sections,
+        "owasp_llm": mapped_sections["owasp_llm"],
+        "owasp_web": mapped_sections["owasp_web"],
+        "owasp_api": mapped_sections["owasp_api"],
         "extract_risks": extract_risks,
         "unified_risks": unified_risks,
         "quick_wins": _string_list(extract_payload.get("quick_wins")),
@@ -92,7 +128,14 @@ def suggested_extract_filename(response_file):
     return f"{safe_stem}-extract.json" if safe_stem else ""
 
 
-def _mapped_question_risks(questions, answers):
+def _mapped_question_risks_by_framework(questions, answers):
+    return {
+        framework_key: _mapped_question_risks(questions, answers, framework_key)
+        for framework_key in ("owasp_llm", "owasp_web", "owasp_api")
+    }
+
+
+def _mapped_question_risks(questions, answers, framework_key="owasp_llm"):
     grouped = defaultdict(lambda: {"score": 0, "severity": 0, "confidence": 0, "evidence": []})
 
     for flow_id, answer in answers.items():
@@ -100,12 +143,12 @@ def _mapped_question_risks(questions, answers):
         if not question:
             continue
 
-        codes = question.get("owasp_llm") or []
+        codes = _question_codes(question, framework_key)
         if not codes:
             continue
 
-        severity = _int_value(question.get("severity_weight"))
-        confidence = _int_value(question.get("confidence_weight"))
+        severity = _int_value(question.get("severity_weight"), default=1)
+        confidence = _int_value(question.get("confidence_weight"), default=1)
         score = severity * confidence
         evidence = {
             "question": _question_label(flow_id),
@@ -114,9 +157,18 @@ def _mapped_question_risks(questions, answers):
             "severity_weight": severity,
             "confidence_weight": confidence,
         }
+        if question.get("category"):
+            evidence["category"] = question.get("category")
+        if question.get("scope"):
+            evidence["scope"] = _string_list(question.get("scope"))
+        if question.get("dfd_impact"):
+            evidence["dfd_impact"] = _string_list(question.get("dfd_impact"))
+        if question.get("risk_context"):
+            evidence["risk_context"] = _string_list(question.get("risk_context"))
 
         for code in codes:
-            if code not in OWASP_LLM_2025:
+            code = str(code or "").strip().upper()
+            if not code:
                 continue
             bucket = grouped[code]
             bucket["score"] += score
@@ -129,7 +181,8 @@ def _mapped_question_risks(questions, answers):
         risks.append(
             {
                 "code": code,
-                "name": OWASP_LLM_2025[code],
+                "name": _risk_name(framework_key, code),
+                "framework": framework_key,
                 "risk_level": _level_from_weights(bucket["severity"], bucket["score"]),
                 "score": bucket["score"],
                 "evidence": bucket["evidence"],
@@ -221,13 +274,29 @@ def _level_from_weights(severity, score):
 
 
 def _load_questions(app_root_path):
-    questions_path = Path(app_root_path) / "questions" / "questionsDb.json"
-    questions = json.loads(questions_path.read_text(encoding="utf-8"))
+    questions_path = _resolve_questions_path(app_root_path)
+    raw_questions = json.loads(questions_path.read_text(encoding="utf-8"))
+    questions = raw_questions.get("questions") if isinstance(raw_questions, dict) else raw_questions
+    if not isinstance(questions, list):
+        return {}
     return {
         int(question["id"]): question
         for question in questions
         if isinstance(question, dict) and str(question.get("id", "")).isdigit()
     }
+
+
+def _resolve_questions_path(app_root_path):
+    app_root_path = Path(app_root_path)
+    candidates = [
+        app_root_path / "questions" / "questionsDb.json",
+        app_root_path.parent / "TM-Questions" / "questionsDb.json",
+        app_root_path.parent / "questions" / "questionsDb.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError("Unable to find questionsDb.json.")
 
 
 def _answers_by_flow_id(response_payload):
@@ -285,8 +354,25 @@ def _string_list(value):
     return []
 
 
-def _int_value(value):
+def _risk_name(framework_key, code):
+    if framework_key == "owasp_llm":
+        return OWASP_LLM_2025.get(code, code)
+    return code
+
+
+def _question_codes(question, framework_key):
+    codes = _string_list(question.get(framework_key))
+    if codes or framework_key != "owasp_llm":
+        return [str(code).strip().upper() for code in codes if str(code).strip()]
+
+    legacy_codes = []
+    for context in _string_list(question.get("risk_context")):
+        legacy_codes.extend(LEGACY_RISK_CONTEXT_TO_OWASP_LLM.get(context.strip().lower(), []))
+    return _unique_strings(legacy_codes)
+
+
+def _int_value(value, default=0):
     try:
         return int(value)
     except (TypeError, ValueError):
-        return 0
+        return default

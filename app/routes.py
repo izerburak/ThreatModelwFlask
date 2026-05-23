@@ -575,7 +575,13 @@ def llm_sec():
         if current_question is None:
             abort(400, description="Invalid questionnaire state.")
 
-        flow_state["answers"][current_flow_id] = flow_engine.extract_answer(request.form, current_question)
+        submitted_answer = flow_engine.extract_answer(request.form, current_question)
+        flow_state["answers"][current_flow_id] = submitted_answer
+        current_app.logger.debug(
+            "LLM security questionnaire submitted %s with answer=%r",
+            current_flow_id,
+            submitted_answer,
+        )
 
         action = request.form.get("action", "next")
 

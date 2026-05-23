@@ -29,7 +29,7 @@ def build_mock_dfd_payload(setup_payload, response_payload, response_file):
         "editable_canvas": bool(setup_payload.get("editable_canvas")),
     }
 
-    answers = response_payload.get("answers") or {}
+    answers = _answers_by_flow_id(response_payload)
     model_id = _build_model_id(model_title, project_name)
 
     user_label = _derive_user_label(answers)
@@ -109,7 +109,7 @@ def _build_model_id(model_title, project_name):
 
 
 def _derive_user_label(answers):
-    user_scope = answers.get("q_2")
+    user_scope = _answer_for(answers, "Q2", "q_2", "2")
     if isinstance(user_scope, list) and user_scope:
         return user_scope[0]
     if isinstance(user_scope, str) and user_scope.strip():
@@ -118,7 +118,7 @@ def _derive_user_label(answers):
 
 
 def _derive_process_label(project_name, answers):
-    system_type = answers.get("q_1")
+    system_type = _answer_for(answers, "Q1", "q_1", "1")
     if isinstance(system_type, list) and system_type:
         return system_type[0]
     if isinstance(system_type, str) and system_type.strip():
@@ -127,9 +127,41 @@ def _derive_process_label(project_name, answers):
 
 
 def _derive_external_label(answers):
-    external_dependency = answers.get("q_8") or answers.get("q_4")
+    external_dependency = _answer_for(answers, "Q8", "q_8", "8") or _answer_for(answers, "Q4", "q_4", "4")
     if isinstance(external_dependency, list) and external_dependency:
         return external_dependency[0]
     if isinstance(external_dependency, str) and external_dependency.strip():
         return external_dependency.strip()
     return "External API"
+
+
+def _answers_by_flow_id(response_payload):
+    if not isinstance(response_payload, dict):
+        return {}
+
+    compact_answers = response_payload.get("answers_by_flow_id")
+    if isinstance(compact_answers, dict):
+        return compact_answers
+
+    answers = response_payload.get("answers")
+    if isinstance(answers, dict):
+        return answers
+    if not isinstance(answers, list):
+        return {}
+
+    normalized = {}
+    for answer_record in answers:
+        if not isinstance(answer_record, dict):
+            continue
+        flow_id = str(answer_record.get("flow_id") or "").strip()
+        answer = answer_record.get("answer")
+        if flow_id and answer not in (None, "", []):
+            normalized[flow_id] = answer
+    return normalized
+
+
+def _answer_for(answers, *keys):
+    for key in keys:
+        if key in answers:
+            return answers[key]
+    return None

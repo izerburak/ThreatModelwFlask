@@ -1,0 +1,56 @@
+{
+  "system": {
+    "name": "DocsAI",
+    "description": "A documentation and knowledge management assistant built on top of a large language model (LLM).",
+    "purpose": "To assist users in creating, organizing, and managing documentation, knowledge bases, and technical content.",
+    "features": {
+      "document_generation": "Automatically generates documentation from raw data, code, or technical content.",
+      "knowledge_organization": "Helps structure and categorize information into logical formats like FAQs, guides, and tutorials.",
+      "content_enrichment": "Adds context, examples, and explanations to improve clarity and usability.",
+      "multilingual_support": "Supports multiple languages for global accessibility.",
+      "integration": "Can integrate with tools like Notion, Confluence, and Git for seamless workflow."
+    },
+    "security": {
+      "access_control": "RBAC (Role-Based Access Control) ensures only authorized users can access specific content.",
+      "data_encryption": "End-to-end encryption for data at rest and in transit.",
+      "audit_logs": "Detailed logs for tracking access and changes to sensitive information."
+    },
+    "user_experience": {
+      "intuitive_interface": "User-friendly interface for easy navigation and content creation.",
+      "search_capabilities": "Advanced search with filters for quick retrieval of information.",
+      "collaboration_tools": "Support for team collaboration, including comments, version control, and shared workspaces."
+    },
+    "limitations": {
+      "contextual_understanding": "May require additional clarification for highly specialized or ambiguous content.",
+      "training_data_bias": "Performance may vary based on the quality and diversity of training data.",
+      "real_time_data": "Cannot access real-time data or external systems without integration."
+    }
+  },
+  "llm_components": {
+    "model": "Large Language Model (LLM) with fine-tuning for technical documentation tasks.",
+    "training_data": "Curated dataset of technical documents, code repositories, and user-generated content.",
+    "fine_tuning": "Tailored to understand and generate high-quality documentation, including code comments, API references, and user guides.",
+    "prompt_engineering": "Custom prompts designed to guide the model in producing structured, accurate, and context-aware outputs."
+  },
+  "use_cases": {
+    "software_development": "Generate API documentation, code comments, and technical guides.",
+    "knowledge_bases": "Create and maintain internal knowledge bases for teams and organizations.",
+    "educational_content": "Develop tutorials, course materials, and learning resources.",
+    "customer_support": "Build FAQs, troubleshooting guides, and support documentation."
+  },
+  "deployment": {
+    "cloud": "Deployed on scalable cloud infrastructure for high availability and performance.",
+    "on-premise": "Available as an on-premise solution for organizations with strict data governance requirements.",
+    "hybrid": "Supports hybrid deployment models for flexibility and control."
+  },
+  "future_directions": {
+    "multi_modal_support": "Integration with visual tools for diagram creation and content visualization.",
+    "voice_assisted_documentation": "Voice-to-text capabilities for hands-free documentation creation.",
+    "ai_co_pilot": "AI-powered co-pilot for real-time assistance during content creation and editing."
+  },
+  "ethical_considerations": {
+    "data_privacy": "Complies with data protection regulations like GDPR and CCPA.",
+    "bias_reduction": "Regular audits and updates to reduce bias and improve fairness in generated content.",
+    "transparency": "Clear communication about the role of AI in content creation and decision-making."
+  }
+}

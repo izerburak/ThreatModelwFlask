@@ -234,6 +234,15 @@
 {% endblock %}
 {% block content %}
 {% set risks_done = manifest.steps.risk_analysis_completed.done %}
+{% set step_labels = {
+    "response_saved": "Questionnaire Response",
+    "llm_extraction_generated": "LLM Extraction",
+    "extraction_generated": "LLM Extraction",
+    "extraction_reviewed": "LLM Extraction",
+    "dfd_generated": "DFD Generated",
+    "risk_analysis_completed": "Risk Analysis",
+    "garak_plan_created": "Garak Plan"
+} %}
 <div class="pipeline-detail-shell">
     <section class="pipeline-detail-header">
         <div>
@@ -377,7 +386,7 @@
                     {% set artifact = artifacts_by_name.get(step.artifact) %}
                     <div class="status-row">
                         <div class="status-top">
-                            <div class="status-title">{{ step_name|replace("_", " ")|title }}</div>
+                            <div class="status-title">{{ step_labels.get(step_name, step_name|replace("_", " ")|title) }}</div>
                             {% if failed %}
                             <span class="badge text-bg-danger">failed</span>
                             {% elif completed %}

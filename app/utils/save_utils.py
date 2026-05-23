@@ -24,7 +24,11 @@ def append_question_to_catalog(question_text: str, options: list):
         "text": question_text,
         "type": "multi" if len(clean_options) > 1 else "single",
         "options": clean_options,
+        "category": "",
+        "scope": [],
         "owasp_llm": [],
+        "owasp_web": [],
+        "owasp_api": [],
         "severity_weight": 1,
         "confidence_weight": 1,
     }
@@ -92,17 +96,25 @@ def append_question_to_layer(layer_name: str, question_text: str, options: list)
 def save_adaptive_llm_sec_answers(answer_map, question_catalog):
     """Save the adaptive LLM security questionnaire.
 
-    Only the compact `answers_by_flow_id` payload is written for survey answers.
-    The `question_catalog` argument is kept for compatibility with existing call sites.
+    The compact `answers_by_flow_id` map remains the canonical payload for
+    downstream compatibility. The detailed `answers` list keeps the old answer
+    record shape without exposing extra question metadata.
     """
     from datetime import datetime, timezone
+
+    compact_answers = {
+        str(flow_id): answer
+        for flow_id, answer in (answer_map or {}).items()
+        if answer not in (None, "", [])
+    }
 
     record = {
         "schema_version": "llmsec.adaptive.v1",
         "project_id": "DEFAULT_PROJECT",
         "system_id": "DEFAULT_SYSTEM",
         "timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "answers_by_flow_id": answer_map,
+        "answers_by_flow_id": compact_answers,
+        "answers": _detailed_answer_records(compact_answers, question_catalog),
     }
 
     responses_dir = Path(current_app.root_path).parent / "responses"
@@ -115,3 +127,29 @@ def save_adaptive_llm_sec_answers(answer_map, question_catalog):
         json.dump(record, f, ensure_ascii=False, indent=2)
 
     return str(filepath)
+
+
+def _detailed_answer_records(answer_map, question_catalog):
+    records = []
+    question_catalog = question_catalog if isinstance(question_catalog, dict) else {}
+
+    for flow_id, answer in answer_map.items():
+        question = question_catalog.get(flow_id) or {}
+        source_question_id = str(question.get("source_id") or question.get("id") or _flow_id_number(flow_id) or flow_id)
+        question_id = str(question.get("id") or source_question_id)
+        records.append(
+            {
+                "flow_id": str(flow_id),
+                "question_id": question_id,
+                "source_question_id": source_question_id,
+                "text": str(question.get("text") or flow_id),
+                "answer": answer,
+            }
+        )
+
+    return records
+
+
+def _flow_id_number(flow_id):
+    text = str(flow_id or "").strip()
+    return text[1:] if len(text) > 1 and text[0].upper() == "Q" and text[1:].isdigit() else None

@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "text_note",
+      "position": {
+        "x": 1450,
+        "y": 100
+      },
+      "data": {
+        "label": "System Summary",
+        "notes": "Purpose: Not specified\nExposure: Not specified"
+      }
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 0.9
+  },
+  "metadata": {
+    "pipeline_id": "20260523154602-Dev-Docs-Assistant",
+    "display_name": "Dev Docs Assistant Threat Model",
+    "project_name": "Dev Docs Assistant",
+    "auditor_name": "Burak",
+    "pipeline_workspace": "C:\\Users\\user\\Desktop\\ThreatModelwFlask\\pipelines\\20260523154602-Dev-Docs-Assistant",
+    "archive_id": "20260523154635-Dev-Docs-Assistant-Threat-Model",
+    "source_name": "Dev Docs Assistant Threat Model",
+    "archived_at": "2026-05-23T15:46:35Z"
+  }
+}

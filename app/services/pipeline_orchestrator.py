@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
-from app.services.extract_to_reactflow import extract_to_reactflow
+from app.services.extract_to_reactflow import extract_to_reactflow, has_recognized_dfd_content
 from app.services.llm_extract_service import generate_llm_extract, parse_extract_json
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis
 
@@ -13,6 +13,7 @@ from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis
 PIPELINE_ARTIFACTS = {
     "manifest.json",
     "response.json",
+    "llm_extraction.json",
     "extraction_raw.json",
     "extraction_reviewed.json",
     "dfd_reactflow.json",
@@ -22,8 +23,7 @@ PIPELINE_ARTIFACTS = {
 
 PIPELINE_STEPS = {
     "response_saved": "response.json",
-    "extraction_generated": "extraction_raw.json",
-    "extraction_reviewed": "extraction_reviewed.json",
+    "llm_extraction_generated": "extraction_raw.json",
     "dfd_generated": "dfd_reactflow.json",
     "risk_analysis_completed": "risks.json",
     "garak_plan_created": "garak_plan.json",
@@ -114,7 +114,7 @@ class PipelineOrchestrator:
 
     def generate_extraction(self, pipeline_id):
         manifest = self._load_manifest(pipeline_id)
-        self._mark_running(manifest, "extraction_generated")
+        self._mark_running(manifest, "llm_extraction_generated")
         try:
             metadata = {
                 "project_name": manifest.get("project_name") or Path(manifest["source_response"]).stem,
@@ -135,24 +135,10 @@ class PipelineOrchestrator:
                 parsed = {}
 
             self._write_artifact(pipeline_id, "extraction_raw.json", parsed)
-            self._mark_step_done(manifest, "extraction_generated")
+            self._mark_step_done(manifest, "llm_extraction_generated")
             return parsed
         except Exception as exc:
-            self._mark_step_error(manifest, "extraction_generated", str(exc))
-            raise
-        finally:
-            self._save_manifest(manifest)
-
-    def save_reviewed_extraction(self, pipeline_id, edited_json):
-        manifest = self._load_manifest(pipeline_id)
-        self._mark_running(manifest, "extraction_reviewed")
-        try:
-            payload = self._coerce_json_object(edited_json)
-            self._write_artifact(pipeline_id, "extraction_reviewed.json", payload)
-            self._mark_step_done(manifest, "extraction_reviewed")
-            return payload
-        except Exception as exc:
-            self._mark_step_error(manifest, "extraction_reviewed", str(exc))
+            self._mark_step_error(manifest, "llm_extraction_generated", str(exc))
             raise
         finally:
             self._save_manifest(manifest)
@@ -161,10 +147,20 @@ class PipelineOrchestrator:
         manifest = self._load_manifest(pipeline_id)
         self._mark_running(manifest, "dfd_generated")
         try:
-            extract_payload = self._load_optional_artifact(pipeline_id, "extraction_reviewed.json")
-            if not isinstance(extract_payload, dict):
-                extract_payload = self._load_optional_artifact(pipeline_id, "extraction_raw.json")
-            graph = extract_to_reactflow(extract_payload if isinstance(extract_payload, dict) else {})
+            extract_payload = self._load_extraction_artifact(pipeline_id)
+            response_payload = self._load_artifact(pipeline_id, "response.json")
+            answers_by_flow_id = _answers_by_flow_id(response_payload)
+            if not has_recognized_dfd_content(extract_payload) and not answers_by_flow_id:
+                raise ValueError(
+                    "LLM extraction did not contain recognizable DFD architecture fields. "
+                    "Expected either `dfd` or `architecture` content."
+                )
+            graph = extract_to_reactflow(
+                extract_payload if isinstance(extract_payload, dict) else {},
+                answers_by_flow_id=answers_by_flow_id,
+            )
+            if len(graph.get("nodes") or []) <= 1:
+                raise ValueError("Generated DFD has no architecture nodes; check the extraction artifact.")
             self._write_artifact(pipeline_id, "dfd_reactflow.json", graph)
             archive_path = archive_dfd_graph(
                 self.app_root_path,
@@ -192,9 +188,7 @@ class PipelineOrchestrator:
         self._mark_running(manifest, "risk_analysis_completed")
         try:
             response_payload = self._load_artifact(pipeline_id, "response.json")
-            extract_payload = self._load_optional_artifact(pipeline_id, "extraction_reviewed.json")
-            if not isinstance(extract_payload, dict):
-                extract_payload = self._load_optional_artifact(pipeline_id, "extraction_raw.json")
+            extract_payload = self._load_extraction_artifact(pipeline_id)
 
             risks = build_risk_analysis(
                 self.app_root_path,
@@ -249,8 +243,7 @@ class PipelineOrchestrator:
             self._save_manifest(manifest)
 
     def run_until_risk_analysis(self, pipeline_id):
-        raw_extract = self.generate_extraction(pipeline_id)
-        self.save_reviewed_extraction(pipeline_id, raw_extract)
+        self.generate_extraction(pipeline_id)
         self.generate_dfd(pipeline_id)
         self.run_risk_analysis(pipeline_id)
         return self.get_manifest(pipeline_id)
@@ -330,17 +323,15 @@ class PipelineOrchestrator:
         except (FileNotFoundError, json.JSONDecodeError, ValueError):
             return None
 
+    def _load_extraction_artifact(self, pipeline_id):
+        for artifact_name in ("extraction_raw.json", "llm_extraction.json", "extraction_reviewed.json"):
+            payload = self._load_optional_artifact(pipeline_id, artifact_name)
+            if isinstance(payload, dict):
+                return payload
+        return None
+
     def _write_json(self, path, payload):
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-
-    def _coerce_json_object(self, payload):
-        if isinstance(payload, dict):
-            return payload
-        if isinstance(payload, str):
-            parsed = parse_extract_json(payload)
-            if isinstance(parsed, dict):
-                return parsed
-        raise ValueError("Edited extraction must be a JSON object.")
 
     def _mark_running(self, manifest, step_name):
         step = manifest["steps"][step_name]
@@ -404,10 +395,12 @@ def _manifest_status(manifest):
         return "risk_analysis_completed"
     if steps.get("dfd_generated", {}).get("done"):
         return "dfd_generated"
+    if steps.get("llm_extraction_generated", {}).get("done"):
+        return "llm_extraction_generated"
     if steps.get("extraction_reviewed", {}).get("done"):
-        return "extraction_reviewed"
+        return "llm_extraction_generated"
     if steps.get("extraction_generated", {}).get("done"):
-        return "extraction_generated"
+        return "llm_extraction_generated"
     return "created"
 
 
@@ -454,3 +447,26 @@ def _risk_reason(risk):
     if risk.get("why"):
         parts.append(str(risk["why"]))
     return ". ".join(part for part in parts if part) + "."
+
+
+def _answers_by_flow_id(response_payload):
+    if not isinstance(response_payload, dict):
+        return {}
+
+    compact_answers = response_payload.get("answers_by_flow_id")
+    if isinstance(compact_answers, dict):
+        return compact_answers
+
+    answers = response_payload.get("answers")
+    if not isinstance(answers, list):
+        return {}
+
+    normalized = {}
+    for answer_record in answers:
+        if not isinstance(answer_record, dict):
+            continue
+        flow_id = str(answer_record.get("flow_id") or "").strip()
+        answer = answer_record.get("answer")
+        if flow_id and answer not in (None, "", []):
+            normalized[flow_id] = answer
+    return normalized

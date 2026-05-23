@@ -14,6 +14,35 @@
     Q15: "action",
     Q22: "output",
     Q24: "data_store",
+    Q48: "interface",
+    Q50: "process",
+    Q51: "process",
+    Q52: "process",
+    Q53: "process",
+    Q54: "process",
+    Q55: "process",
+    Q56: "process",
+    Q57: "process",
+    Q58: "data_store",
+    Q59: "external",
+    Q60: "external",
+    Q61: "external",
+    Q62: "tool",
+    Q63: "process",
+    Q64: "interface",
+    Q65: "tool",
+    Q66: "process",
+    Q67: "interface",
+    Q68: "data_store",
+    Q69: "process",
+    Q70: "interface",
+    Q71: "data_store",
+    Q72: "data_store",
+    Q74: "process",
+    Q77: "process",
+    Q78: "process",
+    Q79: "action",
+    Q80: "process",
   };
 
   const FIELD_ROLE = {
@@ -64,12 +93,12 @@
 
   const ROLE_KEYWORDS = {
     actor: ["user", "users", "employee", "employees", "administrator", "administrators", "developer", "developers", "automated systems", "pipelines", "local system processes"],
-    interface: ["web based chat interface", "chat interface", "rest api endpoint", "api endpoint", "frontend", "cli", "sso", "single sign on", "third party integration", "user facing web interface"],
-    process: ["backend api", "backend", "application backend", "agent workflow", "orchestration", "basic logic", "framework", "routing", "classification", "prompt templating", "input filtering", "rag augmentation", "document ingestion pipeline", "model hosting", "api integration layer"],
+    interface: ["web based chat interface", "chat interface", "rest api endpoint", "api endpoint", "frontend", "cli", "sso", "single sign on", "third party integration", "user facing web interface", "authenticated user dashboard", "admin operator panel", "webhook", "callback endpoint"],
+    process: ["backend api", "backend", "application backend", "agent workflow", "orchestration", "basic logic", "framework", "routing", "classification", "prompt templating", "input filtering", "rag augmentation", "document ingestion pipeline", "model hosting", "api integration layer", "api gateway", "authorization layer", "auth service", "session service", "csrf", "origin protection", "cors", "egress control", "rate limiter", "quota", "siem", "logging"],
     llm: ["llm", "model service", "language model"],
-    data_store: ["database", "vector db", "vector database", "sql", "nosql", "file storage", "cloud storage", "internal knowledge base", "knowledge base", "documentation", "source code", "customer data", "customer support records", "api keys", "credentials", "personally identifiable information", "pii", "internal operational documents"],
-    tool: ["search", "database tool", "internal apis", "admin tools", "tool calling", "agent framework"],
-    external: ["third party cloud api", "external vendor", "external api", "web urls", "public repositories", "external web content"],
+    data_store: ["database", "vector db", "vector database", "sql", "nosql", "file storage", "cloud storage", "internal knowledge base", "knowledge base", "documentation", "source code", "customer data", "customer support records", "api keys", "credentials", "personally identifiable information", "pii", "internal operational documents", "api inventory", "secrets vault", "audit log"],
+    tool: ["search", "database tool", "internal apis", "admin tools", "tool calling", "agent framework", "url fetch", "browser tool", "structured output processor"],
+    external: ["third party cloud api", "external vendor", "external api", "web urls", "public repositories", "external web content", "non production", "undocumented api", "debug api"],
     output: ["api response consumed by other systems", "email", "messaging", "notification", "backend automation", "internal admin dashboard"],
     action: ["create or update tickets", "send emails", "execute workflows", "transactions", "modify system configurations"],
   };
@@ -149,6 +178,7 @@
           return;
         }
         if (question === "Q24" && normalized === "no sensitive data") return;
+        if (addWebApiSecurityHint(builder, question, label, normalized)) return;
 
         const role = inferRole(label, null, question);
         builder.addNode(label, role, `answers.${question}`, question);
@@ -204,6 +234,114 @@
     else if (normalized.includes("web url")) builder.addNode("Web URLs", "external", "answers.Q6", "Q6");
     else if (normalized.includes("email") || normalized.includes("ticket")) builder.addNode(label, "data_store", "answers.Q6", "Q6");
     else if (normalized.includes("public repositor")) builder.addNode("Public Repositories", "external", "answers.Q6", "Q6");
+  }
+
+  function addWebApiSecurityHint(builder, question, label, normalized) {
+    const source = `answers.${question}`;
+    if (question === "Q48") {
+      if (normalized.includes("public chat")) builder.addNode("Public Chat Page", "interface", source, question);
+      else if (normalized.includes("authenticated") || normalized.includes("dashboard")) builder.addNode("Authenticated User Dashboard", "interface", source, question);
+      else if (normalized.includes("admin")) builder.addNode("Admin Panel", "interface", source, question);
+      else if (normalized.includes("webhook") || normalized.includes("callback")) builder.addNode("Webhook / Callback Endpoint", "interface", source, question);
+      else if (normalized.includes("widget") || normalized.includes("iframe")) builder.addNode("Embedded Web Widget", "interface", source, question);
+      else return false;
+      return true;
+    }
+    if (["Q49", "Q52", "Q53", "Q54", "Q55", "Q57"].includes(question)) {
+      builder.addNode("API Gateway / Authorization Layer", "process", source, question);
+      if (question === "Q52") builder.addNode("CORS Policy", "process", source, question);
+      return true;
+    }
+    if (["Q50", "Q56"].includes(question)) {
+      builder.addNode("Auth / Session Service", "process", source, question);
+      if (normalized.includes("service account")) builder.addNode("Service Account Identity", "process", source, question);
+      return true;
+    }
+    if (question === "Q51") {
+      builder.addNode("CSRF / Origin Protection", "process", source, question);
+      return true;
+    }
+    if (question === "Q58") {
+      builder.addNode("API Inventory", "data_store", source, question);
+      return true;
+    }
+    if (question === "Q59") {
+      if (["possibly", "yes", "unknown"].some((term) => normalized.includes(term))) {
+        builder.addNode("Non-production / Undocumented APIs", "external", source, question);
+      }
+      return true;
+    }
+    if (["Q60", "Q61"].includes(question)) {
+      builder.addNode("External API", "external", source, question);
+      return true;
+    }
+    if (question === "Q62") {
+      builder.addNode("URL Fetch / Browser Tool", "tool", source, question);
+      if (normalized.includes("arbitrary") || normalized.includes("internal address")) builder.addNode("Internal Network Destinations", "external", source, question);
+      return true;
+    }
+    if (question === "Q63") {
+      builder.addNode("Egress Control", "process", source, question);
+      return true;
+    }
+    if (question === "Q64") {
+      builder.addNode("Web Output Renderer", "interface", source, question);
+      return true;
+    }
+    if (question === "Q65") {
+      builder.addNode("Structured Output Processor", "tool", source, question);
+      return true;
+    }
+    if (question === "Q66") {
+      builder.addNode("Output Safety Filter", "process", source, question);
+      return true;
+    }
+    if (question === "Q67") {
+      builder.addNode("File Upload Interface", "interface", source, question);
+      builder.addNode("Uploaded File Storage", "data_store", source, question);
+      return true;
+    }
+    if (question === "Q68") {
+      builder.addNode("Shared Retrieval Index", "data_store", source, question);
+      return true;
+    }
+    if (question === "Q69") {
+      builder.addNode("RAG Source Administration API", "interface", source, question);
+      return true;
+    }
+    if (question === "Q70") {
+      builder.addNode("Admin Panel", "interface", source, question);
+      return true;
+    }
+    if (question === "Q71") {
+      builder.addNode("Configuration Audit Log", "data_store", source, question);
+      return true;
+    }
+    if (question === "Q72") {
+      builder.addNode("Secrets Vault", "data_store", source, question);
+      return true;
+    }
+    if (question === "Q74") {
+      builder.addNode("Logging / SIEM", "process", source, question);
+      return true;
+    }
+    if (question === "Q77") {
+      builder.addNode("Rate Limiter", "process", source, question);
+      return true;
+    }
+    if (question === "Q78") {
+      builder.addNode("Quota / Timeout Controller", "process", source, question);
+      return true;
+    }
+    if (question === "Q79") {
+      builder.addNode("Sensitive Business Workflow", "action", source, question);
+      return true;
+    }
+    if (question === "Q80") {
+      builder.addNode("Approval / Step-up Control", "process", source, question);
+      return true;
+    }
+    return false;
   }
 
   function ensureDefaults(builder, answers) {
