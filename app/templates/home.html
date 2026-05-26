@@ -1,76 +1,428 @@
 {% extends "layout.html" %}
+{% block extra_head %}
+<style>
+  .home-shell {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    gap: 1rem;
+    align-items: end;
+    padding: 1.5rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+    background: #111827;
+  }
+
+  .home-hero h1 {
+    margin: 0 0 0.45rem;
+    font-size: 2rem;
+  }
+
+  .home-muted,
+  .home-meta,
+  .home-empty {
+    color: #cbd5e1;
+  }
+
+  .home-selector {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: end;
+  }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(22rem, 1.05fr);
+    gap: 1rem;
+  }
+
+  .home-panel {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+    background: #111827;
+    overflow: hidden;
+  }
+
+  .home-panel-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    background: #172033;
+  }
+
+  .home-panel-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .status-pill {
+    flex: 0 0 auto;
+    border-radius: 999px;
+    padding: 0.42rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .status-pill.low {
+    background: rgba(34, 197, 94, 0.16);
+    color: #bbf7d0;
+  }
+
+  .status-pill.medium {
+    background: rgba(245, 158, 11, 0.17);
+    color: #fde68a;
+  }
+
+  .status-pill.high {
+    background: rgba(249, 115, 22, 0.18);
+    color: #fed7aa;
+  }
+
+  .status-pill.critical {
+    background: rgba(239, 68, 68, 0.22);
+    color: #fecaca;
+  }
+
+  .home-summary {
+    display: grid;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .home-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .home-stat {
+    padding: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 8px;
+    background: #0f172a;
+  }
+
+  .home-stat strong {
+    display: block;
+    font-size: 1.45rem;
+    line-height: 1;
+    color: #f8fafc;
+  }
+
+  .level-list {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .level-row {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr) 2rem;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .level-track {
+    height: 0.62rem;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.16);
+    overflow: hidden;
+  }
+
+  .level-fill {
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .level-fill.critical {
+    background: #ef4444;
+  }
+
+  .level-fill.high {
+    background: #f97316;
+  }
+
+  .level-fill.medium {
+    background: #f59e0b;
+  }
+
+  .level-fill.low {
+    background: #22c55e;
+  }
+
+  .chart-wrap {
+    min-height: 22rem;
+    padding: 1rem;
+    display: grid;
+    place-items: center;
+  }
+
+  .chart-box {
+    width: min(100%, 22rem);
+  }
+
+  .home-list {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+
+  .home-item {
+    padding: 0.95rem;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 8px;
+    background: #0f172a;
+  }
+
+  .home-item-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .home-code {
+    color: #93c5fd;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+  }
+
+  .home-mitigation {
+    margin-top: 0.7rem;
+    border-left: 3px solid #22c55e;
+    padding-left: 0.75rem;
+    color: #dcfce7;
+  }
+
+  .home-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .home-empty {
+    padding: 1rem;
+  }
+
+  @media (max-width: 991px) {
+    .home-hero,
+    .home-grid,
+    .home-selector,
+    .home-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
 {% block content %}
-
-<h3>Welcome to LLM Sentinel</h3>
-<p>This tool helps you model your system and assess potential security threats layer by layer.</p>
-
-<div class="row mt-4 mb-5">
-  <div class="col-md-6 mb-4 mb-md-0">
-    <div class="card h-100">
-      <div class="card-header">
-        <h5 class="mb-0">Last Analysis Summary</h5>
+{% set status_class = (analysis.overall_status|lower) if analysis else "unknown" %}
+{% set max_level_count = home_summary.level_counts.values()|max if home_summary.level_counts else 0 %}
+<div class="home-shell">
+  <section class="home-hero">
+    <div>
+      <h1>LLM Sentinel</h1>
+      <p class="home-muted mb-0">
+        Model your system, generate React Flow DFDs, and review security risks with mitigation evidence.
+      </p>
+    </div>
+    <form method="get" action="{{ url_for('main.home') }}" class="home-selector">
+      <div>
+        <label for="pipelineSelect" class="form-label">Security analysis</label>
+        <select class="form-select" id="pipelineSelect" name="pipeline">
+          {% if not risk_runs %}
+          <option value="" selected>No completed risk analysis yet</option>
+          {% else %}
+          {% for run in risk_runs %}
+          <option value="{{ run.pipeline_id }}" {% if run.pipeline_id == selected_pipeline %}selected{% endif %}>
+            {{ run.label }}{% if run.dfd_name %} - {{ run.dfd_name }}{% endif %} ({{ run.overall_status }})
+          </option>
+          {% endfor %}
+          {% endif %}
+        </select>
       </div>
-      <div class="card-body d-flex flex-column">
-        <ul class="list-group list-group-flush mb-4 flex-grow-1">
-          <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-            <strong>High Risk</strong>
-            <span class="badge bg-danger rounded-pill">3</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-            <strong>Medium Risk</strong>
-            <span class="badge bg-warning rounded-pill text-dark">5</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-            <strong>Low Risk</strong>
-            <span class="badge bg-success rounded-pill">2</span>
-          </li>
-        </ul>
-        <div class="mt-auto">
-          <a href="{{ url_for('main.llm_sec') }}" class="btn btn-primary btn-lg w-100">Start New
-            Analysis &rarr;</a>
+      <button class="btn btn-primary" type="submit" {% if not risk_runs %}disabled{% endif %}>Show</button>
+    </form>
+  </section>
+
+  {% if analysis_error %}
+  <div class="alert alert-danger">{{ analysis_error }}</div>
+  {% endif %}
+
+  {% if analysis %}
+  <section class="home-panel">
+    <div class="home-panel-header">
+      <div>
+        <h2>{{ home_summary.project_name or "Selected project" }}</h2>
+        <div class="home-meta">
+          {{ home_summary.analysis_name or selected_pipeline }}
+          {% if home_summary.updated_at %} · Updated {{ home_summary.updated_at }}{% endif %}
         </div>
       </div>
+      <span class="status-pill {{ status_class }}">{{ analysis.overall_status }}</span>
     </div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="card h-100">
-      <div class="card-body d-flex align-items-center justify-content-center">
-        <div style="width: 100%; max-width: 300px;">
-          <canvas id="riskChart"></canvas>
+    <div class="home-summary">
+      <div class="home-stats">
+        <div class="home-stat">
+          <strong>{{ home_summary.total_risks }}</strong>
+          <span class="home-muted">Consolidated risks</span>
+        </div>
+        <div class="home-stat">
+          <strong>{{ home_summary.mitigation_count }}</strong>
+          <span class="home-muted">Risks with mitigation</span>
+        </div>
+        <div class="home-stat">
+          <strong>{{ home_summary.quick_win_count }}</strong>
+          <span class="home-muted">Quick wins</span>
         </div>
       </div>
+      <div class="home-meta">
+        Status source: {{ analysis.status_source }}.
+        {{ analysis.answers_analyzed }} questionnaire answers analyzed.
+        {% if selected_manifest and selected_manifest.auditor_name %}Auditor: {{ selected_manifest.auditor_name }}.{% endif %}
+      </div>
+      <div class="home-actions">
+        <a class="btn btn-primary" href="{{ url_for('main.llm_sec') }}">Start New Analysis</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('main.risk', pipeline=selected_pipeline) }}">Open Risks &amp; Mitigations</a>
+        {% if selected_pipeline %}
+        <a class="btn btn-outline-secondary" href="{{ url_for('main.pipeline_detail', pipeline_id=selected_pipeline) }}">Pipeline Details</a>
+        {% endif %}
+      </div>
     </div>
+  </section>
+
+  <div class="home-grid">
+    <section class="home-panel">
+      <div class="home-panel-header">
+        <h2>Risk Status</h2>
+      </div>
+      <div class="home-summary">
+        <div class="level-list">
+          {% for item in home_summary.chart_data %}
+          {% set level_class = item.label|lower %}
+          {% set width = (item.count * 100 / max_level_count) if max_level_count else 0 %}
+          <div class="level-row">
+            <strong>{{ item.label }}</strong>
+            <div class="level-track">
+              <div class="level-fill {{ level_class }}" style="width: {{ width }}%;"></div>
+            </div>
+            <span class="home-muted">{{ item.count }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="home-panel">
+      <div class="home-panel-header">
+        <h2>Distribution</h2>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-box">
+          <canvas id="riskChart" aria-label="Risk distribution chart"></canvas>
+        </div>
+      </div>
+    </section>
   </div>
+
+  <div class="home-grid">
+    <section class="home-panel">
+      <div class="home-panel-header">
+        <h2>Most Recent Risks</h2>
+      </div>
+      {% if home_summary.top_risks %}
+      <div class="home-list">
+        {% for risk in home_summary.top_risks %}
+        <article class="home-item">
+          <div class="home-item-top">
+            <div>
+              <div class="home-code">{{ risk.code }} - {{ risk.name }}</div>
+              {% if risk.sources %}<div class="home-muted">Sources: {{ risk.sources|join(", ") }}</div>{% endif %}
+            </div>
+            <span class="status-pill {{ risk.risk_level|lower }}">{{ risk.risk_level }}</span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="home-empty">No risks were found for this analysis.</div>
+      {% endif %}
+    </section>
+
+    <section class="home-panel">
+      <div class="home-panel-header">
+        <h2>Mitigations</h2>
+      </div>
+      {% if home_summary.mitigation_risks %}
+      <div class="home-list">
+        {% for risk in home_summary.mitigation_risks %}
+        <article class="home-item">
+          <div class="home-code">{{ risk.code }} - {{ risk.name }}</div>
+          {% for mitigation in risk.mitigations[:2] %}
+          <div class="home-mitigation">{{ mitigation }}</div>
+          {% endfor %}
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="home-empty">No mitigation guidance is available in this artifact.</div>
+      {% endif %}
+    </section>
+  </div>
+  {% else %}
+  <section class="home-panel">
+    <div class="home-empty">
+      No completed security analysis is available yet. Start a new questionnaire run, then create a pipeline to generate DFD, risks, and mitigations.
+      <div class="home-actions mt-3">
+        <a class="btn btn-primary" href="{{ url_for('main.llm_sec') }}">Start New Analysis</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('main.pipeline_index') }}">Open Pipeline</a>
+      </div>
+    </div>
+  </section>
+  {% endif %}
 </div>
 
-<!-- Include Chart.js from CDN -->
+{% if analysis %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById('riskChart').getContext('2d');
-  const riskChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['High', 'Medium', 'Low'],
-      datasets: [{
-        label: 'Risk Distribution',
-        data: [3, 5, 2],
-        backgroundColor: ['#dc3545', '#ffc107', '#198754'],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: '#cbd5e1'
-          }
-        }
-      }
-    }
-  });
+  (() => {
+    const chartData = {{ home_summary.chart_data|tojson }};
+    const canvas = document.getElementById("riskChart");
+    if (!canvas || !window.Chart) return;
+    new Chart(canvas.getContext("2d"), {
+      type: "doughnut",
+      data: {
+        labels: chartData.map((item) => item.label),
+        datasets: [{
+          label: "Risk distribution",
+          data: chartData.map((item) => item.count),
+          backgroundColor: ["#ef4444", "#f97316", "#f59e0b", "#22c55e"],
+          borderColor: "#111827",
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        responsive: true,
+        cutout: "58%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              color: "#cbd5e1",
+              boxWidth: 14,
+            },
+          },
+        },
+      },
+    });
+  })();
 </script>
-
+{% endif %}
 {% endblock %}

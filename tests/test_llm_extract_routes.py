@@ -171,7 +171,7 @@ class LlmExtractRoutesTests(unittest.TestCase):
         self.assertTrue((self.extract_dir / "llmsec_bad_json-extract.raw.txt").exists())
         self.assertTrue((self.extract_dir / "llmsec_bad_json-extract.json").exists())
 
-    def test_generate_extract_preserves_valid_json_even_when_schema_is_legacy(self):
+    def test_generate_extract_cleans_valid_json_even_when_schema_is_legacy(self):
         responses_dir = self.root / "responses"
         prompts_dir = self.root / "LLM-Prompts"
         responses_dir.mkdir()
@@ -206,7 +206,12 @@ class LlmExtractRoutesTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(payload["success"])
-        self.assertEqual(payload["parsed"], legacy_extract)
+        self.assertEqual(payload["parsed"]["schema_version"], "llmsec.arch_extract.cleaned.v1")
+        self.assertEqual(payload["parsed"]["system_summary"]["purpose"], "Documentation assistant")
+        self.assertEqual(
+            payload["parsed"]["architecture"]["components"],
+            [{"name": "Model", "description": "Large Language Model"}],
+        )
         self.assertIsNone(payload["parse_warning"])
         self.assertTrue((self.extract_dir / "llmsec_legacy_extract-extract.json").exists())
 

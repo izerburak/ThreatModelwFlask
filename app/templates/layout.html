@@ -81,8 +81,16 @@
         }
 
         .custom-navbar .navbar-brand {
+            align-items: center;
             font-size: 1.25rem;
             letter-spacing: -0.025em;
+        }
+
+        .navbar-brand-logo {
+            border-radius: 8px;
+            height: 36px;
+            object-fit: cover;
+            width: 36px;
         }
 
         .custom-navbar .nav-link {
@@ -324,9 +332,12 @@
 <body class="{% block body_class %}{% endblock %}">
     <!-- Full Width Premium Navbar -->
     <nav class="navbar navbar-expand-lg custom-navbar mb-5">
-        <div class="container">
+            <div class="container">
             <a class="navbar-brand fw-bold text-white d-flex align-items-center gap-2"
                 href="{{ url_for('main.home') }}">
+                <img class="navbar-brand-logo"
+                    src="{{ url_for('static', filename='images/LLM_Senti_Logo.png') }}"
+                    alt="LLM Sentinel logo">
                 LLM Sentinel
             </a>
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
@@ -348,24 +359,20 @@
                             href="{{ url_for('main.add_question') }}">Add Question</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if active_tab == 'reactflow_test' %}active{% endif %}"
-                            href="{{ url_for('main.reactflow_test') }}">React Flow Lab</a>
+                        <a class="nav-link {% if active_tab == 'pipeline' %}active{% endif %}"
+                            href="{{ url_for('main.pipeline_index') }}">Pipeline</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'dfd_mapper_lab' %}active{% endif %}"
                             href="{{ url_for('main.dfd_mapper_lab') }}">Threat Model</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'risk' %}active{% endif %}"
+                            href="{{ url_for('main.risk') }}">Security &amp; Risks</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if active_tab == 'garak' %}active{% endif %}"
                             href="{{ url_for('main.garak') }}">Garak</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if active_tab == 'pipeline' %}active{% endif %}"
-                            href="{{ url_for('main.pipeline_index') }}">Pipeline</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if active_tab == 'risk' %}active{% endif %}"
-                            href="{{ url_for('main.risk') }}">Risks &amp; Mitigations</a>
                     </li>
                 </ul>
             </div>

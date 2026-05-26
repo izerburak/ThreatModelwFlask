@@ -1,0 +1,42 @@
+{
+  "pipeline_id": "20260524211059-test2",
+  "project_name": "test2",
+  "dfd_name": "test2 Threat Model",
+  "auditor_name": "burak",
+  "source_response": "llmsec_2026-05-23_15-42-34_01_public_customer_support_ai_chatbot.json",
+  "created_at": "2026-05-24T21:10:59Z",
+  "updated_at": "2026-05-24T21:11:59Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-05-24T21:10:59Z",
+      "artifact": "response.json"
+    },
+    "llm_extraction_generated": {
+      "done": true,
+      "timestamp": "2026-05-24T21:11:59Z",
+      "artifact": "extraction_raw.json",
+      "error": null
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-05-24T21:11:59Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-05-24T21:11:59Z",
+      "artifact": "risks.json",
+      "error": null
+    },
+    "garak_plan_created": {
+      "done": false,
+      "timestamp": null,
+      "artifact": "garak_plan.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260524211159-test2-Threat-Model.json"
+}

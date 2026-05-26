@@ -35,6 +35,7 @@ from app.services.llm_extract_service import generate_llm_extract
 from app.services.pipeline_orchestrator import PIPELINE_STEPS, PipelineOrchestrator
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis, suggested_extract_filename, unify_risks
 from app.services.garak_service import garak_report_path, garak_status
+from app.services.static_dfd_mapper import build_static_dfd_from_answers
 from app.utils.save_utils import (
     append_question_to_catalog,
     save_adaptive_llm_sec_answers,
@@ -48,7 +49,13 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
-    return render_template("home.html", active_tab="home")
+    orchestrator = _pipeline_orchestrator()
+    selected_pipeline = request.args.get("pipeline") or ""
+    return render_template(
+        "home.html",
+        active_tab="home",
+        **_home_security_analysis(orchestrator, selected_pipeline),
+    )
 
 
 @main.route("/favicon.ico")
@@ -399,6 +406,27 @@ def reactflow_from_extract():
     payload = request.get_json(silent=True) or {}
     graph = extract_to_reactflow(payload)
     return jsonify(graph)
+
+
+@main.route("/api/static-dfd-map", methods=["POST"])
+def static_dfd_map():
+    payload = request.get_json(silent=True)
+    if payload is None:
+        return jsonify({"ok": False, "error": "Expected a JSON object containing questionnaire answers."}), 400
+
+    graph_mode = payload.get("graph_mode", "compact") if isinstance(payload, dict) else "compact"
+    raw_answers = payload
+    if isinstance(payload, dict) and "graph_mode" in payload and "answers" in payload:
+        raw_answers = payload["answers"]
+        if isinstance(raw_answers, list):
+            raw_answers = {"answers": raw_answers}
+
+    try:
+        graph = build_static_dfd_from_answers(raw_answers, graph_mode=graph_mode)
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+    return jsonify({"ok": True, "graph": graph})
 
 
 @main.route("/api/generate-extract", methods=["POST"])
@@ -849,6 +877,80 @@ def _risk_preview_payload(payload):
     }
 
 
+def _home_security_analysis(orchestrator, selected_pipeline):
+    risk_runs = _pipeline_risk_runs(orchestrator)
+    available_ids = {run.get("pipeline_id") for run in risk_runs}
+    selected_pipeline = selected_pipeline if selected_pipeline in available_ids else ""
+    if not selected_pipeline and risk_runs:
+        selected_pipeline = risk_runs[0].get("pipeline_id") or ""
+
+    selected_manifest = None
+    analysis = None
+    analysis_error = None
+
+    if selected_pipeline:
+        try:
+            selected_manifest = orchestrator.get_manifest(selected_pipeline)
+            analysis = orchestrator.load_artifact(selected_pipeline, "risks.json")
+            analysis = _with_unified_risks(analysis)
+        except (FileNotFoundError, ValueError, json.JSONDecodeError):
+            analysis_error = "Selected pipeline risk analysis was not found."
+
+    return {
+        "risk_runs": risk_runs,
+        "selected_pipeline": selected_pipeline,
+        "selected_manifest": selected_manifest,
+        "analysis": analysis,
+        "analysis_error": analysis_error,
+        "home_summary": _home_analysis_summary(analysis, selected_manifest),
+    }
+
+
+def _home_analysis_summary(analysis, manifest):
+    levels = ("Critical", "High", "Medium", "Low")
+    empty_counts = {level: 0 for level in levels}
+    if not isinstance(analysis, dict):
+        return {
+            "level_counts": empty_counts,
+            "chart_data": [{"label": level, "count": 0} for level in levels],
+            "total_risks": 0,
+            "mitigation_count": 0,
+            "quick_win_count": 0,
+            "top_risks": [],
+            "mitigation_risks": [],
+            "project_name": manifest.get("project_name") if isinstance(manifest, dict) else "",
+            "analysis_name": manifest.get("dfd_name") if isinstance(manifest, dict) else "",
+            "updated_at": manifest.get("updated_at") if isinstance(manifest, dict) else "",
+        }
+
+    unified_risks = analysis.get("unified_risks") if isinstance(analysis.get("unified_risks"), list) else []
+    quick_wins = analysis.get("quick_wins") if isinstance(analysis.get("quick_wins"), list) else []
+    level_counts = dict(empty_counts)
+    mitigation_risks = []
+
+    for risk in unified_risks:
+        if not isinstance(risk, dict):
+            continue
+        level = str(risk.get("risk_level") or "").strip().title()
+        if level in level_counts:
+            level_counts[level] += 1
+        if risk.get("mitigations"):
+            mitigation_risks.append(risk)
+
+    return {
+        "level_counts": level_counts,
+        "chart_data": [{"label": level, "count": level_counts[level]} for level in levels],
+        "total_risks": len([risk for risk in unified_risks if isinstance(risk, dict)]),
+        "mitigation_count": len(mitigation_risks),
+        "quick_win_count": len(quick_wins),
+        "top_risks": [risk for risk in unified_risks if isinstance(risk, dict)][:5],
+        "mitigation_risks": mitigation_risks[:5],
+        "project_name": manifest.get("project_name") if isinstance(manifest, dict) else "",
+        "analysis_name": manifest.get("dfd_name") if isinstance(manifest, dict) else "",
+        "updated_at": manifest.get("updated_at") if isinstance(manifest, dict) else "",
+    }
+
+
 def _with_unified_risks(analysis):
     if not isinstance(analysis, dict):
         return analysis
@@ -892,7 +994,7 @@ def _pipeline_risk_runs(orchestrator):
                 **preview,
             }
         )
-    return runs
+    return sorted(runs, key=lambda item: item.get("updated_at") or "", reverse=True)
 
 
 def _answers_by_flow_id(response_payload):

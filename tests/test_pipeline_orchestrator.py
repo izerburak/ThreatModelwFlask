@@ -17,7 +17,17 @@ class PipelineOrchestratorTests(unittest.TestCase):
         self.responses_dir.mkdir()
         self.response_file = "llmsec_test.json"
         (self.responses_dir / self.response_file).write_text(
-            json.dumps({"answers_by_flow_id": {"Q1": "Docs assistant"}}),
+            json.dumps(
+                {
+                    "answers_by_flow_id": {
+                        "Q1": "Docs assistant",
+                        "Q2": ["Authenticated public users"],
+                        "Q3": ["REST API endpoint"],
+                        "Q7": ["Input filtering"],
+                        "Q17": "Third-party cloud API",
+                    }
+                }
+            ),
             encoding="utf-8",
         )
 
@@ -54,6 +64,26 @@ class PipelineOrchestratorTests(unittest.TestCase):
             updated_manifest["steps"]["llm_extraction_generated"]["artifact"],
             "extraction_raw.json",
         )
+
+    def test_pipeline_dfd_uses_static_mapper_without_extraction_artifact(self):
+        orchestrator = PipelineOrchestrator(str(self.app_dir))
+        manifest = orchestrator.create_pipeline(self.response_file, project_name="Docs", dfd_name="Docs DFD")
+
+        graph = orchestrator.generate_dfd(manifest["pipeline_id"])
+        pipeline_dir = self.root / "pipelines" / manifest["pipeline_id"]
+        updated_manifest = orchestrator.get_manifest(manifest["pipeline_id"])
+        node_ids = {node["id"] for node in graph["nodes"]}
+        edges = {(edge["source"], edge["target"], edge["label"]) for edge in graph["edges"]}
+
+        self.assertTrue((pipeline_dir / "dfd_reactflow.json").exists())
+        self.assertFalse((pipeline_dir / "extraction_raw.json").exists())
+        self.assertIn("actor_authenticated_user", node_ids)
+        self.assertIn("entry_rest_api", node_ids)
+        self.assertIn(("actor_authenticated_user", "entry_rest_api", "Authenticated request"), edges)
+        self.assertEqual(graph["metadata"]["pipeline_source"], "static_dfd_mapper")
+        self.assertEqual(graph["metadata"]["graph_mode"], "compact")
+        self.assertTrue(updated_manifest["steps"]["dfd_generated"]["done"])
+        self.assertIn("dfd_archive", updated_manifest)
 
 
 if __name__ == "__main__":

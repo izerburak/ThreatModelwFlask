@@ -5,9 +5,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
-from app.services.extract_to_reactflow import extract_to_reactflow, has_recognized_dfd_content
 from app.services.llm_extract_service import generate_llm_extract, parse_extract_json
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis
+from app.services.static_dfd_mapper import build_static_dfd_from_answers
 
 
 PIPELINE_ARTIFACTS = {
@@ -147,20 +147,25 @@ class PipelineOrchestrator:
         manifest = self._load_manifest(pipeline_id)
         self._mark_running(manifest, "dfd_generated")
         try:
-            extract_payload = self._load_extraction_artifact(pipeline_id)
             response_payload = self._load_artifact(pipeline_id, "response.json")
             answers_by_flow_id = _answers_by_flow_id(response_payload)
-            if not has_recognized_dfd_content(extract_payload) and not answers_by_flow_id:
-                raise ValueError(
-                    "LLM extraction did not contain recognizable DFD architecture fields. "
-                    "Expected either `dfd` or `architecture` content."
-                )
-            graph = extract_to_reactflow(
-                extract_payload if isinstance(extract_payload, dict) else {},
-                answers_by_flow_id=answers_by_flow_id,
+            if not answers_by_flow_id:
+                raise ValueError("Questionnaire response did not contain answers_by_flow_id for static DFD mapping.")
+
+            graph = build_static_dfd_from_answers({"answers_by_flow_id": answers_by_flow_id}, graph_mode="compact")
+            graph.setdefault("metadata", {})
+            graph["metadata"].update(
+                {
+                    "pipeline_id": pipeline_id,
+                    "pipeline_source": "static_dfd_mapper",
+                    "display_name": manifest.get("dfd_name") or f"{Path(manifest.get('source_response') or pipeline_id).stem} DFD",
+                    "project_name": manifest.get("project_name"),
+                    "auditor_name": manifest.get("auditor_name"),
+                    "source_response": manifest.get("source_response"),
+                }
             )
             if len(graph.get("nodes") or []) <= 1:
-                raise ValueError("Generated DFD has no architecture nodes; check the extraction artifact.")
+                raise ValueError("Generated DFD has no architecture nodes; check the questionnaire response.")
             self._write_artifact(pipeline_id, "dfd_reactflow.json", graph)
             archive_path = archive_dfd_graph(
                 self.app_root_path,
@@ -243,8 +248,8 @@ class PipelineOrchestrator:
             self._save_manifest(manifest)
 
     def run_until_risk_analysis(self, pipeline_id):
-        self.generate_extraction(pipeline_id)
         self.generate_dfd(pipeline_id)
+        self.generate_extraction(pipeline_id)
         self.run_risk_analysis(pipeline_id)
         return self.get_manifest(pipeline_id)
 

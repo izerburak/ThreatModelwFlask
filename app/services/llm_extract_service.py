@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
+from app.services.arch_extract_cleaner import clean_arch_extract_v4
 from app.services.ollama_client import chat
 
 
@@ -40,6 +41,16 @@ def generate_llm_extract(app_root_path, metadata, response_file, app_config=None
             "LLM returned a response that could not be parsed as JSON.",
             raw_path.name,
         )
+    elif not _has_extraction_content(parsed_extract):
+        raw_path = save_raw_extract_text(app_root_path, build_raw_extract_filename(response_file), raw_content)
+        parsed_extract = build_fallback_extract(
+            metadata,
+            response_file,
+            answers_by_flow_id,
+            "LLM returned JSON, but it did not contain recognizable extraction fields.",
+            raw_path.name,
+        )
+    parsed_extract = clean_arch_extract_v4(parsed_extract)
 
     extract_filename = build_extract_filename(response_file)
     saved_path = save_extract_payload(app_root_path, extract_filename, parsed_extract)
@@ -164,9 +175,15 @@ def build_fallback_extract(metadata, response_file, answers_by_flow_id, reason, 
 def _has_extraction_content(parsed):
     if not isinstance(parsed, dict) or not parsed:
         return False
+    if set(parsed).issubset({"status", "message", "success", "ok", "error"}):
+        return False
     if isinstance(parsed.get("system_summary"), dict) and parsed["system_summary"]:
         return True
     if isinstance(parsed.get("architecture"), dict) and parsed["architecture"]:
+        return True
+    if isinstance(parsed.get("system"), dict) and parsed["system"]:
+        return True
+    if isinstance(parsed.get("llm_components"), dict) and parsed["llm_components"]:
         return True
     dfd = parsed.get("dfd")
     if isinstance(dfd, dict):
