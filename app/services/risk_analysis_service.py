@@ -17,6 +17,32 @@ OWASP_LLM_2025 = {
     "LLM10": "Unbounded Consumption",
 }
 
+OWASP_WEB_2025 = {
+    "A01:2025": "Broken Access Control",
+    "A02:2025": "Security Misconfiguration",
+    "A03:2025": "Software Supply Chain Failures",
+    "A04:2025": "Cryptographic Failures",
+    "A05:2025": "Injection",
+    "A06:2025": "Insecure Design",
+    "A07:2025": "Authentication Failures",
+    "A08:2025": "Software or Data Integrity Failures",
+    "A09:2025": "Security Logging and Alerting Failures",
+    "A10:2025": "Mishandling of Exceptional Conditions",
+}
+
+OWASP_API_2023 = {
+    "API1:2023": "Broken Object Level Authorization",
+    "API2:2023": "Broken Authentication",
+    "API3:2023": "Broken Object Property Level Authorization",
+    "API4:2023": "Unrestricted Resource Consumption",
+    "API5:2023": "Broken Function Level Authorization",
+    "API6:2023": "Unrestricted Access to Sensitive Business Flows",
+    "API7:2023": "Server Side Request Forgery",
+    "API8:2023": "Security Misconfiguration",
+    "API9:2023": "Improper Inventory Management",
+    "API10:2023": "Unsafe Consumption of APIs",
+}
+
 RISK_RANK = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
 
 LEGACY_RISK_CONTEXT_TO_OWASP_LLM = {
@@ -357,6 +383,10 @@ def _string_list(value):
 def _risk_name(framework_key, code):
     if framework_key == "owasp_llm":
         return OWASP_LLM_2025.get(code, code)
+    if framework_key == "owasp_web":
+        return OWASP_WEB_2025.get(code, code)
+    if framework_key == "owasp_api":
+        return OWASP_API_2023.get(code, code)
     return code
 
 

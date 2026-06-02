@@ -7,7 +7,7 @@ from unittest.mock import patch
 try:
     from app import create_app
     from app.services.llm_extract_service import generate_llm_extract
-    from app.services.risk_analysis_service import build_risk_analysis
+    from app.services.risk_analysis_service import _risk_name, build_risk_analysis
     from app.utils.save_utils import save_adaptive_llm_sec_answers
 except ModuleNotFoundError as exc:  # pragma: no cover
     if exc.name != "flask":
@@ -145,6 +145,14 @@ class PipelineCompatibilityTests(unittest.TestCase):
             if item.get("question") == "Q2"
         ]
         self.assertTrue(any(item.get("dfd_impact") == ["actor", "trust_boundary", "data_flow"] for item in evidence))
+
+    def test_owasp_framework_code_names_are_resolved(self):
+        self.assertEqual(_risk_name("owasp_llm", "LLM06"), "Excessive Agency")
+        self.assertEqual(_risk_name("owasp_web", "A05:2025"), "Injection")
+        self.assertEqual(_risk_name("owasp_api", "API5:2023"), "Broken Function Level Authorization")
+        self.assertEqual(_risk_name("owasp_web", "A99:2025"), "A99:2025")
+        self.assertEqual(_risk_name("owasp_api", "API99:2023"), "API99:2023")
+        self.assertEqual(_risk_name("unknown", "X1"), "X1")
 
     def test_llm_extract_prompt_uses_answer_essentials(self):
         response_payload = {
