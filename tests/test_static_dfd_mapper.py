@@ -15,6 +15,10 @@ def _edges(graph):
     return {(edge["source"], edge["target"], edge["label"]) for edge in graph["edges"]}
 
 
+def _edge(graph, source, target, label):
+    return next(edge for edge in graph["edges"] if edge["source"] == source and edge["target"] == target and edge["label"] == label)
+
+
 def _orphan_node_ids(graph):
     incident = {
         node_id
@@ -60,7 +64,7 @@ def _consistency_answers():
 
 
 class StaticDfdMapperTests(unittest.TestCase):
-    def test_public_chatbot_compact_graph_pairs_actors_to_valid_entries(self):
+    def test_public_chatbot_graph_pairs_actors_to_valid_entries(self):
         graph = build_static_dfd_from_answers(
             {
                 "Q2": ["Anonymous public internet users", "Authenticated public users", "Administrators only"],
@@ -212,7 +216,7 @@ class StaticDfdMapperTests(unittest.TestCase):
 
         self.assertEqual(build_static_dfd_from_answers(flat), build_static_dfd_from_answers(wrapped))
 
-    def test_compact_mode_density_is_lower_than_detailed_mode(self):
+    def test_mapper_returns_one_canonical_graph(self):
         answers = {
             "Q1": "Customer support assistant",
             "Q2": ["Anonymous public internet users", "Authenticated public users", "Administrators only"],
@@ -235,15 +239,20 @@ class StaticDfdMapperTests(unittest.TestCase):
             "Q48": ["Public chat page", "Authenticated user dashboard", "Admin/operator panel", "Webhook or callback endpoint"],
         }
 
-        compact = build_static_dfd_from_answers(answers, graph_mode="compact")
-        detailed = build_static_dfd_from_answers(answers, graph_mode="detailed")
-        compact_edges = _edges(compact)
+        graph = build_static_dfd_from_answers(answers)
+        legacy_arg_graph = build_static_dfd_from_answers(answers, graph_mode="unused")
+        edges = _edges(graph)
 
-        self.assertLess(len(compact["edges"]), len(detailed["edges"]))
-        self.assertNotIn(("actor_public_user", "entry_admin_panel", "User prompt / request"), compact_edges)
-        self.assertNotIn(("actor_public_user", "entry_user_dashboard", "User prompt / request"), compact_edges)
-        self.assertNotIn(("actor_admin", "entry_webhook", "Admin operation"), compact_edges)
-        self.assertLess(len(compact["edges"]), 65)
+        self.assertEqual(graph, legacy_arg_graph)
+        self.assertEqual(graph["metadata"]["graph_mode"], "canonical")
+        self.assertTrue(graph["metadata"]["canonical_graph"])
+        self.assertNotIn("compact", graph)
+        self.assertNotIn("detailed", graph)
+        self.assertNotIn(("actor_public_user", "entry_admin_panel", "User prompt / request"), edges)
+        self.assertNotIn(("actor_public_user", "entry_user_dashboard", "User prompt / request"), edges)
+        self.assertNotIn(("actor_admin", "entry_webhook", "Admin operation"), edges)
+        self.assertFalse(any(edge["label"] == "Contains" for edge in graph["edges"]))
+        self.assertLess(len(graph["edges"]), 65)
 
     def test_numeric_question_ids_and_saved_answer_records_are_supported(self):
         numeric = build_static_dfd_from_answers({"1": "Customer support assistant", "2": ["Authenticated public users"], "3": ["REST API endpoint"]})
@@ -267,49 +276,47 @@ class StaticDfdMapperTests(unittest.TestCase):
             build_static_dfd_from_answers({"project": "demo"})
 
     def test_all_edges_have_evidence(self):
-        for mode in ("compact", "detailed"):
-            graph = build_static_dfd_from_answers(_consistency_answers(), graph_mode=mode)
-            empty_edges = [
-                edge
-                for edge in graph["edges"]
-                if not (edge.get("data") or {}).get("evidence")
-                and not (edge.get("data") or {}).get("technical")
-            ]
+        graph = build_static_dfd_from_answers(_consistency_answers())
+        empty_edges = [
+            edge
+            for edge in graph["edges"]
+            if not (edge.get("data") or {}).get("evidence")
+            and not (edge.get("data") or {}).get("technical")
+        ]
 
-            self.assertEqual(empty_edges, [])
+        self.assertEqual(empty_edges, [])
 
     def test_consistency_graph_has_no_non_boundary_orphans(self):
         answers = {
             **_consistency_answers(),
             "Q13": ["Vector DB", "SQL/NoSQL", "File storage", "Cloud storage"],
         }
-        for mode in ("compact", "detailed"):
-            graph = build_static_dfd_from_answers(answers, graph_mode=mode)
+        graph = build_static_dfd_from_answers(answers)
 
-            self.assertEqual(_orphan_node_ids(graph), set())
-            self.assertEqual(graph["metadata"]["orphan_nodes"], [])
+        self.assertEqual(_orphan_node_ids(graph), set())
+        self.assertEqual(graph["metadata"]["orphan_nodes"], [])
 
     def test_trust_boundary_contains_only_existing_nodes(self):
-        for mode in ("compact", "detailed"):
-            graph = build_static_dfd_from_answers(_consistency_answers(), graph_mode=mode)
-            node_ids = _node_ids(graph)
-            for node in graph["nodes"]:
-                if node["data"].get("nodeType") != "trust_boundary":
-                    continue
-                for contained_id in node["data"].get("contains") or []:
-                    self.assertIn(contained_id, node_ids)
+        graph = build_static_dfd_from_answers(_consistency_answers())
+        node_ids = _node_ids(graph)
+        self.assertIn("boundary_public_internet", node_ids)
+        self.assertIn("boundary_internal_api_to_model", node_ids)
+        for node in graph["nodes"]:
+            if node["data"].get("nodeType") != "trust_boundary":
+                continue
+            for contained_id in node["data"].get("contains") or []:
+                self.assertIn(contained_id, node_ids)
 
-    def test_detailed_contains_edges_target_existing_nodes(self):
-        graph = build_static_dfd_from_answers(_consistency_answers(), graph_mode="detailed")
+    def test_edges_target_existing_nodes(self):
+        graph = build_static_dfd_from_answers(_consistency_answers())
         node_ids = _node_ids(graph)
 
         for edge in graph["edges"]:
-            if edge["label"] == "Contains":
-                self.assertIn(edge["source"], node_ids)
-                self.assertIn(edge["target"], node_ids)
+            self.assertIn(edge["source"], node_ids)
+            self.assertIn(edge["target"], node_ids)
 
     def test_metadata_controls_reference_existing_nodes_only(self):
-        graph = build_static_dfd_from_answers(_consistency_answers(), graph_mode="compact")
+        graph = build_static_dfd_from_answers(_consistency_answers())
         node_ids = _node_ids(graph)
 
         for control in graph["metadata"]["controls"]:
@@ -327,6 +334,90 @@ class StaticDfdMapperTests(unittest.TestCase):
                 for item in unresolved
             )
         )
+
+    def test_q81_q82_enrich_existing_edge_metadata_without_new_nodes(self):
+        base_answers = {
+            "Q2": ["Authenticated public users"],
+            "Q3": ["REST API endpoint"],
+            "Q11": "Framework",
+            "Q33": "Prompt/response logging with monitoring",
+            "Q74": "Yes, with security alerts and privacy controls",
+        }
+        base_graph = build_static_dfd_from_answers(base_answers)
+        enriched_graph = build_static_dfd_from_answers(
+            {
+                **base_answers,
+                "Q81": ["Web application to backend/API"],
+                "Q82": ["Browser to web application", "Logging or monitoring pipeline"],
+            }
+        )
+
+        self.assertEqual(_node_ids(base_graph), _node_ids(enriched_graph))
+        self.assertEqual(_edges(base_graph), _edges(enriched_graph))
+
+        request_edge = _edge(enriched_graph, "actor_authenticated_user", "entry_rest_api", "Authenticated request")
+        backend_edge = _edge(enriched_graph, "entry_rest_api", "process_orchestrator", "LLM request")
+        logging_edge = _edge(enriched_graph, "llm_gateway", "process_logging_monitoring", "Audit log event")
+
+        self.assertIn("Sensitive data", request_edge["data"]["badges"])
+        self.assertTrue(request_edge["data"]["trust_boundary_crossed"])
+        self.assertEqual(request_edge["data"]["direction"], "request")
+        self.assertNotIn("Trust boundary", request_edge["data"]["display_badges"])
+        self.assertNotIn("Response", request_edge["data"]["display_badges"])
+        self.assertEqual(backend_edge["data"]["transport_security"], "unclear")
+        self.assertIn("TLS required", backend_edge["data"]["badges"])
+        self.assertEqual(backend_edge["data"]["display_badges"], ["Transport unclear", "TLS required"])
+        self.assertIn("Sensitive logs", logging_edge["data"]["badges"])
+        self.assertEqual(logging_edge["data"]["display_badges"], ["Sensitive logs"])
+        self.assertIn("Q82", request_edge["data"]["source_questions"])
+        self.assertEqual(logging_edge["data"]["data_categories"], ["prompt", "response", "PII"])
+
+    def test_q81_q82_combined_risk_on_same_edge(self):
+        graph = build_static_dfd_from_answers(
+            {
+                "Q2": ["Authenticated public users"],
+                "Q3": ["REST API endpoint"],
+                "Q11": "Framework",
+                "Q81": ["Web application to backend/API"],
+                "Q82": ["Web application to backend/API"],
+            }
+        )
+        edge = _edge(graph, "entry_rest_api", "process_orchestrator", "LLM request")
+
+        self.assertEqual(edge["data"]["transport_security"], "unclear")
+        self.assertEqual(edge["data"]["sensitive_data"], "sensitive")
+        self.assertEqual(edge["data"]["combined_risk"], "sensitive_data_over_unclear_transport")
+        self.assertEqual(edge["data"]["display_badges"], ["Sensitive data", "Transport unclear", "TLS required"])
+        self.assertEqual(edge["data"]["visual_badges"], edge["data"]["display_badges"])
+
+    def test_response_and_trust_boundary_are_metadata_not_display_badges(self):
+        graph = build_static_dfd_from_answers(
+            {
+                "Q2": ["Authenticated public users"],
+                "Q3": ["REST API endpoint"],
+                "Q11": "Framework",
+            }
+        )
+        response_edge = _edge(graph, "entry_rest_api", "actor_authenticated_user", "Response")
+        request_edge = _edge(graph, "actor_authenticated_user", "entry_rest_api", "Authenticated request")
+
+        self.assertEqual(response_edge["data"]["direction"], "response")
+        self.assertTrue(request_edge["data"]["trust_boundary_crossed"])
+        self.assertIn("Trust boundary", request_edge["data"]["badges"])
+        self.assertNotIn("Trust boundary", request_edge["data"]["display_badges"])
+        self.assertNotIn("Response", response_edge["data"]["display_badges"])
+
+    def test_no_default_telemetry_label_for_logging(self):
+        graph = build_static_dfd_from_answers(
+            {
+                "Q17": "Third-party cloud API",
+                "Q33": "Prompt/response logging with monitoring",
+                "Q74": "Yes, with security alerts and privacy controls",
+            }
+        )
+
+        self.assertIn(("llm_gateway", "process_logging_monitoring", "Audit log event"), _edges(graph))
+        self.assertFalse(any("Telemetry" in edge["label"] for edge in graph["edges"]))
 
 
 if __name__ == "__main__":

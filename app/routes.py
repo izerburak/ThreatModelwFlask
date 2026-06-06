@@ -1,4 +1,5 @@
 import json
+from threading import Thread
 from pathlib import Path
 
 from flask import (
@@ -208,6 +209,47 @@ def pipeline_start():
     return redirect(url_for("main.pipeline_detail", pipeline_id=manifest["pipeline_id"]))
 
 
+@main.route("/api/pipeline/start", methods=["POST"])
+def pipeline_start_api():
+    payload = request.get_json(silent=True) if request.is_json else request.form
+    payload = payload or {}
+    response_filename = payload.get("response_filename") or ""
+    project_name = payload.get("project_name") or ""
+    dfd_name = payload.get("dfd_name") or ""
+    auditor_name = payload.get("auditor_name") or ""
+    orchestrator = _pipeline_orchestrator()
+
+    try:
+        manifest = orchestrator.create_pipeline(
+            response_filename,
+            project_name=project_name,
+            dfd_name=dfd_name,
+            auditor_name=auditor_name,
+        )
+    except FileNotFoundError:
+        return jsonify({"ok": False, "error": "Selected questionnaire response was not found."}), 404
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+    _start_pipeline_background(
+        manifest["pipeline_id"],
+        current_app.root_path,
+        dict(current_app.config),
+    )
+
+    return (
+        jsonify(
+            {
+                "ok": True,
+                "pipeline_id": manifest["pipeline_id"],
+                "detail_url": url_for("main.pipeline_detail", pipeline_id=manifest["pipeline_id"]),
+                "manifest_url": url_for("main.pipeline_manifest_api", pipeline_id=manifest["pipeline_id"]),
+            }
+        ),
+        201,
+    )
+
+
 @main.route("/pipeline/<pipeline_id>")
 def pipeline_detail(pipeline_id):
     orchestrator = _pipeline_orchestrator()
@@ -414,15 +456,14 @@ def static_dfd_map():
     if payload is None:
         return jsonify({"ok": False, "error": "Expected a JSON object containing questionnaire answers."}), 400
 
-    graph_mode = payload.get("graph_mode", "compact") if isinstance(payload, dict) else "compact"
     raw_answers = payload
-    if isinstance(payload, dict) and "graph_mode" in payload and "answers" in payload:
+    if isinstance(payload, dict) and "answers" in payload:
         raw_answers = payload["answers"]
         if isinstance(raw_answers, list):
             raw_answers = {"answers": raw_answers}
 
     try:
-        graph = build_static_dfd_from_answers(raw_answers, graph_mode=graph_mode)
+        graph = build_static_dfd_from_answers(raw_answers)
     except ValueError as exc:
         return jsonify({"ok": False, "error": str(exc)}), 400
 
@@ -821,6 +862,23 @@ def _load_extract_payload(filename):
 
 def _pipeline_orchestrator():
     return PipelineOrchestrator(current_app.root_path, current_app.config)
+
+
+def _start_pipeline_background(pipeline_id, app_root_path, app_config):
+    worker = Thread(
+        target=_run_pipeline_background,
+        args=(pipeline_id, app_root_path, app_config),
+        daemon=True,
+    )
+    worker.start()
+
+
+def _run_pipeline_background(pipeline_id, app_root_path, app_config):
+    orchestrator = PipelineOrchestrator(app_root_path, app_config)
+    try:
+        orchestrator.run_until_risk_analysis(pipeline_id)
+    except Exception:
+        pass
 
 
 def _dfd_preview_payload(payload):

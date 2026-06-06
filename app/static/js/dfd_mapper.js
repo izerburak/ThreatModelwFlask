@@ -103,10 +103,10 @@
     action: ["create or update tickets", "send emails", "execute workflows", "transactions", "modify system configurations"],
   };
 
-  function buildDfdGraph({ answersByFlowId, qwenExtract, mode = "compact" } = {}) {
+  function buildDfdGraph({ answersByFlowId, qwenExtract } = {}) {
     const answers = isObject(answersByFlowId) ? answersByFlowId : {};
     const extract = isObject(qwenExtract) ? qwenExtract : {};
-    const builder = createBuilder(mode);
+    const builder = createBuilder("canonical");
     const pipelineItems = [];
     const trustBoundaries = [];
 
@@ -115,7 +115,7 @@
     addAnswerNodes(builder, answers, pipelineItems, trustBoundaries);
     addExtractNodes(builder, extract, pipelineItems, trustBoundaries);
     ensureDefaults(builder, answers);
-    addPipeline(builder, pipelineItems, mode);
+    addPipeline(builder, pipelineItems, "canonical");
     layoutNodes(builder.nodes);
     addTemplateEdges(builder, trustBoundaries);
 
@@ -128,7 +128,8 @@
           answers: Object.keys(answers).length > 0,
           qwenExtract: Object.keys(extract).length > 0,
         },
-        mode,
+        graph_mode: "canonical",
+        canonical_graph: true,
       },
     };
   }

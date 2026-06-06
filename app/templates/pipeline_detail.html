@@ -1,4 +1,13 @@
 {% extends "layout.html" %}
+{% set step_labels = {
+    "response_saved": "Questionnaire Response",
+    "llm_extraction_generated": "LLM Extraction",
+    "extraction_generated": "LLM Extraction",
+    "extraction_reviewed": "LLM Extraction",
+    "dfd_generated": "DFD Generated",
+    "risk_analysis_completed": "Risk Analysis",
+    "garak_plan_created": "Garak Plan"
+} %}
 {% block extra_head %}
 <style>
     .pipeline-detail-shell {
@@ -31,6 +40,48 @@
     .pipeline-meta {
         margin-top: 0.45rem;
         color: #cbd5e1;
+    }
+
+    .pipeline-run-status {
+        display: grid;
+        gap: 0.65rem;
+        min-width: 260px;
+        max-width: 420px;
+        width: 100%;
+    }
+
+    .pipeline-run-status-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .pipeline-run-label {
+        color: #e2e8f0;
+        font-weight: 700;
+    }
+
+    .pipeline-run-copy {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    .pipeline-progress {
+        height: 0.7rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .pipeline-progress-bar {
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8, #22c55e);
+        transition: width 0.28s ease;
     }
 
     .pipeline-detail-grid {
@@ -234,15 +285,6 @@
 {% endblock %}
 {% block content %}
 {% set risks_done = manifest.steps.risk_analysis_completed.done %}
-{% set step_labels = {
-    "response_saved": "Questionnaire Response",
-    "llm_extraction_generated": "LLM Extraction",
-    "extraction_generated": "LLM Extraction",
-    "extraction_reviewed": "LLM Extraction",
-    "dfd_generated": "DFD Generated",
-    "risk_analysis_completed": "Risk Analysis",
-    "garak_plan_created": "Garak Plan"
-} %}
 <div class="pipeline-detail-shell">
     <section class="pipeline-detail-header">
         <div>
@@ -256,6 +298,18 @@
             </div>
         </div>
         <div class="detail-actions">
+            <div class="pipeline-run-status" aria-live="polite">
+                <div class="pipeline-run-status-top">
+                    <div>
+                        <div class="pipeline-run-label">Run Status</div>
+                        <div class="pipeline-run-copy" id="pipelineRunCopy">Loading current pipeline state...</div>
+                    </div>
+                    <span class="badge text-bg-info" id="pipelineRunBadge">{{ manifest.status }}</span>
+                </div>
+                <div class="pipeline-progress">
+                    <div class="pipeline-progress-bar" id="pipelineProgressBar"></div>
+                </div>
+            </div>
             <a class="btn btn-outline-primary" href="{{ url_for('main.pipeline_manifest_api', pipeline_id=manifest.pipeline_id) }}">Manifest JSON</a>
             <form method="post" action="{{ url_for('main.pipeline_garak_plan', pipeline_id=manifest.pipeline_id) }}">
                 <button class="btn btn-primary" type="submit" {% if not risks_done %}disabled{% endif %}>Create Garak Plan</button>
@@ -384,15 +438,15 @@
                     {% set failed = step.error %}
                     {% set completed = step.done %}
                     {% set artifact = artifacts_by_name.get(step.artifact) %}
-                    <div class="status-row">
+                    <div class="status-row" data-step-name="{{ step_name }}">
                         <div class="status-top">
                             <div class="status-title">{{ step_labels.get(step_name, step_name|replace("_", " ")|title) }}</div>
                             {% if failed %}
-                            <span class="badge text-bg-danger">failed</span>
+                            <span class="badge text-bg-danger" data-step-badge>failed</span>
                             {% elif completed %}
-                            <span class="badge text-bg-success">completed</span>
+                            <span class="badge text-bg-success" data-step-badge>completed</span>
                             {% else %}
-                            <span class="badge text-bg-secondary">pending</span>
+                            <span class="badge text-bg-secondary" data-step-badge>pending</span>
                             {% endif %}
                         </div>
                         <div class="status-meta">
@@ -418,4 +472,100 @@
         </aside>
     </div>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    const manifestUrl = "{{ url_for('main.pipeline_manifest_api', pipeline_id=manifest.pipeline_id) }}";
+    const stepLabels = {{ step_labels|tojson }};
+    const pipelineRunBadge = document.getElementById("pipelineRunBadge");
+    const pipelineRunCopy = document.getElementById("pipelineRunCopy");
+    const pipelineProgressBar = document.getElementById("pipelineProgressBar");
+    const statusRows = new Map(
+        Array.from(document.querySelectorAll("[data-step-name]")).map((row) => [row.dataset.stepName, row])
+    );
+
+    function humanStepName(stepName) {
+        return stepLabels[stepName] || stepName.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    function applyBadge(element, state) {
+        if (!element) return;
+        const classes = {
+            failed: "badge text-bg-danger",
+            completed: "badge text-bg-success",
+            running: "badge text-bg-warning",
+            pending: "badge text-bg-secondary",
+            ready: "badge text-bg-info",
+        };
+        element.className = classes[state] || classes.pending;
+        element.textContent = state;
+    }
+
+    function stepState(stepName, step, manifestStatus) {
+        if (step?.error) return "failed";
+        if (step?.done) return "completed";
+        if (manifestStatus === `${stepName}_running`) return "running";
+        return "pending";
+    }
+
+    function renderManifestStatus(manifest) {
+        const steps = manifest.steps || {};
+        const stepNames = Object.keys(steps);
+        const completedCount = stepNames.filter((name) => steps[name]?.done).length;
+        const runningStep = stepNames.find((name) => manifest.status === `${name}_running`);
+        const failedStep = stepNames.find((name) => steps[name]?.error);
+        const mainPipelineDone = Boolean(steps.risk_analysis_completed?.done);
+        const progressCount = completedCount + (runningStep ? 0.45 : 0);
+        const progressPercent = stepNames.length ? Math.min(100, Math.round((progressCount / stepNames.length) * 100)) : 0;
+
+        if (pipelineProgressBar) {
+            pipelineProgressBar.style.width = `${progressPercent}%`;
+        }
+
+        if (failedStep) {
+            applyBadge(pipelineRunBadge, "failed");
+            pipelineRunCopy.textContent = `${humanStepName(failedStep)} stopped: ${steps[failedStep].error}`;
+        } else if (runningStep) {
+            applyBadge(pipelineRunBadge, "running");
+            pipelineRunCopy.textContent = `${humanStepName(runningStep)} is running. Updated ${manifest.updated_at || "now"}.`;
+        } else if (mainPipelineDone) {
+            applyBadge(pipelineRunBadge, "completed");
+            pipelineRunCopy.textContent = `Risk analysis is complete. Updated ${manifest.updated_at || "now"}.`;
+        } else {
+            applyBadge(pipelineRunBadge, "ready");
+            pipelineRunCopy.textContent = `${manifest.status || "created"}. Updated ${manifest.updated_at || "now"}.`;
+        }
+
+        stepNames.forEach((stepName) => {
+            const row = statusRows.get(stepName);
+            const badge = row?.querySelector("[data-step-badge]");
+            applyBadge(badge, stepState(stepName, steps[stepName], manifest.status));
+        });
+
+        return !failedStep && !mainPipelineDone;
+    }
+
+    async function refreshPipelineManifest() {
+        try {
+            const response = await fetch(manifestUrl, { cache: "no-store" });
+            if (!response.ok) throw new Error("Manifest could not be loaded.");
+            const manifest = await response.json();
+            return renderManifestStatus(manifest);
+        } catch (error) {
+            applyBadge(pipelineRunBadge, "failed");
+            pipelineRunCopy.textContent = error.message;
+            return false;
+        }
+    }
+
+    const initialManifest = {{ manifest|tojson }};
+    let shouldPoll = renderManifestStatus(initialManifest);
+    const poller = window.setInterval(async () => {
+        if (!shouldPoll) {
+            window.clearInterval(poller);
+            return;
+        }
+        shouldPoll = await refreshPipelineManifest();
+    }, 2000);
+</script>
 {% endblock %}

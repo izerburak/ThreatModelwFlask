@@ -14,7 +14,7 @@
     { value: "tool", label: "Tool call", defaultLabel: "Tool request" },
     { value: "api", label: "API / DB operation", defaultLabel: "API call request" },
     { value: "response", label: "Response", defaultLabel: "Response" },
-    { value: "logging", label: "Logging / audit", defaultLabel: "Telemetry / audit event" },
+    { value: "logging", label: "Logging / audit", defaultLabel: "Audit log event" },
   ];
   const PALETTE = [
     { role: "actor", label: "Actor", description: "Person, user group, or initiating system." },
@@ -83,6 +83,39 @@
     if (Array.isArray(value)) return value.length ? value.join(", ") : "";
     if (value && typeof value === "object") return JSON.stringify(value);
     return value === undefined || value === null ? "" : String(value);
+  }
+
+  function displayBadges(value) {
+    const allowed = new Set([
+      "Sensitive data",
+      "Transport unclear",
+      "TLS required",
+      "State-changing",
+      "External service",
+      "User-controlled input",
+      "Untrusted content",
+      "Shared service account",
+      "Sensitive logs",
+      "Human approval",
+    ]);
+    const priority = [
+      "Sensitive data",
+      "Transport unclear",
+      "TLS required",
+      "State-changing",
+      "Shared service account",
+      "External service",
+      "Untrusted content",
+      "User-controlled input",
+      "Sensitive logs",
+      "Human approval",
+    ];
+    const unique = [];
+    asArray(value).forEach((badge) => {
+      const text = String(badge || "").trim();
+      if (allowed.has(text) && !unique.includes(text)) unique.push(text);
+    });
+    return unique.sort((left, right) => priority.indexOf(left) - priority.indexOf(right)).slice(0, 3);
   }
 
   function nodeTypeFromData(data, fallbackRole) {
@@ -285,6 +318,12 @@
         ...data,
         edgeType,
         evidence: asArray(data.evidence),
+        badges: asArray(data.badges),
+        display_badges: displayBadges(data.display_badges || data.visual_badges || data.badges),
+        visual_badges: displayBadges(data.display_badges || data.visual_badges || data.badges),
+        data_categories: asArray(data.data_categories),
+        source_questions: asArray(data.source_questions),
+        owasp_refs: asArray(data.owasp_refs),
         metadata: asObject(data.metadata),
       },
       markerEnd: { type: "arrowclosed" },
@@ -313,6 +352,7 @@
     const data = asObject(props.data);
     const edgeType = data.edgeType || inferEdgeType(props.label, data);
     const label = props.label || data.label || "";
+    const visualBadges = displayBadges(data.display_badges || data.visual_badges || data.badges);
     const palette = edgeStyle(edgeType);
     const geometry = edgeGeometry({
       sourceX,
@@ -357,7 +397,14 @@
                 transform: `translate(-50%, -50%) translate(${geometry.labelX}px, ${geometry.labelY}px)`,
                 borderColor: selected ? "#f8fafc" : palette.stroke,
               },
-            }, label)
+            }, [
+              e("div", { key: "label", className: "static-edge-label-text" }, label),
+              visualBadges.length
+                ? e("div", { key: "badges", className: "static-edge-badges" },
+                    visualBadges.map((badge) => e("span", { key: badge, className: "static-edge-badge" }, badge))
+                  )
+                : null,
+            ])
           )
         : null,
     ]);
@@ -501,9 +548,11 @@
     const warnings = asArray(data.warnings);
     const assumptions = asArray(data.assumptions);
     const rows = [
-      ["Graph mode", data.graph_mode],
+      ["Graph", data.canonical_graph ? "Canonical DFD" : data.graph_mode],
       ["Mapper version", data.mapper_version],
       ["Answer count", data.normalized_answer_count],
+      ["Transport security", data.transport_security],
+      ["Sensitive data movement", data.sensitive_data_movement],
       ["Signals", Object.keys(signals).length ? signals : null],
     ];
 
@@ -544,9 +593,102 @@
     ];
   }
 
-  function renderSelectedDetails(selectedNode, selectedEdge, options) {
+  function renderBooleanField(label, value) {
+    if (value === undefined || value === null || value === "") return null;
+    if (value === false) return renderField(label, "No");
+    if (value === true) return renderField(label, "Yes");
+    return renderField(label, value);
+  }
+
+  function labelForNodeId(nodeId, nodes) {
+    const node = nodes.find((item) => item.id === nodeId);
+    return node?.data?.label || nodeId;
+  }
+
+  function selectedEdgeLabels(edge, nodes) {
+    const data = asObject(edge?.data);
+    return {
+      source: data.source_label || labelForNodeId(edge.source, nodes),
+      target: data.target_label || labelForNodeId(edge.target, nodes),
+    };
+  }
+
+  function flowTrace(selectedEdge, nodes, edges) {
+    if (!selectedEdge) return [];
+    const path = [selectedEdge.source, selectedEdge.target];
+    const visited = new Set(path);
+    let current = selectedEdge.target;
+
+    for (let i = 0; i < 4; i += 1) {
+      const outgoing = edges.filter((edge) => edge.source === current && !visited.has(edge.target));
+      if (outgoing.length !== 1) break;
+      const next = outgoing[0].target;
+      path.push(next);
+      visited.add(next);
+      const role = String(nodes.find((node) => node.id === next)?.data?.role || "");
+      const nodeType = String(nodes.find((node) => node.id === next)?.data?.nodeType || "");
+      if (["data_store", "external", "output", "action"].includes(role) || ["database", "external_api"].includes(nodeType)) break;
+      current = next;
+    }
+
+    return path.map((nodeId) => labelForNodeId(nodeId, nodes));
+  }
+
+  function hasAmbiguousConnectedFlows(selectedEdge, edges) {
+    if (!selectedEdge) return false;
+    return edges.filter((edge) => edge.source === selectedEdge.target && edge.target !== selectedEdge.source).length > 1;
+  }
+
+  function formatMetadataLabel(value) {
+    const text = String(value || "").replace(/_/g, " ").trim();
+    return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+  }
+
+  function flowSummary(selectedEdge, nodes) {
+    const data = asObject(selectedEdge.data);
+    const labels = selectedEdgeLabels(selectedEdge, nodes);
+    const direction = formatMetadataLabel(data.direction || "flow").toLowerCase();
+    const parts = [`${labels.source} sends a ${direction} to ${labels.target}.`];
+    if (data.trust_boundary_crossed) parts.push("The flow crosses a trust boundary.");
+    if (data.sensitive_data === "sensitive" || data.sensitive_data === true) parts.push("Sensitive data may be transmitted on this path.");
+    if (data.transport_security === "unclear" || data.transport_security === "unknown") parts.push("Transport protection is not clearly established.");
+    if (data.user_controlled_input) parts.push("The flow may include user-controlled input.");
+    return parts.join(" ");
+  }
+
+  function securityNotes(data) {
+    const notes = [];
+    if (data.user_controlled_input) notes.push("This flow carries user-controlled input.");
+    if (data.trust_boundary_crossed) notes.push("This flow crosses a trust boundary.");
+    if (data.sensitive_data === "sensitive" || data.sensitive_data === true) notes.push("Sensitive data may be transmitted on this path.");
+    if (data.transport_security === "unclear" || data.transport_security === "unknown") notes.push("Transport protection is unclear for this path.");
+    if (data.state_changing) notes.push("This flow can trigger a state-changing action.");
+    if (data.external_or_untrusted_content) notes.push("External or untrusted content may enter this flow.");
+    if (data.combined_risk === "sensitive_data_over_unclear_transport") notes.push("Sensitive data and unclear transport protection overlap on this path.");
+    return notes.slice(0, 4);
+  }
+
+  function renderDeveloperDetails(data) {
+    const sections = [
+      asArray(data.source_questions).length ? renderTextList("Related questions", data.source_questions) : null,
+      asArray(data.owasp_refs).length ? renderTextList("OWASP references", data.owasp_refs) : null,
+      asArray(data.evidence).length ? renderTextList("Raw evidence", data.evidence) : null,
+      asArray(data.badges).length ? renderTextList("All metadata badges", data.badges) : null,
+      Object.keys(asObject(data.metadata)).length ? renderObjectBlock("Raw metadata", data.metadata) : null,
+    ].filter(Boolean);
+    if (!sections.length) return null;
+    return e("details", { className: "detail-section developer-details" }, [
+      e("summary", { key: "summary", className: "detail-section-title" }, "Developer details"),
+      ...sections.map((section, index) => e("div", { key: `section-${index}` }, section)),
+    ]);
+  }
+
+  function renderSelectedDetails(selectedNode, selectedEdge, options, nodes, edges) {
     if (selectedNode) {
       const data = asObject(selectedNode.data);
+      const connectedFlows = edges
+        .filter((edge) => edge.source === selectedNode.id || edge.target === selectedNode.id)
+        .map((edge) => `${edge.label || edge.id}: ${labelForNodeId(edge.source, nodes)} -> ${labelForNodeId(edge.target, nodes)}`);
       const rows = [
         renderField("Label", data.label || selectedNode.id),
         renderField("Node type", data.nodeType),
@@ -556,6 +698,7 @@
         renderField("Data classification", data.data_classification),
         renderField("Boundary type", data.boundaryType || data.boundary_type),
         renderField("Contains", data.contains),
+        renderField("OWASP references", data.owasp_refs),
       ].filter(Boolean).flat();
 
       return e("div", { className: "mapper-toolbox mb-3" }, [
@@ -563,24 +706,50 @@
         rows.length ? e("dl", { key: "rows", className: "detail-list" }, rows) : null,
         options.showEvidence ? renderTextList("Evidence", data.evidence) : null,
         options.showControls ? renderTextList("Controls", data.controls) : null,
+        connectedFlows.length ? renderTextList("Connected flows", connectedFlows) : null,
         options.showMetadata ? renderObjectBlock("Node metadata", data.metadata) : null,
       ]);
     }
 
     if (selectedEdge) {
       const data = asObject(selectedEdge.data);
-      const rows = [
-        renderField("Label", selectedEdge.label || data.label || selectedEdge.id),
-        renderField("Source", selectedEdge.source),
-        renderField("Target", selectedEdge.target),
-        renderField("Edge type", data.edgeType),
+      const labels = selectedEdgeLabels(selectedEdge, nodes);
+      const trace = flowTrace(selectedEdge, nodes, edges);
+      const securityRows = [
+        renderField("Direction", formatMetadataLabel(data.direction)),
+        renderField("Flow type", formatMetadataLabel(data.flow_type)),
+        renderField("Transport", formatMetadataLabel(data.transport_security)),
+        renderField("Sensitive data", data.sensitive_data === "sensitive" || data.sensitive_data === true ? "Yes" : data.sensitive_data),
+        renderField("Data categories", data.data_categories),
+        renderField("Authentication", formatMetadataLabel(data.auth_context)),
+        renderField("Authorization", formatMetadataLabel(data.authorization_context)),
+        renderBooleanField("Trust boundary", data.trust_boundary_crossed),
+        renderField("Boundary path", data.boundary_path),
+        renderBooleanField("User-controlled input", data.user_controlled_input),
+        renderBooleanField("External/untrusted content", data.external_or_untrusted_content),
+        renderBooleanField("State-changing", data.state_changing),
+        renderBooleanField("Logging / monitoring", data.flow_type === "logging_flow" || data.sensitive_data === "sensitive_logs"),
+        renderField("Combined risk", data.combined_risk),
       ].filter(Boolean).flat();
+      const notes = securityNotes(data);
 
       return e("div", { className: "mapper-toolbox mb-3" }, [
         e("div", { key: "title", className: "mapper-toolbox-title" }, "Selected Flow"),
-        rows.length ? e("dl", { key: "rows", className: "detail-list" }, rows) : null,
-        options.showEvidence ? renderTextList("Evidence", data.evidence) : null,
-        options.showMetadata ? renderObjectBlock("Flow metadata", data.metadata) : null,
+        e("div", { key: "flow-heading", className: "selected-flow-heading" }, [
+          e("div", { key: "label", className: "selected-flow-label" }, selectedEdge.label || data.label || selectedEdge.id),
+          e("div", { key: "pair", className: "selected-flow-pair" }, `${labels.source} -> ${labels.target}`),
+        ]),
+        trace.length ? renderTextList("Flow trace", [trace.join(" -> "), hasAmbiguousConnectedFlows(selectedEdge, edges) ? "Additional connected flows available." : null].filter(Boolean)) : null,
+        e("div", { key: "summary", className: "detail-section" }, [
+          e("div", { key: "title", className: "detail-section-title" }, "Flow summary"),
+          e("p", { key: "copy", className: "detail-copy" }, flowSummary(selectedEdge, nodes)),
+        ]),
+        securityRows.length ? e("div", { key: "security", className: "detail-section" }, [
+          e("div", { key: "title", className: "detail-section-title" }, "Security details"),
+          e("dl", { key: "rows", className: "detail-list" }, securityRows),
+        ]) : null,
+        notes.length ? renderTextList("Security notes", notes) : null,
+        renderDeveloperDetails(data),
       ]);
     }
 
@@ -611,13 +780,12 @@
     const [selectedNodeId, setSelectedNodeId] = React.useState(initialGraph.nodes[0]?.id || null);
     const [selectedEdgeId, setSelectedEdgeId] = React.useState(null);
     const [selectedStaticResponse, setSelectedStaticResponse] = React.useState("");
-    const [staticGraphMode, setStaticGraphMode] = React.useState("compact");
     const [staticInput, setStaticInput] = React.useState(pretty(STATIC_SAMPLE));
     const [staticOutput, setStaticOutput] = React.useState(null);
     const [staticError, setStaticError] = React.useState("");
     const [showEvidence, setShowEvidence] = React.useState(false);
     const [showControls, setShowControls] = React.useState(false);
-    const [showMetadata, setShowMetadata] = React.useState(true);
+    const [showMetadata, setShowMetadata] = React.useState(false);
     const [newEdgeType, setNewEdgeType] = React.useState("data");
     const [status, setStatus] = React.useState("Ready.");
     const [statusType, setStatusType] = React.useState("info");
@@ -813,7 +981,7 @@
         const response = await fetch("/api/static-dfd-map", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: parsed, graph_mode: staticGraphMode }),
+          body: JSON.stringify({ answers: parsed }),
         });
         const payload = await response.json();
         if (!response.ok || !payload.ok) throw new Error(payload.error || "Static mapper failed.");
@@ -826,7 +994,7 @@
         setSelectedNodeId(flowGraph.nodes[0]?.id || null);
         setSelectedEdgeId(null);
         window.localStorage.setItem(GRAPH_KEY, JSON.stringify(graph));
-        setStatus(`Generated ${graph.metadata?.graph_mode || staticGraphMode} static DFD with ${flowGraph.nodes.length} nodes and ${flowGraph.edges.length} flows.`);
+        setStatus(`Generated canonical static DFD with ${flowGraph.nodes.length} nodes and ${flowGraph.edges.length} flows.`);
         setStatusType("info");
         window.setTimeout(() => flowRef.current?.fitView({ padding: 0.18, duration: 250 }), 0);
       } catch (error) {
@@ -834,7 +1002,7 @@
         setStatus(error.message || "Static mapper failed.");
         setStatusType("error");
       }
-    }, [staticGraphMode, staticInput]);
+    }, [staticInput]);
 
     const copyStaticOutput = React.useCallback(async () => {
       if (!staticOutput) {
@@ -933,17 +1101,6 @@
             ])
           : e("div", { key: "static-inputs" }, [
               e("h5", { key: "title" }, "Static DFD Mapper"),
-              e("label", { key: "mode-label", className: "form-label", htmlFor: "staticGraphMode" }, "Graph mode"),
-              e("select", {
-                key: "mode",
-                id: "staticGraphMode",
-                className: "form-select mb-3",
-                value: staticGraphMode,
-                onChange: (event) => setStaticGraphMode(event.target.value),
-              }, [
-                e("option", { key: "compact", value: "compact" }, "Compact"),
-                e("option", { key: "detailed", value: "detailed" }, "Detailed"),
-              ]),
               e("label", { key: "response-label", className: "form-label", htmlFor: "staticResponseFile" }, "Saved response"),
               e("div", { key: "response-row", className: "d-flex gap-2 mb-3" }, [
                 e("select", {
@@ -1094,7 +1251,7 @@
                   e("span", { key: "label" }, "Show Metadata"),
                 ]),
               ]),
-              renderSelectedDetails(selectedNode, selectedEdge, { showEvidence, showControls, showMetadata }),
+              renderSelectedDetails(selectedNode, selectedEdge, { showEvidence, showControls, showMetadata }, nodes, edges),
               e("div", { key: "json-title", className: "mapper-toolbox-title" }, "Raw Graph JSON"),
               e("pre", { key: "json", className: "static-output" }, staticOutput ? pretty(staticOutput) : "Generate a static DFD to preview the graph JSON."),
             ])

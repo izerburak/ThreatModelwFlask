@@ -152,7 +152,7 @@ class PipelineOrchestrator:
             if not answers_by_flow_id:
                 raise ValueError("Questionnaire response did not contain answers_by_flow_id for static DFD mapping.")
 
-            graph = build_static_dfd_from_answers({"answers_by_flow_id": answers_by_flow_id}, graph_mode="compact")
+            graph = build_static_dfd_from_answers({"answers_by_flow_id": answers_by_flow_id})
             graph.setdefault("metadata", {})
             graph["metadata"].update(
                 {

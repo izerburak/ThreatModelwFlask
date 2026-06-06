@@ -4,11 +4,21 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from app.services.pipeline_orchestrator import PipelineOrchestrator
+try:
+    from app import create_app
+    from app.services.pipeline_orchestrator import PipelineOrchestrator
+except ModuleNotFoundError as exc:  # pragma: no cover
+    if exc.name != "flask":
+        raise
+    create_app = None
+    PipelineOrchestrator = None
 
 
 class PipelineOrchestratorTests(unittest.TestCase):
     def setUp(self):
+        if PipelineOrchestrator is None:
+            self.skipTest("Flask is not installed in the active Python environment.")
+
         self.temp_dir = tempfile.TemporaryDirectory()
         self.root = Path(self.temp_dir.name)
         self.app_dir = self.root / "app"
@@ -81,9 +91,55 @@ class PipelineOrchestratorTests(unittest.TestCase):
         self.assertIn("entry_rest_api", node_ids)
         self.assertIn(("actor_authenticated_user", "entry_rest_api", "Authenticated request"), edges)
         self.assertEqual(graph["metadata"]["pipeline_source"], "static_dfd_mapper")
-        self.assertEqual(graph["metadata"]["graph_mode"], "compact")
+        self.assertEqual(graph["metadata"]["graph_mode"], "canonical")
+        self.assertTrue(graph["metadata"]["canonical_graph"])
         self.assertTrue(updated_manifest["steps"]["dfd_generated"]["done"])
         self.assertIn("dfd_archive", updated_manifest)
+
+
+class PipelineStartApiTests(unittest.TestCase):
+    def setUp(self):
+        if create_app is None:
+            self.skipTest("Flask is not installed in the active Python environment.")
+
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp_dir.name)
+        self.app_dir = self.root / "app"
+        self.responses_dir = self.root / "responses"
+        self.app_dir.mkdir()
+        self.responses_dir.mkdir()
+        self.response_file = "llmsec_test.json"
+        (self.responses_dir / self.response_file).write_text(
+            json.dumps({"answers_by_flow_id": {"Q1": "Docs assistant"}}),
+            encoding="utf-8",
+        )
+        self.app = create_app()
+        self.app.root_path = str(self.app_dir)
+        self.client = self.app.test_client()
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    @patch("app.routes._start_pipeline_background")
+    def test_pipeline_start_api_returns_manifest_urls_and_starts_worker(self, start_background):
+        response = self.client.post(
+            "/api/pipeline/start",
+            data={
+                "response_filename": self.response_file,
+                "project_name": "Docs",
+                "dfd_name": "Docs Threat Model",
+            },
+        )
+        payload = response.get_json()
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(payload["ok"])
+        self.assertIn("/pipeline/", payload["detail_url"])
+        self.assertIn("/api/pipeline/", payload["manifest_url"])
+        start_background.assert_called_once()
+
+        manifest_path = self.root / "pipelines" / payload["pipeline_id"] / "manifest.json"
+        self.assertTrue(manifest_path.exists())
 
 
 if __name__ == "__main__":

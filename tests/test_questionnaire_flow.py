@@ -76,7 +76,7 @@ def _answered_to_q42_with_q20_from_rag():
 
 class QuestionnaireFlowTests(unittest.TestCase):
     def test_loads_all_questions_from_catalog(self):
-        self.assertEqual(len(_engine().question_catalog), 80)
+        self.assertEqual(len(_engine().question_catalog), 82)
 
     def test_scenario_a_public_web_llm(self):
         answers = {
@@ -156,7 +156,7 @@ class QuestionnaireFlowTests(unittest.TestCase):
 
         self.assertEqual(
             _pending(answers),
-            ["Q31", "Q28", "Q16", "Q39", "Q65", "Q66", "Q75", "Q79", "Q80", "Q44"],
+            ["Q31", "Q28", "Q16", "Q39", "Q65", "Q66", "Q75", "Q79", "Q80", "Q81", "Q82", "Q44"],
         )
 
     def test_scenario_g_rich_output(self):
@@ -189,6 +189,9 @@ class QuestionnaireFlowTests(unittest.TestCase):
             "Q22": ["No significant trust boundary"],
             "Q29": ["No significant trust boundary"],
             "Q42": ["No one (static configuration)"],
+            "Q73": "Yes, encryption is enforced end-to-end where applicable",
+            "Q81": ["All sensitive communication is encrypted"],
+            "Q82": ["No sensitive data is transmitted"],
         }
 
         for _ in range(120):

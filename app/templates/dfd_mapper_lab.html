@@ -229,6 +229,28 @@
         text-transform: uppercase;
     }
 
+    .selected-flow-heading {
+        display: grid;
+        gap: 0.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .selected-flow-label {
+        color: #f8fafc;
+        font-size: 1rem;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .selected-flow-pair,
+    .detail-copy {
+        color: #cbd5e1;
+        font-size: 0.88rem;
+        line-height: 1.45;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
     .detail-value-list {
         color: #e2e8f0;
         font-size: 0.84rem;
@@ -248,6 +270,16 @@
         overflow: auto;
         padding: 0.65rem;
         white-space: pre-wrap;
+    }
+
+    .developer-details summary {
+        cursor: pointer;
+        list-style-position: inside;
+        margin-bottom: 0;
+    }
+
+    .developer-details[open] summary {
+        margin-bottom: 0.4rem;
     }
 
     .detail-toggles {
@@ -280,6 +312,31 @@
         text-align: center;
         white-space: normal;
         width: max-content;
+    }
+
+    .static-edge-label-text {
+        overflow-wrap: anywhere;
+    }
+
+    .static-edge-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem;
+        justify-content: center;
+        margin-top: 0.25rem;
+        max-width: 170px;
+    }
+
+    .static-edge-badge {
+        background: rgba(248, 250, 252, 0.1);
+        border: 1px solid rgba(248, 250, 252, 0.18);
+        border-radius: 999px;
+        color: #e2e8f0;
+        font-size: 0.58rem;
+        font-weight: 700;
+        line-height: 1.05;
+        padding: 0.12rem 0.3rem;
+        white-space: nowrap;
     }
 
     .static-edge-label-response {

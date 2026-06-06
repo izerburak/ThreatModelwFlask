@@ -28,6 +28,65 @@
         color: #cbd5e1;
     }
 
+    .pipeline-health {
+        display: grid;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        border: 1px solid rgba(59, 130, 246, 0.28);
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.96));
+    }
+
+    .pipeline-health-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .pipeline-health-title {
+        font-weight: 700;
+        color: #f8fafc;
+    }
+
+    .pipeline-health-meta {
+        color: #94a3b8;
+        font-size: 0.92rem;
+        overflow-wrap: anywhere;
+    }
+
+    .pipeline-run-progress {
+        display: none;
+        height: 0.6rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .pipeline-run-progress.is-visible {
+        display: block;
+    }
+
+    .pipeline-run-progress-bar {
+        width: 38%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8, #22c55e, #f59e0b);
+        animation: pipeline-progress-pulse 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pipeline-progress-pulse {
+        from {
+            transform: translateX(-18%);
+        }
+
+        to {
+            transform: translateX(178%);
+        }
+    }
+
     .pipeline-panel-header {
         padding: 1rem 1.25rem;
         border-bottom: 1px solid rgba(148, 163, 184, 0.16);
@@ -115,13 +174,28 @@
         </p>
     </section>
 
+    <section class="pipeline-health" aria-live="polite">
+        <div class="pipeline-health-top">
+            <div>
+                <div class="pipeline-health-title">LLM Service</div>
+                <div class="pipeline-health-meta" id="llmStatusText">Checking model status...</div>
+            </div>
+            <span class="badge text-bg-secondary" id="llmStatusBadge">checking</span>
+        </div>
+        <div class="pipeline-health-meta" id="pipelineRunStatus">No pipeline is running from this page.</div>
+        <div class="pipeline-run-progress" id="pipelineRunProgress">
+            <div class="pipeline-run-progress-bar"></div>
+        </div>
+    </section>
+
     <section class="pipeline-panel">
         <div class="pipeline-panel-header">
             <h2>Start Pipeline</h2>
         </div>
         <div class="pipeline-panel-body">
             {% if response_files %}
-            <form class="pipeline-start-form" method="post" action="{{ url_for('main.pipeline_start') }}">
+            <form class="pipeline-start-form" method="post" action="{{ url_for('main.pipeline_start') }}"
+                data-async-action="{{ url_for('main.pipeline_start_api') }}">
                 <div class="full-width">
                     <label for="responseFilename" class="form-label">Saved Questionnaire Response</label>
                     <select id="responseFilename" class="form-select" name="response_filename" required>
@@ -204,6 +278,11 @@
 <script>
     const projectNameInput = document.getElementById("projectName");
     const dfdNameInput = document.getElementById("dfdName");
+    const pipelineForm = document.querySelector(".pipeline-start-form");
+    const llmStatusText = document.getElementById("llmStatusText");
+    const llmStatusBadge = document.getElementById("llmStatusBadge");
+    const pipelineRunStatus = document.getElementById("pipelineRunStatus");
+    const pipelineRunProgress = document.getElementById("pipelineRunProgress");
 
     if (projectNameInput && dfdNameInput) {
         projectNameInput.addEventListener("input", () => {
@@ -216,5 +295,65 @@
             dfdNameInput.dataset.edited = "true";
         });
     }
+
+    async function refreshLlmStatus() {
+        if (!llmStatusText || !llmStatusBadge) return;
+
+        try {
+            const response = await fetch("{{ url_for('main.llm_status') }}", { cache: "no-store" });
+            const payload = await response.json();
+            const model = payload.model || "configured model";
+            const host = payload.host || "configured host";
+
+            if (payload.ok) {
+                llmStatusBadge.className = "badge text-bg-success";
+                llmStatusBadge.textContent = "ready";
+                llmStatusText.textContent = `${model} is reachable at ${host}.`;
+            } else {
+                llmStatusBadge.className = "badge text-bg-danger";
+                llmStatusBadge.textContent = "offline";
+                llmStatusText.textContent = payload.error || `${model} was not found at ${host}.`;
+            }
+        } catch (error) {
+            llmStatusBadge.className = "badge text-bg-danger";
+            llmStatusBadge.textContent = "offline";
+            llmStatusText.textContent = "Could not reach the LLM status endpoint.";
+        }
+    }
+
+    if (pipelineForm) {
+        pipelineForm.addEventListener("submit", async (event) => {
+            const asyncAction = pipelineForm.dataset.asyncAction;
+            if (!asyncAction || !window.fetch) return;
+
+            event.preventDefault();
+            const submitButton = pipelineForm.querySelector("button[type='submit']");
+            if (submitButton) submitButton.disabled = true;
+            pipelineRunProgress?.classList.add("is-visible");
+            pipelineRunStatus.textContent = "Pipeline workspace is being created...";
+
+            try {
+                const response = await fetch(asyncAction, {
+                    method: "POST",
+                    body: new FormData(pipelineForm),
+                });
+                const payload = await response.json();
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.error || "Pipeline could not be started.");
+                }
+
+                pipelineRunStatus.textContent = "Pipeline is running. Opening live status...";
+                window.location.assign(payload.detail_url);
+            } catch (error) {
+                pipelineRunProgress?.classList.remove("is-visible");
+                pipelineRunStatus.textContent = error.message;
+                if (submitButton) submitButton.disabled = false;
+            }
+        });
+    }
+
+    refreshLlmStatus();
+    window.setInterval(refreshLlmStatus, 8000);
 </script>
 {% endblock %}

@@ -3,7 +3,7 @@ from typing import Any
 
 
 MAPPER_VERSION = "static-dfd-v2"
-GRAPH_MODES = {"compact", "detailed"}
+CANONICAL_GRAPH_MODE = "canonical"
 
 LANE_X = {
     "actor": 0,
@@ -30,9 +30,8 @@ LANE_START_Y = {
 LANE_SPACING = 145
 
 
-def build_static_dfd_from_answers(raw_answers: dict, graph_mode: str = "compact") -> dict:
+def build_static_dfd_from_answers(raw_answers: dict, graph_mode: str | None = None) -> dict:
     """Build a deterministic React Flow DFD from questionnaire answers only."""
-    mode = graph_mode if graph_mode in GRAPH_MODES else "compact"
     normalized_answers = normalize_answers(raw_answers)
     signals = extract_architecture_signals(normalized_answers)
     graph = {
@@ -40,14 +39,18 @@ def build_static_dfd_from_answers(raw_answers: dict, graph_mode: str = "compact"
         "edges": [],
     }
     _clean_boundary_contains(graph["nodes"])
-    graph["edges"] = build_edges(signals, graph["nodes"], mode)
-    graph = prune_edges(graph, signals, mode)
+    graph["edges"] = build_edges(signals, graph["nodes"])
+    graph = prune_edges(graph, signals)
+    _enrich_edge_metadata(graph["edges"], signals, graph["nodes"])
     graph = layout_graph(graph)
     controls, unresolved_control_targets = _finalize_metadata_controls(signals["controls"], graph["nodes"])
     orphan_nodes = _graph_orphan_nodes(graph)
     graph["metadata"] = {
         "mapper_version": MAPPER_VERSION,
-        "graph_mode": mode,
+        "graph_mode": CANONICAL_GRAPH_MODE,
+        "canonical_graph": True,
+        "transport_security": signals.get("edge_metadata", {}).get("transport_global"),
+        "sensitive_data_movement": signals.get("edge_metadata", {}).get("sensitive_global"),
         "normalized_answer_count": len(normalized_answers),
         "warnings": signals["warnings"],
         "assumptions": signals["assumptions"],
@@ -145,6 +148,7 @@ def extract_architecture_signals(normalized_answers: dict[str, Any]) -> dict[str
         "controls": [],
         "logging": {"enabled": False, "evidence": []},
         "model": {"has_llm": bool(normalized_answers), "hosting": None, "evidence": []},
+        "edge_metadata": {"transport": [], "sensitive": [], "transport_global": None, "sensitive_global": None},
         "warnings": [],
         "assumptions": [],
     }
@@ -158,6 +162,7 @@ def extract_architecture_signals(normalized_answers: dict[str, Any]) -> dict[str
     _extract_external_services(signals, normalized_answers)
     _extract_trust_boundaries(signals, normalized_answers)
     _extract_controls(signals, normalized_answers)
+    _extract_edge_metadata(signals, normalized_answers)
     _extract_warnings_and_assumptions(signals, normalized_answers)
     return signals
 
@@ -238,7 +243,7 @@ def build_nodes(signals: dict[str, Any]) -> list[dict[str, Any]]:
     return builder.nodes
 
 
-def build_edges(signals: dict[str, Any], nodes: list[dict[str, Any]], graph_mode: str) -> list[dict[str, Any]]:
+def build_edges(signals: dict[str, Any], nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Create semantically valid DFD edges from architecture signals and nodes."""
     builder = _EdgeBuilder(nodes)
     request_pairs = _valid_request_pairs(signals)
@@ -260,14 +265,13 @@ def build_edges(signals: dict[str, Any], nodes: list[dict[str, Any]], graph_mode
     _add_rag_edges(builder, signals, nodes)
     _add_tool_edges(builder, signals, nodes)
     _add_external_api_edges(builder, signals, nodes)
-    _add_output_edges(builder, signals, nodes, request_pairs, graph_mode)
-    _add_logging_edges(builder, signals, graph_mode)
-    _add_boundary_edges(builder, signals, graph_mode)
+    _add_output_edges(builder, signals, nodes, request_pairs)
+    _add_logging_edges(builder, signals)
     _add_orphan_node_edges(builder, signals, nodes)
     return builder.edges
 
 
-def prune_edges(graph: dict[str, Any], signals: dict[str, Any], graph_mode: str) -> dict[str, Any]:
+def prune_edges(graph: dict[str, Any], signals: dict[str, Any]) -> dict[str, Any]:
     """Remove duplicated or semantically invalid edges."""
     valid_request_pairs = set(_valid_request_pairs(signals))
     valid_response_pairs = {(entry_id, actor_id) for actor_id, entry_id in valid_request_pairs}
@@ -287,10 +291,6 @@ def prune_edges(graph: dict[str, Any], signals: dict[str, Any], graph_mode: str)
                 continue
         if edge.get("label") in {"Response", "Validated response"} and edge.get("target", "").startswith("actor_"):
             if (edge["source"], edge["target"]) not in valid_response_pairs:
-                continue
-        if graph_mode == "compact" and edge.get("label") == "Telemetry / audit event":
-            compact_telemetry_sources = {"llm_gateway", "process_tool_layer"}
-            if edge.get("source") not in compact_telemetry_sources:
                 continue
         pruned.append(edge)
 
@@ -642,6 +642,78 @@ def _extract_controls(signals: dict[str, Any], answers: dict[str, Any]) -> None:
             signals["controls"].append(control)
 
 
+def _extract_edge_metadata(signals: dict[str, Any], answers: dict[str, Any]) -> None:
+    path_mappings = {
+        "browser to web application": "browser_to_web",
+        "web application to backend api": "web_to_backend",
+        "backend api to llm or model service": "backend_to_llm",
+        "backend api to vector database or storage": "backend_to_storage",
+        "backend api to internal tool service apis": "backend_to_internal_tools",
+        "backend api to external providers": "backend_to_external_providers",
+        "logging or monitoring pipeline": "logging_pipeline",
+    }
+
+    for value in _answer_values(answers, "Q81"):
+        normalized = _normalize_text(value)
+        if "all sensitive communication is encrypted" in normalized:
+            signals["edge_metadata"]["transport_global"] = {
+                "status": "encrypted",
+                "source_questions": ["Q81"],
+                "evidence": [_evidence("Q81", value)],
+            }
+            continue
+        if normalized == "unknown":
+            signals["edge_metadata"]["transport"].append(
+                {
+                    "path": "major",
+                    "status": "unknown",
+                    "badges": ["Transport unknown", "TLS required"],
+                    "evidence": [_evidence("Q81", value)],
+                }
+            )
+            continue
+        path_key = path_mappings.get(normalized)
+        if path_key:
+            signals["edge_metadata"]["transport"].append(
+                {
+                    "path": path_key,
+                    "status": "unclear",
+                    "badges": ["Transport unclear", "TLS required"],
+                    "evidence": [_evidence("Q81", value)],
+                }
+            )
+
+    for value in _answer_values(answers, "Q82"):
+        normalized = _normalize_text(value)
+        if "no sensitive data is transmitted" in normalized:
+            signals["edge_metadata"]["sensitive_global"] = {
+                "status": "not_transmitted",
+                "source_questions": ["Q82"],
+                "evidence": [_evidence("Q82", value)],
+            }
+            continue
+        if normalized == "unknown":
+            signals["edge_metadata"]["sensitive"].append(
+                {
+                    "path": "major",
+                    "classification": "unknown",
+                    "badges": ["Sensitive data unknown"],
+                    "evidence": [_evidence("Q82", value)],
+                }
+            )
+            continue
+        path_key = path_mappings.get(normalized)
+        if path_key:
+            signals["edge_metadata"]["sensitive"].append(
+                {
+                    "path": path_key,
+                    "classification": "sensitive",
+                    "badges": _sensitive_path_badges(path_key),
+                    "evidence": [_evidence("Q82", value)],
+                }
+            )
+
+
 def _extract_warnings_and_assumptions(signals: dict[str, Any], answers: dict[str, Any]) -> None:
     if not signals["actors"]:
         signals["warnings"].append("No actor could be inferred from Q2.")
@@ -655,7 +727,7 @@ def _extract_warnings_and_assumptions(signals: dict[str, Any], answers: dict[str
         signals["warnings"].append("Tool layer exists but no specific tool target exists.")
     if _answers_contain(answers, "Q14", ("directly",)):
         signals["warnings"].append("Direct external API access by the LLM or tool environment is inferred.")
-    for question_id in ("Q2", "Q3", "Q8", "Q11", "Q12", "Q14", "Q17", "Q31", "Q33", "Q40", "Q47"):
+    for question_id in ("Q2", "Q3", "Q8", "Q11", "Q12", "Q14", "Q17", "Q31", "Q33", "Q40", "Q47", "Q81", "Q82"):
         if _answers_contain(answers, question_id, ("unknown",)):
             signals["warnings"].append(f"{question_id} is Unknown; static mapping may be incomplete.")
 
@@ -760,16 +832,14 @@ def _add_external_api_edges(builder: "_EdgeBuilder", signals: dict[str, Any], no
         builder.add("process_api_connector", "external_network", "Network fetch", _evidence_for(nodes, "process_api_connector", "external_network"))
 
 
-def _add_output_edges(builder: "_EdgeBuilder", signals: dict[str, Any], nodes: list[dict[str, Any]], request_pairs: list[tuple[str, str]], graph_mode: str) -> None:
+def _add_output_edges(builder: "_EdgeBuilder", signals: dict[str, Any], nodes: list[dict[str, Any]], request_pairs: list[tuple[str, str]]) -> None:
     if not builder.has("llm_gateway"):
         return
-    response_pairs = request_pairs
-    if graph_mode == "compact":
-        response_pairs = [
-            (actor_id, entry_id)
-            for actor_id, entry_id in request_pairs
-            if actor_id not in {"actor_third_party_system", "actor_external_service"}
-        ]
+    response_pairs = [
+        (actor_id, entry_id)
+        for actor_id, entry_id in request_pairs
+        if actor_id not in {"actor_third_party_system", "actor_external_service"}
+    ]
     output_node = "process_output_validator" if builder.has("process_output_validator") else None
     if output_node:
         builder.add("llm_gateway", output_node, "Model output", _evidence_for(nodes, "llm_gateway", output_node))
@@ -783,29 +853,19 @@ def _add_output_edges(builder: "_EdgeBuilder", signals: dict[str, Any], nodes: l
         builder.add(entry_id, actor_id, "Response", _evidence_for(nodes, entry_id, actor_id))
 
 
-def _add_logging_edges(builder: "_EdgeBuilder", signals: dict[str, Any], graph_mode: str) -> None:
+def _add_logging_edges(builder: "_EdgeBuilder", signals: dict[str, Any]) -> None:
     if not builder.has("process_logging_monitoring"):
         return
     logging_evidence = signals.get("logging", {}).get("evidence") or []
     sources = ["llm_gateway"]
-    if graph_mode == "detailed":
-        sources = ["process_preprocessor", "process_orchestrator", "process_rag_orchestrator", "llm_gateway", "process_tool_layer", "process_api_connector", "process_output_validator"]
+    if builder.has("process_tool_layer"):
+        sources.append("process_tool_layer")
     for source in sources:
         if builder.has(source):
-            builder.add(source, "process_logging_monitoring", "Telemetry / audit event", logging_evidence)
+            builder.add(source, "process_logging_monitoring", "Audit log event", logging_evidence)
     if builder.has("store_llm_logs"):
         log_store_evidence = logging_evidence + _node_evidence(builder.nodes, "store_llm_logs")
         builder.add("process_logging_monitoring", "store_llm_logs", "Prompt/response logs", log_store_evidence)
-
-
-def _add_boundary_edges(builder: "_EdgeBuilder", signals: dict[str, Any], graph_mode: str) -> None:
-    if graph_mode != "detailed":
-        return
-    for boundary in signals["trust_boundaries"]:
-        boundary_id = boundary["id"]
-        for contained_id in boundary.get("contains", []):
-            if builder.has(boundary_id) and builder.has(contained_id):
-                builder.add(boundary_id, contained_id, "Contains", boundary.get("evidence") or [])
 
 
 def _add_orphan_node_edges(builder: "_EdgeBuilder", signals: dict[str, Any], nodes: list[dict[str, Any]]) -> None:
@@ -825,6 +885,289 @@ def _add_orphan_node_edges(builder: "_EdgeBuilder", signals: dict[str, Any], nod
 
 def _has_incident_edge(builder: "_EdgeBuilder", node_id: str) -> bool:
     return any(edge.get("source") == node_id or edge.get("target") == node_id for edge in builder.edges)
+
+
+def _enrich_edge_metadata(edges: list[dict[str, Any]], signals: dict[str, Any], nodes: list[dict[str, Any]]) -> None:
+    edge_metadata = signals.get("edge_metadata") or {}
+    transport_items = edge_metadata.get("transport") or []
+    sensitive_items = edge_metadata.get("sensitive") or []
+    node_data = {node["id"]: node.get("data") or {} for node in nodes}
+
+    for edge in edges:
+        data = edge.setdefault("data", {})
+        data["flow_type"] = _flow_type_for_edge(edge)
+        data["direction"] = _direction_for_edge(edge)
+        data["source_label"] = node_data.get(edge.get("source"), {}).get("label")
+        data["target_label"] = node_data.get(edge.get("target"), {}).get("label")
+        data["trust_boundary_crossed"] = _edge_crosses_trust_boundary(edge, node_data)
+        if data["trust_boundary_crossed"]:
+            _extend_unique(data.setdefault("badges", []), ["Trust boundary"])
+
+        for item in transport_items:
+            if _edge_matches_metadata_path(edge, item.get("path")):
+                data["transport_security"] = item.get("status") or "unclear"
+                data["transport_risk"] = data["transport_security"] in {"unclear", "unknown"}
+                _extend_unique(data.setdefault("badges", []), item.get("badges") or [])
+                _extend_unique(data.setdefault("evidence", []), item.get("evidence") or [])
+
+        for item in sensitive_items:
+            if _edge_matches_metadata_path(edge, item.get("path")):
+                data["sensitive_data"] = item.get("classification") or "sensitive"
+                data["data_categories"] = _data_categories_for_path(item.get("path"))
+                _extend_unique(data.setdefault("badges", []), item.get("badges") or [])
+                _extend_unique(data.setdefault("evidence", []), item.get("evidence") or [])
+
+        if data.get("sensitive_data") in {"sensitive", True} and data.get("transport_security") in {"unclear", "unknown"}:
+            data["combined_risk"] = "sensitive_data_over_unclear_transport"
+            _extend_unique(data.setdefault("badges", []), ["TLS required"])
+
+        data["source_questions"] = _source_questions(data.get("evidence") or [])
+        data["badges"] = _prioritized_badges(data.get("badges") or [])
+        if data["trust_boundary_crossed"]:
+            data["boundary_path"] = _edge_boundary_path(edge, node_data)
+        data["display_badges"] = _display_badges(data["badges"])
+        data["visual_badges"] = data["display_badges"]
+
+
+def _edge_matches_metadata_path(edge: dict[str, Any], path_key: str | None) -> bool:
+    source = edge.get("source") or ""
+    target = edge.get("target") or ""
+    label = edge.get("label") or ""
+    if label == "Contains":
+        return False
+    if path_key == "major":
+        return _edge_matches_any_major_path(edge)
+    if path_key == "browser_to_web":
+        return _is_actor_id(source) and _is_entry_id(target) or _is_entry_id(source) and _is_actor_id(target)
+    if path_key == "web_to_backend":
+        return (
+            _is_entry_id(source) and (_is_backend_id(target) or (target == "llm_gateway" and _direction_for_edge(edge) == "request"))
+            or _is_backend_id(source) and _is_entry_id(target)
+        )
+    if path_key == "backend_to_llm":
+        return _is_backend_id(source) and _is_llm_id(target) or _is_llm_id(source) and _is_backend_id(target)
+    if path_key == "backend_to_storage":
+        return _is_backend_id(source) and _is_store_id(target) or _is_store_id(source) and _is_backend_id(target)
+    if path_key == "backend_to_internal_tools":
+        return (
+            _is_backend_id(source) and (_is_tool_id(target) or _is_business_id(target))
+            or (_is_tool_id(source) or _is_business_id(source)) and (_is_backend_id(target) or _is_store_id(target))
+        )
+    if path_key == "backend_to_external_providers":
+        return (
+            (_is_backend_id(source) or _is_llm_id(source)) and _is_external_id(target)
+            or _is_external_id(source) and (_is_backend_id(target) or _is_llm_id(target))
+        )
+    if path_key == "logging_pipeline":
+        logging_ids = {"process_logging_monitoring", "store_llm_logs"}
+        return source in logging_ids or target in logging_ids
+    return False
+
+
+def _sensitive_path_badges(path_key: str) -> list[str]:
+    badges = {
+        "browser_to_web": ["Sensitive data", "Prompt/context", "Credentials possible"],
+        "web_to_backend": ["Sensitive data", "Prompt/context", "Credentials possible"],
+        "backend_to_llm": ["Sensitive data", "Prompt/context"],
+        "backend_to_storage": ["Sensitive data", "Retrieved context"],
+        "backend_to_internal_tools": ["Sensitive data", "Tool result", "Credentials possible"],
+        "backend_to_external_providers": ["Sensitive data", "External service"],
+        "logging_pipeline": ["Sensitive logs"],
+    }
+    return badges.get(path_key, ["Sensitive data"])
+
+
+def _edge_matches_any_major_path(edge: dict[str, Any]) -> bool:
+    return any(
+        _edge_matches_metadata_path(edge, path_key)
+        for path_key in (
+            "browser_to_web",
+            "web_to_backend",
+            "backend_to_llm",
+            "backend_to_storage",
+            "backend_to_internal_tools",
+            "backend_to_external_providers",
+            "logging_pipeline",
+        )
+    )
+
+
+def _data_categories_for_path(path_key: str | None) -> list[str]:
+    categories = {
+        "browser_to_web": ["prompt", "PII", "credentials"],
+        "web_to_backend": ["prompt", "PII", "credentials"],
+        "backend_to_llm": ["prompt", "retrieved_context", "PII"],
+        "backend_to_storage": ["retrieved_context", "PII"],
+        "backend_to_internal_tools": ["tool_result", "PII", "credentials"],
+        "backend_to_external_providers": ["prompt", "PII"],
+        "logging_pipeline": ["prompt", "response", "PII"],
+    }
+    return categories.get(path_key or "", [])
+
+
+def _flow_type_for_edge(edge: dict[str, Any]) -> str:
+    text = _normalize_text(edge.get("label"))
+    if "authenticated request" in text or "user prompt request" in text:
+        return "user_request"
+    if "llm request" in text or "prompt" in text or "model api request" in text or "model invocation" in text:
+        return "llm_inference_request"
+    if "model output" in text or "model response" in text or text == "response":
+        return "llm_response"
+    if "retrieval" in text or "retrieved context" in text:
+        return "rag_retrieval"
+    if "tool" in text or "business api" in text or "admin configuration" in text:
+        return "tool_or_action_flow"
+    if "audit log" in text or "logs" in text:
+        return "logging_flow"
+    if "api" in text or "database" in text or "storage" in text:
+        return "api_or_storage_flow"
+    return "data_flow"
+
+
+def _direction_for_edge(edge: dict[str, Any]) -> str:
+    text = _normalize_text(edge.get("label"))
+    if "response" in text or "result" in text or "model output" in text or "retrieved context" in text:
+        return "response"
+    if "log" in text or "audit" in text:
+        return "event"
+    return "request"
+
+
+def _edge_crosses_trust_boundary(edge: dict[str, Any], node_data: dict[str, dict[str, Any]]) -> bool:
+    source_zone = _trust_zone_for_node(edge.get("source") or "", node_data)
+    target_zone = _trust_zone_for_node(edge.get("target") or "", node_data)
+    return bool(source_zone and target_zone and source_zone != target_zone)
+
+
+def _edge_boundary_path(edge: dict[str, Any], node_data: dict[str, dict[str, Any]]) -> str | None:
+    source_zone = _trust_zone_for_node(edge.get("source") or "", node_data)
+    target_zone = _trust_zone_for_node(edge.get("target") or "", node_data)
+    if source_zone and target_zone and source_zone != target_zone:
+        return f"{source_zone} -> {target_zone}"
+    return None
+
+
+def _trust_zone_for_node(node_id: str, node_data: dict[str, dict[str, Any]]) -> str:
+    if node_id.startswith("actor_"):
+        return "Public Internet"
+    if node_id.startswith("entry_"):
+        return "Application / Backend Zone"
+    if node_id in {"llm_gateway", "llm_runtime"}:
+        return "AI / Model Processing Zone"
+    if node_id == "external_model_provider":
+        return "External Services"
+    if node_id.startswith("store_"):
+        return "Data Storage Zone"
+    if node_id.startswith("external_"):
+        return "External Services"
+    if node_id in {"process_logging_monitoring"}:
+        return "Admin / Operations Zone"
+    if node_id.startswith("process_") or node_id.startswith("tool_") or node_id.startswith("business_"):
+        return "Application / Backend Zone"
+    return node_data.get(node_id, {}).get("containedBy") or ""
+
+
+def _source_questions(evidence: list[str]) -> list[str]:
+    questions = []
+    for item in evidence:
+        match = re.match(r"(Q\d+):", str(item))
+        if match and match.group(1) not in questions:
+            questions.append(match.group(1))
+    return questions
+
+
+def _prioritized_badges(badges: list[Any]) -> list[str]:
+    priority = [
+        "Trust boundary",
+        "Sensitive data",
+        "Sensitive logs",
+        "Prompt/context",
+        "Retrieved context",
+        "Credentials possible",
+        "Transport unclear",
+        "Transport unknown",
+        "TLS required",
+        "State-changing",
+        "Shared service account",
+        "User-controlled input",
+        "Untrusted content",
+        "External service",
+        "Human approval",
+        "Sensitive data unknown",
+    ]
+    clean = []
+    for badge in badges:
+        text = str(badge or "").strip()
+        if text and text not in clean:
+            clean.append(text)
+    return sorted(clean, key=lambda item: priority.index(item) if item in priority else len(priority))
+
+
+def _display_badges(badges: list[str]) -> list[str]:
+    allowed = {
+        "Sensitive data",
+        "Transport unclear",
+        "TLS required",
+        "State-changing",
+        "External service",
+        "User-controlled input",
+        "Untrusted content",
+        "Shared service account",
+        "Sensitive logs",
+        "Human approval",
+    }
+    priority = [
+        "Sensitive data",
+        "Transport unclear",
+        "TLS required",
+        "State-changing",
+        "Shared service account",
+        "External service",
+        "Untrusted content",
+        "User-controlled input",
+        "Sensitive logs",
+        "Human approval",
+    ]
+    filtered = [badge for badge in badges if badge in allowed]
+    return sorted(filtered, key=lambda item: priority.index(item))[:3]
+
+
+def _is_actor_id(node_id: str) -> bool:
+    return node_id.startswith("actor_")
+
+
+def _is_entry_id(node_id: str) -> bool:
+    return node_id.startswith("entry_")
+
+
+def _is_backend_id(node_id: str) -> bool:
+    return node_id.startswith("process_")
+
+
+def _is_llm_id(node_id: str) -> bool:
+    return node_id in {"llm_gateway", "llm_runtime", "external_model_provider"}
+
+
+def _is_store_id(node_id: str) -> bool:
+    return node_id.startswith("store_")
+
+
+def _is_tool_id(node_id: str) -> bool:
+    return node_id.startswith("tool_")
+
+
+def _is_business_id(node_id: str) -> bool:
+    return node_id.startswith("business_")
+
+
+def _is_external_id(node_id: str) -> bool:
+    return node_id.startswith("external_") or node_id == "external_model_provider"
+
+
+def _extend_unique(target: list[Any], values: list[Any]) -> None:
+    for value in values:
+        if value and value not in target:
+            target.append(value)
 
 
 def _orphan_anchor(builder: "_EdgeBuilder", node: dict[str, Any]) -> tuple[str, str, str] | None:

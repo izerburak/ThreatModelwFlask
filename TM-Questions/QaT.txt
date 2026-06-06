@@ -287,6 +287,8 @@ questions:
           - Q75
           - Q79
           - Q80
+          - Q81
+          - Q82
         next_after: Q44
       - else:
           - []
@@ -317,7 +319,13 @@ questions:
     next: null
 
   Q80:
-    next: null
+    next: Q81
+
+  Q81:
+    next: Q82
+
+  Q82:
+    next: Q77
 
   Q44:
     next: Q45
@@ -431,7 +439,7 @@ questions:
     next: Q73
 
   Q73:
-    next: Q77
+    next: Q81
 
   Q77:
     next: Q78
