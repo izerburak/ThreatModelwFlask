@@ -1,0 +1,189 @@
+{
+  "schema_version": "llmsec.adaptive.v1",
+  "project_id": "MOCK_CUSTOMER_SUPPORT_SAAS",
+  "system_id": "SUPPORT_ASSISTANT_RAG_AGENT",
+  "scenario_name": "Multi-tenant customer support assistant with RAG, ticket updates, notifications, and backend API tools",
+  "timestamp_utc": "2026-06-07T15:24:53Z",
+  "answers_by_flow_id": {
+    "Q1": "Customer support assistant",
+    "Q2": [
+      "Authenticated public users",
+      "Internal employees only",
+      "Administrators only"
+    ],
+    "Q3": [
+      "Web-based chat interface",
+      "REST API endpoint",
+      "Internal service-to-service calls"
+    ],
+    "Q4": "Yes",
+    "Q5": [
+      "Direct user prompts",
+      "Uploaded files",
+      "Retrieved internal documents",
+      "API or database records"
+    ],
+    "Q6": [
+      "User text input only",
+      "File uploads",
+      "Email or ticket data"
+    ],
+    "Q7": [
+      "Input filtering",
+      "Prompt templating",
+      "RAG augmentation",
+      "Routing/classification"
+    ],
+    "Q8": [
+      "Internal knowledge base",
+      "Documentation",
+      "Customer data"
+    ],
+    "Q9": [
+      "Frontend",
+      "Backend API",
+      "Auth service",
+      "Monitoring service"
+    ],
+    "Q10": "Per user",
+    "Q11": "Agent workflow",
+    "Q12": [
+      "Search",
+      "Database",
+      "Internal APIs"
+    ],
+    "Q13": [
+      "Vector DB",
+      "SQL/NoSQL",
+      "File storage",
+      "Cloud storage"
+    ],
+    "Q14": "Via backend",
+    "Q15": [
+      "Generate text responses only",
+      "Create or update tickets/records",
+      "Send emails or notifications"
+    ],
+    "Q16": "Yes, in low-risk actions only",
+    "Q17": "Third-party cloud API",
+    "Q18": "Yes, different models for separate tasks",
+    "Q19": "Stored in configuration files",
+    "Q20": "Yes, through retrieved documents or memory",
+    "Q21": [
+      "Plain text only",
+      "Markdown or rich text",
+      "Structured JSON"
+    ],
+    "Q22": [
+      "User-facing web interface",
+      "Internal admin dashboard",
+      "API response consumed by other systems",
+      "Email, messaging, or notification channel"
+    ],
+    "Q23": [
+      "Public internet to web application",
+      "Web application to internal API",
+      "Internal API to model service",
+      "Cross-tenant or cross-user context boundary"
+    ],
+    "Q24": [
+      "Personally identifiable information (PII)",
+      "Internal operational documents",
+      "Customer support records"
+    ],
+    "Q25": "Username/password login",
+    "Q26": "Role-based access control (RBAC)",
+    "Q27": "Partially enforced",
+    "Q28": "Partially limited",
+    "Q29": [
+      "Public chat interface",
+      "RAG or document ingestion pipeline",
+      "Tool-calling or agent framework",
+      "Model hosting or API integration layer"
+    ],
+    "Q30": "Basic input filtering only",
+    "Q31": "Rule-based or schema validation",
+    "Q32": "Basic redaction or masking",
+    "Q33": "Prompt/response logging with monitoring",
+    "Q34": "User/account-based rate limiting",
+    "Q35": "Version pinning and review",
+    "Q36": "Partially protected",
+    "Q37": [
+      "Prompt injection to override instructions",
+      "Sensitive data extraction",
+      "Unauthorized action triggering",
+      "Denial of service or excessive usage"
+    ],
+    "Q38": [
+      "Insufficient monitoring",
+      "Poor prompt/change management",
+      "Weak access control hygiene",
+      "No incident response process for LLM misuse"
+    ],
+    "Q39": "Yes, low-impact decisions",
+    "Q40": "Multi-tenant with weak or unclear isolation",
+    "Q41": "User identity partially propagated",
+    "Q42": [
+      "Developers only",
+      "Administrators via admin panel",
+      "Automated systems or pipelines"
+    ],
+    "Q43": "Yes, for indexing only",
+    "Q44": "Basic separation (read vs write)",
+    "Q45": "No access to secrets or hidden data",
+    "Q46": "User-level isolation",
+    "Q47": "Logs contain full prompts and responses",
+    "Q48": [
+      "Authenticated user dashboard",
+      "Admin/operator panel",
+      "Webhook or callback endpoint"
+    ],
+    "Q49": "Partially separated",
+    "Q50": "Partially revalidated",
+    "Q51": "Partially enforced",
+    "Q52": "Broad but intentional allowlist",
+    "Q53": "Yes, with partial authorization checks",
+    "Q54": "Yes, with partial validation",
+    "Q55": "Yes, but permission checks follow the current user",
+    "Q56": "Yes, but permissions are tightly scoped",
+    "Q57": "Partially reviewed",
+    "Q58": "Partial inventory",
+    "Q59": "Possibly, but restricted",
+    "Q60": "Basic validation only",
+    "Q61": "Yes, with basic filtering only",
+    "Q62": "Only allowlisted domains are reachable",
+    "Q63": "Partially restricted",
+    "Q64": "Markdown with sanitization",
+    "Q65": "Yes, with strict schema and allowlists",
+    "Q66": "Partially blocked",
+    "Q67": "Basic type and size validation",
+    "Q68": "Yes, with partial isolation",
+    "Q69": "Partially protected",
+    "Q70": "Yes, with basic controls",
+    "Q71": "Versioned but no approval workflow",
+    "Q72": "Environment/config secrets with limited scope",
+    "Q73": "Partially encrypted",
+    "Q74": "Logged without alerting",
+    "Q75": "Some non-critical failures may continue safely",
+    "Q76": "Partial sanitization",
+    "Q77": "Partial or inconsistent limits",
+    "Q78": "Yes, but bounded by quotas and timeouts",
+    "Q79": [
+      "Notifications or external messages",
+      "Ticket escalation or priority changes"
+    ],
+    "Q80": "Only high-risk actions require approval",
+    "Q81": [
+      "Backend/API to vector database or storage",
+      "Backend/API to internal tool/service APIs"
+    ],
+    "Q82": [
+      "Browser to web application",
+      "Web application to backend/API",
+      "Backend/API to LLM or model service",
+      "Backend/API to vector database or storage",
+      "Backend/API to internal tool/service APIs",
+      "Logging or monitoring pipeline"
+    ]
+  }
+}

@@ -148,7 +148,13 @@ def extract_architecture_signals(normalized_answers: dict[str, Any]) -> dict[str
         "controls": [],
         "logging": {"enabled": False, "evidence": []},
         "model": {"has_llm": bool(normalized_answers), "hosting": None, "evidence": []},
-        "edge_metadata": {"transport": [], "sensitive": [], "transport_global": None, "sensitive_global": None},
+        "edge_metadata": {
+            "transport": [],
+            "sensitive": [],
+            "transport_default": None,
+            "transport_global": None,
+            "sensitive_global": None,
+        },
         "warnings": [],
         "assumptions": [],
     }
@@ -653,11 +659,15 @@ def _extract_edge_metadata(signals: dict[str, Any], answers: dict[str, Any]) -> 
         "logging or monitoring pipeline": "logging_pipeline",
     }
 
+    q73_default = _transport_default_from_q73(answers)
+    if q73_default:
+        signals["edge_metadata"]["transport_default"] = q73_default
+
     for value in _answer_values(answers, "Q81"):
         normalized = _normalize_text(value)
         if "all sensitive communication is encrypted" in normalized:
             signals["edge_metadata"]["transport_global"] = {
-                "status": "encrypted",
+                "status": "enforced",
                 "source_questions": ["Q81"],
                 "evidence": [_evidence("Q81", value)],
             }
@@ -678,7 +688,7 @@ def _extract_edge_metadata(signals: dict[str, Any], answers: dict[str, Any]) -> 
                 {
                     "path": path_key,
                     "status": "unclear",
-                    "badges": ["Transport unclear", "TLS required"],
+                    "badges": ["Transport unclear"],
                     "evidence": [_evidence("Q81", value)],
                 }
             )
@@ -714,6 +724,31 @@ def _extract_edge_metadata(signals: dict[str, Any], answers: dict[str, Any]) -> 
             )
 
 
+def _transport_default_from_q73(answers: dict[str, Any]) -> dict[str, Any] | None:
+    values = _answer_values(answers, "Q73")
+    if not values:
+        return None
+    value = values[0]
+    normalized = _normalize_text(value)
+    if "enforced end to end" in normalized or "encryption is enforced" in normalized:
+        status = "enforced"
+    elif "partially encrypted" in normalized:
+        status = "partially_encrypted"
+    elif "no or unclear" in normalized or "unclear encryption" in normalized:
+        status = "unclear"
+    elif normalized == "unknown":
+        status = "unknown"
+    else:
+        status = None
+    if not status:
+        return None
+    return {
+        "status": status,
+        "source_questions": ["Q73"],
+        "evidence": [_evidence("Q73", value)],
+    }
+
+
 def _extract_warnings_and_assumptions(signals: dict[str, Any], answers: dict[str, Any]) -> None:
     if not signals["actors"]:
         signals["warnings"].append("No actor could be inferred from Q2.")
@@ -727,7 +762,7 @@ def _extract_warnings_and_assumptions(signals: dict[str, Any], answers: dict[str
         signals["warnings"].append("Tool layer exists but no specific tool target exists.")
     if _answers_contain(answers, "Q14", ("directly",)):
         signals["warnings"].append("Direct external API access by the LLM or tool environment is inferred.")
-    for question_id in ("Q2", "Q3", "Q8", "Q11", "Q12", "Q14", "Q17", "Q31", "Q33", "Q40", "Q47", "Q81", "Q82"):
+    for question_id in ("Q2", "Q3", "Q8", "Q11", "Q12", "Q14", "Q17", "Q31", "Q33", "Q40", "Q47", "Q73", "Q81", "Q82"):
         if _answers_contain(answers, question_id, ("unknown",)):
             signals["warnings"].append(f"{question_id} is Unknown; static mapping may be incomplete.")
 
@@ -891,21 +926,25 @@ def _enrich_edge_metadata(edges: list[dict[str, Any]], signals: dict[str, Any], 
     edge_metadata = signals.get("edge_metadata") or {}
     transport_items = edge_metadata.get("transport") or []
     sensitive_items = edge_metadata.get("sensitive") or []
+    transport_default = edge_metadata.get("transport_global") or edge_metadata.get("transport_default") or {}
     node_data = {node["id"]: node.get("data") or {} for node in nodes}
 
     for edge in edges:
         data = edge.setdefault("data", {})
+        data["flow_label"] = edge.get("label") or data.get("label") or edge.get("id")
         data["flow_type"] = _flow_type_for_edge(edge)
         data["direction"] = _direction_for_edge(edge)
         data["source_label"] = node_data.get(edge.get("source"), {}).get("label")
         data["target_label"] = node_data.get(edge.get("target"), {}).get("label")
         data["trust_boundary_crossed"] = _edge_crosses_trust_boundary(edge, node_data)
+        data["crosses_trust_boundary"] = data["trust_boundary_crossed"]
         if data["trust_boundary_crossed"]:
             _extend_unique(data.setdefault("badges", []), ["Trust boundary"])
 
         for item in transport_items:
             if _edge_matches_metadata_path(edge, item.get("path")):
                 data["transport_security"] = item.get("status") or "unclear"
+                data["transport_state"] = _normalize_transport_state(data["transport_security"])
                 data["transport_risk"] = data["transport_security"] in {"unclear", "unknown"}
                 _extend_unique(data.setdefault("badges", []), item.get("badges") or [])
                 _extend_unique(data.setdefault("evidence", []), item.get("evidence") or [])
@@ -913,20 +952,42 @@ def _enrich_edge_metadata(edges: list[dict[str, Any]], signals: dict[str, Any], 
         for item in sensitive_items:
             if _edge_matches_metadata_path(edge, item.get("path")):
                 data["sensitive_data"] = item.get("classification") or "sensitive"
+                data["contains_sensitive_data"] = _contains_sensitive_data_value(data["sensitive_data"])
                 data["data_categories"] = _data_categories_for_path(item.get("path"))
+                data["data_carried"] = _data_carried_for_edge(edge, data)
                 _extend_unique(data.setdefault("badges", []), item.get("badges") or [])
                 _extend_unique(data.setdefault("evidence", []), item.get("evidence") or [])
 
-        if data.get("sensitive_data") in {"sensitive", True} and data.get("transport_security") in {"unclear", "unknown"}:
+        if "contains_sensitive_data" not in data:
+            data["contains_sensitive_data"] = _contains_sensitive_data_value(data.get("sensitive_data"))
+        if "data_carried" not in data:
+            data["data_carried"] = _data_carried_for_edge(edge, data)
+
+        should_have_transport = (
+            data.get("contains_sensitive_data") is True
+            or data.get("trust_boundary_crossed") is True
+            or data.get("transport_risk") is True
+        )
+        if not data.get("transport_state") and should_have_transport and transport_default.get("status"):
+            data["transport_state"] = _normalize_transport_state(transport_default.get("status"))
+            data["transport_security"] = data["transport_state"]
+            _extend_unique(data.setdefault("evidence", []), transport_default.get("evidence") or [])
+        elif not data.get("transport_state"):
+            data["transport_state"] = "not_applicable" if not should_have_transport else "unknown"
+            data.setdefault("transport_security", data["transport_state"])
+
+        if should_have_transport:
+            data.setdefault("required_control", "TLS")
+
+        if data.get("contains_sensitive_data") is True and data.get("transport_state") in {"unclear", "unknown", "missing"}:
             data["combined_risk"] = "sensitive_data_over_unclear_transport"
-            _extend_unique(data.setdefault("badges", []), ["TLS required"])
 
         data["source_questions"] = _source_questions(data.get("evidence") or [])
         data["badges"] = _prioritized_badges(data.get("badges") or [])
         if data["trust_boundary_crossed"]:
             data["boundary_path"] = _edge_boundary_path(edge, node_data)
-        data["display_badges"] = _display_badges(data["badges"])
-        data["visual_badges"] = data["display_badges"]
+        data["display_badges"] = []
+        data["visual_badges"] = []
 
 
 def _edge_matches_metadata_path(edge: dict[str, Any], path_key: str | None) -> bool:
@@ -1003,6 +1064,41 @@ def _data_categories_for_path(path_key: str | None) -> list[str]:
         "logging_pipeline": ["prompt", "response", "PII"],
     }
     return categories.get(path_key or "", [])
+
+
+def _data_carried_for_edge(edge: dict[str, Any], data: dict[str, Any]) -> str:
+    categories = data.get("data_categories") or []
+    if categories:
+        return ", ".join(str(category).replace("_", " ") for category in categories)
+    label = str(edge.get("label") or data.get("flow_label") or "").strip()
+    return label or "Unknown"
+
+
+def _contains_sensitive_data_value(value: Any) -> bool | str:
+    if value is True or value == "sensitive":
+        return True
+    if value in {"unknown", "Sensitive data unknown"}:
+        return "unknown"
+    if value is False or value in {"not_transmitted", "none"}:
+        return False
+    return "unknown"
+
+
+def _normalize_transport_state(value: Any) -> str:
+    normalized = _normalize_text(value)
+    if normalized in {"encrypted", "enforced", "tls enforced"} or "enforced" in normalized:
+        return "enforced"
+    if "partial" in normalized:
+        return "partially_encrypted"
+    if "missing" in normalized or "no encryption" in normalized or "weak encryption" in normalized:
+        return "missing"
+    if "unclear" in normalized:
+        return "unclear"
+    if "unknown" in normalized:
+        return "unknown"
+    if "not applicable" in normalized:
+        return "not_applicable"
+    return str(value or "unknown")
 
 
 def _flow_type_for_edge(edge: dict[str, Any]) -> str:

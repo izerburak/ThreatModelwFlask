@@ -361,14 +361,19 @@ class StaticDfdMapperTests(unittest.TestCase):
 
         self.assertIn("Sensitive data", request_edge["data"]["badges"])
         self.assertTrue(request_edge["data"]["trust_boundary_crossed"])
+        self.assertTrue(request_edge["data"]["crosses_trust_boundary"])
         self.assertEqual(request_edge["data"]["direction"], "request")
-        self.assertNotIn("Trust boundary", request_edge["data"]["display_badges"])
-        self.assertNotIn("Response", request_edge["data"]["display_badges"])
+        self.assertEqual(request_edge["data"]["display_badges"], [])
+        self.assertEqual(request_edge["data"]["visual_badges"], [])
         self.assertEqual(backend_edge["data"]["transport_security"], "unclear")
-        self.assertIn("TLS required", backend_edge["data"]["badges"])
-        self.assertEqual(backend_edge["data"]["display_badges"], ["Transport unclear", "TLS required"])
+        self.assertEqual(backend_edge["data"]["transport_state"], "unclear")
+        self.assertEqual(backend_edge["data"]["required_control"], "TLS")
+        self.assertNotIn("TLS required", backend_edge["data"]["badges"])
+        self.assertEqual(backend_edge["data"]["contains_sensitive_data"], "unknown")
+        self.assertEqual(backend_edge["data"]["display_badges"], [])
+        self.assertEqual(backend_edge["data"]["visual_badges"], [])
         self.assertIn("Sensitive logs", logging_edge["data"]["badges"])
-        self.assertEqual(logging_edge["data"]["display_badges"], ["Sensitive logs"])
+        self.assertEqual(logging_edge["data"]["display_badges"], [])
         self.assertIn("Q82", request_edge["data"]["source_questions"])
         self.assertEqual(logging_edge["data"]["data_categories"], ["prompt", "response", "PII"])
 
@@ -385,10 +390,14 @@ class StaticDfdMapperTests(unittest.TestCase):
         edge = _edge(graph, "entry_rest_api", "process_orchestrator", "LLM request")
 
         self.assertEqual(edge["data"]["transport_security"], "unclear")
+        self.assertEqual(edge["data"]["transport_state"], "unclear")
         self.assertEqual(edge["data"]["sensitive_data"], "sensitive")
+        self.assertTrue(edge["data"]["contains_sensitive_data"])
+        self.assertEqual(edge["data"]["required_control"], "TLS")
         self.assertEqual(edge["data"]["combined_risk"], "sensitive_data_over_unclear_transport")
-        self.assertEqual(edge["data"]["display_badges"], ["Sensitive data", "Transport unclear", "TLS required"])
-        self.assertEqual(edge["data"]["visual_badges"], edge["data"]["display_badges"])
+        self.assertNotIn("TLS required", edge["data"]["badges"])
+        self.assertEqual(edge["data"]["display_badges"], [])
+        self.assertEqual(edge["data"]["visual_badges"], [])
 
     def test_response_and_trust_boundary_are_metadata_not_display_badges(self):
         graph = build_static_dfd_from_answers(
@@ -404,8 +413,37 @@ class StaticDfdMapperTests(unittest.TestCase):
         self.assertEqual(response_edge["data"]["direction"], "response")
         self.assertTrue(request_edge["data"]["trust_boundary_crossed"])
         self.assertIn("Trust boundary", request_edge["data"]["badges"])
-        self.assertNotIn("Trust boundary", request_edge["data"]["display_badges"])
-        self.assertNotIn("Response", response_edge["data"]["display_badges"])
+        self.assertEqual(request_edge["data"]["display_badges"], [])
+        self.assertEqual(response_edge["data"]["display_badges"], [])
+
+    def test_q73_sets_transport_state_without_treating_tls_required_as_enforced(self):
+        enforced = build_static_dfd_from_answers(
+            {
+                "Q2": ["Authenticated public users"],
+                "Q3": ["REST API endpoint"],
+                "Q11": "Framework",
+                "Q73": "Yes, encryption is enforced end-to-end where applicable",
+                "Q82": ["Web application to backend/API"],
+            }
+        )
+        enforced_edge = _edge(enforced, "entry_rest_api", "process_orchestrator", "LLM request")
+        self.assertEqual(enforced_edge["data"]["transport_state"], "enforced")
+        self.assertEqual(enforced_edge["data"]["required_control"], "TLS")
+        self.assertNotIn("TLS required", enforced_edge["data"]["badges"])
+
+        unclear = build_static_dfd_from_answers(
+            {
+                "Q2": ["Authenticated public users"],
+                "Q3": ["REST API endpoint"],
+                "Q11": "Framework",
+                "Q73": "Yes, encryption is enforced end-to-end where applicable",
+                "Q81": ["Web application to backend/API"],
+                "Q82": ["Web application to backend/API"],
+            }
+        )
+        unclear_edge = _edge(unclear, "entry_rest_api", "process_orchestrator", "LLM request")
+        self.assertEqual(unclear_edge["data"]["transport_state"], "unclear")
+        self.assertEqual(unclear_edge["data"]["combined_risk"], "sensitive_data_over_unclear_transport")
 
     def test_no_default_telemetry_label_for_logging(self):
         graph = build_static_dfd_from_answers(

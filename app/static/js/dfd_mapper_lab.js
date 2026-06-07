@@ -319,8 +319,8 @@
         edgeType,
         evidence: asArray(data.evidence),
         badges: asArray(data.badges),
-        display_badges: displayBadges(data.display_badges || data.visual_badges || data.badges),
-        visual_badges: displayBadges(data.display_badges || data.visual_badges || data.badges),
+        display_badges: [],
+        visual_badges: [],
         data_categories: asArray(data.data_categories),
         source_questions: asArray(data.source_questions),
         owasp_refs: asArray(data.owasp_refs),
@@ -352,7 +352,6 @@
     const data = asObject(props.data);
     const edgeType = data.edgeType || inferEdgeType(props.label, data);
     const label = props.label || data.label || "";
-    const visualBadges = displayBadges(data.display_badges || data.visual_badges || data.badges);
     const palette = edgeStyle(edgeType);
     const geometry = edgeGeometry({
       sourceX,
@@ -397,14 +396,7 @@
                 transform: `translate(-50%, -50%) translate(${geometry.labelX}px, ${geometry.labelY}px)`,
                 borderColor: selected ? "#f8fafc" : palette.stroke,
               },
-            }, [
-              e("div", { key: "label", className: "static-edge-label-text" }, label),
-              visualBadges.length
-                ? e("div", { key: "badges", className: "static-edge-badges" },
-                    visualBadges.map((badge) => e("span", { key: badge, className: "static-edge-badge" }, badge))
-                  )
-                : null,
-            ])
+            }, e("div", { key: "label", className: "static-edge-label-text" }, label))
           )
         : null,
     ]);
@@ -644,14 +636,30 @@
     return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
   }
 
+  function knownValue(value, fallback = "Unknown") {
+    if (value === undefined || value === null || value === "") return fallback;
+    if (Array.isArray(value) && !value.length) return fallback;
+    return value;
+  }
+
+  function sensitiveDisplay(value) {
+    if (value === true || value === "sensitive") return "Yes";
+    if (value === false || value === "not_transmitted") return "No";
+    return "Unknown";
+  }
+
+  function transportState(data) {
+    return data.transport_state || data.transport_security || "unknown";
+  }
+
   function flowSummary(selectedEdge, nodes) {
     const data = asObject(selectedEdge.data);
     const labels = selectedEdgeLabels(selectedEdge, nodes);
     const direction = formatMetadataLabel(data.direction || "flow").toLowerCase();
     const parts = [`${labels.source} sends a ${direction} to ${labels.target}.`];
     if (data.trust_boundary_crossed) parts.push("The flow crosses a trust boundary.");
-    if (data.sensitive_data === "sensitive" || data.sensitive_data === true) parts.push("Sensitive data may be transmitted on this path.");
-    if (data.transport_security === "unclear" || data.transport_security === "unknown") parts.push("Transport protection is not clearly established.");
+    if (data.contains_sensitive_data === true || data.sensitive_data === "sensitive" || data.sensitive_data === true) parts.push("Sensitive data may be transmitted on this path.");
+    if (["unclear", "unknown", "missing"].includes(transportState(data))) parts.push("Transport protection is not clearly established.");
     if (data.user_controlled_input) parts.push("The flow may include user-controlled input.");
     return parts.join(" ");
   }
@@ -660,8 +668,8 @@
     const notes = [];
     if (data.user_controlled_input) notes.push("This flow carries user-controlled input.");
     if (data.trust_boundary_crossed) notes.push("This flow crosses a trust boundary.");
-    if (data.sensitive_data === "sensitive" || data.sensitive_data === true) notes.push("Sensitive data may be transmitted on this path.");
-    if (data.transport_security === "unclear" || data.transport_security === "unknown") notes.push("Transport protection is unclear for this path.");
+    if (data.contains_sensitive_data === true || data.sensitive_data === "sensitive" || data.sensitive_data === true) notes.push("Sensitive data may be transmitted on this path.");
+    if (["unclear", "unknown", "missing"].includes(transportState(data))) notes.push("Transport protection is unclear for this path.");
     if (data.state_changing) notes.push("This flow can trigger a state-changing action.");
     if (data.external_or_untrusted_content) notes.push("External or untrusted content may enter this flow.");
     if (data.combined_risk === "sensitive_data_over_unclear_transport") notes.push("Sensitive data and unclear transport protection overlap on this path.");
@@ -716,19 +724,21 @@
       const labels = selectedEdgeLabels(selectedEdge, nodes);
       const trace = flowTrace(selectedEdge, nodes, edges);
       const securityRows = [
-        renderField("Direction", formatMetadataLabel(data.direction)),
-        renderField("Flow type", formatMetadataLabel(data.flow_type)),
-        renderField("Transport", formatMetadataLabel(data.transport_security)),
-        renderField("Sensitive data", data.sensitive_data === "sensitive" || data.sensitive_data === true ? "Yes" : data.sensitive_data),
-        renderField("Data categories", data.data_categories),
-        renderField("Authentication", formatMetadataLabel(data.auth_context)),
-        renderField("Authorization", formatMetadataLabel(data.authorization_context)),
-        renderBooleanField("Trust boundary", data.trust_boundary_crossed),
+        renderField("Direction", formatMetadataLabel(knownValue(data.direction))),
+        renderField("Flow type", formatMetadataLabel(knownValue(data.flow_type))),
+        renderField("Data carried", knownValue(data.data_carried || data.data_categories || selectedEdge.label)),
+        renderField("Sensitive data", sensitiveDisplay(data.contains_sensitive_data ?? data.sensitive_data)),
+        renderField("Transport security", formatMetadataLabel(transportState(data))),
+        renderField("Required control", data.required_control || "Not specified"),
+        renderField("Authentication", formatMetadataLabel(knownValue(data.auth_context))),
+        renderField("Authorization", formatMetadataLabel(knownValue(data.authorization_context))),
+        renderBooleanField("Trust boundary crossing", data.crosses_trust_boundary ?? data.trust_boundary_crossed),
         renderField("Boundary path", data.boundary_path),
         renderBooleanField("User-controlled input", data.user_controlled_input),
         renderBooleanField("External/untrusted content", data.external_or_untrusted_content),
         renderBooleanField("State-changing", data.state_changing),
         renderBooleanField("Logging / monitoring", data.flow_type === "logging_flow" || data.sensitive_data === "sensitive_logs"),
+        renderField("Evidence", data.source_questions),
         renderField("Combined risk", data.combined_risk),
       ].filter(Boolean).flat();
       const notes = securityNotes(data);
@@ -785,7 +795,6 @@
     const [staticError, setStaticError] = React.useState("");
     const [showEvidence, setShowEvidence] = React.useState(false);
     const [showControls, setShowControls] = React.useState(false);
-    const [showMetadata, setShowMetadata] = React.useState(false);
     const [newEdgeType, setNewEdgeType] = React.useState("data");
     const [status, setStatus] = React.useState("Ready.");
     const [statusType, setStatusType] = React.useState("info");
@@ -1241,19 +1250,8 @@
                   }),
                   e("span", { key: "label" }, "Show Controls"),
                 ]),
-                e("label", { key: "metadata", className: "detail-toggle" }, [
-                  e("input", {
-                    key: "input",
-                    type: "checkbox",
-                    checked: showMetadata,
-                    onChange: (event) => setShowMetadata(event.target.checked),
-                  }),
-                  e("span", { key: "label" }, "Show Metadata"),
-                ]),
               ]),
-              renderSelectedDetails(selectedNode, selectedEdge, { showEvidence, showControls, showMetadata }, nodes, edges),
-              e("div", { key: "json-title", className: "mapper-toolbox-title" }, "Raw Graph JSON"),
-              e("pre", { key: "json", className: "static-output" }, staticOutput ? pretty(staticOutput) : "Generate a static DFD to preview the graph JSON."),
+              renderSelectedDetails(selectedNode, selectedEdge, { showEvidence, showControls, showMetadata: false }, nodes, edges),
             ])
           : e("div", { key: "editor-output-panel" }, [
         e("h5", { key: "title" }, selectedEdge && !selectedNode ? "Selected Flow" : "Selected Node"),
