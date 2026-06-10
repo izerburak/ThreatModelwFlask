@@ -6,6 +6,7 @@ from pathlib import Path
 
 from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
 from app.services.llm_extract_service import generate_llm_extract, parse_extract_json
+from app.services.llm_risk_review import review_risk_analysis
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis
 from app.services.static_dfd_mapper import build_static_dfd_from_answers
 
@@ -199,6 +200,13 @@ class PipelineOrchestrator:
                 self.app_root_path,
                 response_payload if isinstance(response_payload, dict) else {},
                 extract_payload if isinstance(extract_payload, dict) else None,
+            )
+            # Optional, constrained local-LLM review on top of the deterministic baseline.
+            # Best-effort: never raises; if the model is unavailable the baseline is unchanged.
+            risks = review_risk_analysis(
+                risks,
+                _answers_by_flow_id(response_payload),
+                self.app_config,
             )
             self._write_artifact(pipeline_id, "risks.json", risks)
             self._mark_step_done(manifest, "risk_analysis_completed")

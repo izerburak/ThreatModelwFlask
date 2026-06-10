@@ -1,0 +1,825 @@
+{
+  "schema_version": "llmsec.adaptive.v1",
+  "project_id": "DEMO_PUBLIC_SUPPORT",
+  "system_id": "public-rag-support-assistant",
+  "scenario_name": "Public customer-support RAG assistant (agentic, 3rd-party LLM, weak multi-tenant)",
+  "timestamp_utc": "2026-06-11T10:00:00Z",
+  "answers_by_flow_id": {
+    "Q1": "Customer support assistant",
+    "Q2": [
+      "Anonymous public internet users",
+      "Authenticated public users"
+    ],
+    "Q3": [
+      "Web-based chat interface",
+      "REST API endpoint"
+    ],
+    "Q4": "Yes",
+    "Q5": [
+      "Direct user prompts",
+      "Uploaded files",
+      "Retrieved internal documents"
+    ],
+    "Q6": [
+      "File uploads",
+      "Email or ticket data"
+    ],
+    "Q7": [
+      "Input filtering",
+      "Prompt templating",
+      "RAG augmentation"
+    ],
+    "Q8": [
+      "Internal knowledge base",
+      "Customer data"
+    ],
+    "Q9": [
+      "Frontend",
+      "Backend API"
+    ],
+    "Q10": "Per user",
+    "Q11": "Agent workflow",
+    "Q12": [
+      "Search",
+      "Database",
+      "Internal APIs"
+    ],
+    "Q13": [
+      "Vector DB",
+      "SQL/NoSQL",
+      "Cloud storage"
+    ],
+    "Q14": "Via backend",
+    "Q15": [
+      "Generate text responses only",
+      "Create or update tickets/records",
+      "Send emails or notifications"
+    ],
+    "Q16": "Yes, in low-risk actions only",
+    "Q17": "Third-party cloud API",
+    "Q18": "No, a single model is used",
+    "Q19": "Stored in configuration files",
+    "Q20": "Yes, through retrieved documents or memory",
+    "Q21": [
+      "Markdown or rich text",
+      "Structured JSON"
+    ],
+    "Q22": [
+      "User-facing web interface",
+      "API response consumed by other systems"
+    ],
+    "Q23": [
+      "Public internet to web application",
+      "Web application to internal API",
+      "Internal API to model service",
+      "Cross-tenant or cross-user context boundary"
+    ],
+    "Q24": [
+      "Personally identifiable information (PII)",
+      "Customer support records"
+    ],
+    "Q25": "Single sign-on (SSO)",
+    "Q26": "Role-based access control (RBAC)",
+    "Q27": "Partially enforced",
+    "Q28": "Partially limited",
+    "Q29": [
+      "Public chat interface",
+      "RAG or document ingestion pipeline",
+      "Tool-calling or agent framework"
+    ],
+    "Q30": "Basic input filtering only",
+    "Q31": "Rule-based or schema validation",
+    "Q32": "Access controls and scoped retrieval",
+    "Q33": "Prompt/response logging with monitoring",
+    "Q34": "User/account-based rate limiting",
+    "Q35": "Version pinning and review",
+    "Q36": "Partially protected",
+    "Q37": [
+      "Prompt injection to override instructions",
+      "Sensitive data extraction",
+      "Unauthorized action triggering"
+    ],
+    "Q38": [
+      "Insufficient monitoring",
+      "Weak access control hygiene"
+    ],
+    "Q39": "Yes, moderate-impact decisions",
+    "Q40": "Multi-tenant with weak or unclear isolation",
+    "Q41": "User identity partially propagated",
+    "Q42": [
+      "Administrators via admin panel"
+    ],
+    "Q43": "Yes, for indexing only",
+    "Q44": "Basic separation (read vs write)",
+    "Q45": "Access to limited non-sensitive configuration",
+    "Q46": "User-level isolation",
+    "Q47": "Logs contain full prompts and responses",
+    "Q48": [
+      "Public chat page",
+      "Authenticated user dashboard",
+      "Admin/operator panel"
+    ],
+    "Q49": "Partially separated",
+    "Q50": "Partially revalidated",
+    "Q51": "Partially enforced",
+    "Q52": "Broad but intentional allowlist",
+    "Q53": "Yes, with partial authorization checks",
+    "Q54": "Yes, with partial validation",
+    "Q55": "Yes, through a shared backend service account",
+    "Q56": "Yes, broad shared service account",
+    "Q57": "Partially reviewed",
+    "Q58": "Partial inventory",
+    "Q59": "Possibly, but restricted",
+    "Q60": "Basic validation only",
+    "Q61": "Yes, with basic filtering only",
+    "Q62": "Only allowlisted domains are reachable",
+    "Q63": "Partially restricted",
+    "Q64": "Markdown with sanitization",
+    "Q65": "Yes, with partial validation",
+    "Q66": "Partially blocked",
+    "Q67": "Basic type and size validation",
+    "Q68": "Yes, shared stores may affect other users",
+    "Q69": "Partially protected",
+    "Q70": "Yes, with basic controls",
+    "Q71": "Versioned but no approval workflow",
+    "Q72": "Environment/config secrets with limited scope",
+    "Q73": "Partially encrypted",
+    "Q74": "Logged without alerting",
+    "Q75": "Some non-critical failures may continue safely",
+    "Q76": "Partial sanitization",
+    "Q77": "Basic global limits only",
+    "Q78": "Yes, partially bounded",
+    "Q79": [
+      "Notifications or external messages",
+      "Ticket escalation or priority changes"
+    ],
+    "Q80": "Only high-risk actions require approval",
+    "Q81": [
+      "Backend/API to LLM or model service",
+      "Backend/API to internal tool/service APIs",
+      "Backend/API to external providers"
+    ],
+    "Q82": [
+      "Browser to web application",
+      "Web application to backend/API",
+      "Backend/API to LLM or model service",
+      "Backend/API to vector database or storage",
+      "Logging or monitoring pipeline"
+    ]
+  },
+  "answers": [
+    {
+      "flow_id": "Q1",
+      "question_id": "1",
+      "source_question_id": "1",
+      "text": "What is the primary purpose of the LLM in this system?",
+      "answer": "Customer support assistant"
+    },
+    {
+      "flow_id": "Q2",
+      "question_id": "2",
+      "source_question_id": "2",
+      "text": "Who can directly interact with the LLM system?",
+      "answer": [
+        "Anonymous public internet users",
+        "Authenticated public users"
+      ]
+    },
+    {
+      "flow_id": "Q3",
+      "question_id": "3",
+      "source_question_id": "3",
+      "text": "Through which interfaces is the LLM accessible?",
+      "answer": [
+        "Web-based chat interface",
+        "REST API endpoint"
+      ]
+    },
+    {
+      "flow_id": "Q4",
+      "question_id": "4",
+      "source_question_id": "4",
+      "text": "Does the LLM process sensitive or business-critical data?",
+      "answer": "Yes"
+    },
+    {
+      "flow_id": "Q5",
+      "question_id": "5",
+      "source_question_id": "5",
+      "text": "What are the primary sources of input data for the LLM?",
+      "answer": [
+        "Direct user prompts",
+        "Uploaded files",
+        "Retrieved internal documents"
+      ]
+    },
+    {
+      "flow_id": "Q6",
+      "question_id": "6",
+      "source_question_id": "6",
+      "text": "What types of external or untrusted content can be ingested by the LLM?",
+      "answer": [
+        "File uploads",
+        "Email or ticket data"
+      ]
+    },
+    {
+      "flow_id": "Q7",
+      "question_id": "7",
+      "source_question_id": "7",
+      "text": "What processing steps occur before user input reaches the LLM?",
+      "answer": [
+        "Input filtering",
+        "Prompt templating",
+        "RAG augmentation"
+      ]
+    },
+    {
+      "flow_id": "Q8",
+      "question_id": "8",
+      "source_question_id": "8",
+      "text": "Which data sources are connected via RAG?",
+      "answer": [
+        "Internal knowledge base",
+        "Customer data"
+      ]
+    },
+    {
+      "flow_id": "Q9",
+      "question_id": "9",
+      "source_question_id": "9",
+      "text": "Which internal services can call the LLM?",
+      "answer": [
+        "Frontend",
+        "Backend API"
+      ]
+    },
+    {
+      "flow_id": "Q10",
+      "question_id": "10",
+      "source_question_id": "10",
+      "text": "Does the system store conversation history?",
+      "answer": "Per user"
+    },
+    {
+      "flow_id": "Q11",
+      "question_id": "11",
+      "source_question_id": "11",
+      "text": "Is there an orchestration layer?",
+      "answer": "Agent workflow"
+    },
+    {
+      "flow_id": "Q12",
+      "question_id": "12",
+      "source_question_id": "12",
+      "text": "Does the LLM have access to tools?",
+      "answer": [
+        "Search",
+        "Database",
+        "Internal APIs"
+      ]
+    },
+    {
+      "flow_id": "Q13",
+      "question_id": "13",
+      "source_question_id": "13",
+      "text": "Which storage systems are accessible?",
+      "answer": [
+        "Vector DB",
+        "SQL/NoSQL",
+        "Cloud storage"
+      ]
+    },
+    {
+      "flow_id": "Q14",
+      "question_id": "14",
+      "source_question_id": "14",
+      "text": "Can the LLM call external APIs?",
+      "answer": "Via backend"
+    },
+    {
+      "flow_id": "Q15",
+      "question_id": "15",
+      "source_question_id": "15",
+      "text": "What actions can the LLM trigger?",
+      "answer": [
+        "Generate text responses only",
+        "Create or update tickets/records",
+        "Send emails or notifications"
+      ]
+    },
+    {
+      "flow_id": "Q16",
+      "question_id": "16",
+      "source_question_id": "16",
+      "text": "Can the LLM affect real-world state or business processes without human approval?",
+      "answer": "Yes, in low-risk actions only"
+    },
+    {
+      "flow_id": "Q17",
+      "question_id": "17",
+      "source_question_id": "17",
+      "text": "Where is the LLM hosted?",
+      "answer": "Third-party cloud API"
+    },
+    {
+      "flow_id": "Q18",
+      "question_id": "18",
+      "source_question_id": "18",
+      "text": "Does the system use multiple LLM models for different tasks?",
+      "answer": "No, a single model is used"
+    },
+    {
+      "flow_id": "Q19",
+      "question_id": "19",
+      "source_question_id": "19",
+      "text": "How are LLM prompts or system instructions managed?",
+      "answer": "Stored in configuration files"
+    },
+    {
+      "flow_id": "Q20",
+      "question_id": "20",
+      "source_question_id": "20",
+      "text": "Can users influence system prompts or instructions indirectly?",
+      "answer": "Yes, through retrieved documents or memory"
+    },
+    {
+      "flow_id": "Q21",
+      "question_id": "21",
+      "source_question_id": "21",
+      "text": "What output formats are produced by the LLM?",
+      "answer": [
+        "Markdown or rich text",
+        "Structured JSON"
+      ]
+    },
+    {
+      "flow_id": "Q22",
+      "question_id": "22",
+      "source_question_id": "22",
+      "text": "Where is LLM output rendered or consumed?",
+      "answer": [
+        "User-facing web interface",
+        "API response consumed by other systems"
+      ]
+    },
+    {
+      "flow_id": "Q23",
+      "question_id": "23",
+      "source_question_id": "23",
+      "text": "Which trust boundaries does user input cross before reaching the LLM?",
+      "answer": [
+        "Public internet to web application",
+        "Web application to internal API",
+        "Internal API to model service",
+        "Cross-tenant or cross-user context boundary"
+      ]
+    },
+    {
+      "flow_id": "Q24",
+      "question_id": "24",
+      "source_question_id": "24",
+      "text": "Which sensitive data categories are accessible to the LLM?",
+      "answer": [
+        "Personally identifiable information (PII)",
+        "Customer support records"
+      ]
+    },
+    {
+      "flow_id": "Q25",
+      "question_id": "25",
+      "source_question_id": "25",
+      "text": "How are users authenticated before interacting with the LLM?",
+      "answer": "Single sign-on (SSO)"
+    },
+    {
+      "flow_id": "Q26",
+      "question_id": "26",
+      "source_question_id": "26",
+      "text": "How is authorization enforced for LLM access?",
+      "answer": "Role-based access control (RBAC)"
+    },
+    {
+      "flow_id": "Q27",
+      "question_id": "27",
+      "source_question_id": "27",
+      "text": "Is role-based filtering applied to retrieved documents or data?",
+      "answer": "Partially enforced"
+    },
+    {
+      "flow_id": "Q28",
+      "question_id": "28",
+      "source_question_id": "28",
+      "text": "Is the LLM's behavior limited by user role, data scope, or task permissions?",
+      "answer": "Partially limited"
+    },
+    {
+      "flow_id": "Q29",
+      "question_id": "29",
+      "source_question_id": "29",
+      "text": "Which components expose the largest LLM-related attack surface?",
+      "answer": [
+        "Public chat interface",
+        "RAG or document ingestion pipeline",
+        "Tool-calling or agent framework"
+      ]
+    },
+    {
+      "flow_id": "Q30",
+      "question_id": "30",
+      "source_question_id": "30",
+      "text": "Are safeguards implemented against prompt injection attacks?",
+      "answer": "Basic input filtering only"
+    },
+    {
+      "flow_id": "Q31",
+      "question_id": "31",
+      "source_question_id": "31",
+      "text": "Is LLM output validated before being used by other systems?",
+      "answer": "Rule-based or schema validation"
+    },
+    {
+      "flow_id": "Q32",
+      "question_id": "32",
+      "source_question_id": "32",
+      "text": "Are safeguards implemented to prevent sensitive data leakage?",
+      "answer": "Access controls and scoped retrieval"
+    },
+    {
+      "flow_id": "Q33",
+      "question_id": "33",
+      "source_question_id": "33",
+      "text": "How are LLM interactions logged and monitored?",
+      "answer": "Prompt/response logging with monitoring"
+    },
+    {
+      "flow_id": "Q34",
+      "question_id": "34",
+      "source_question_id": "34",
+      "text": "Are rate limits or abuse protections applied to the LLM interface?",
+      "answer": "User/account-based rate limiting"
+    },
+    {
+      "flow_id": "Q35",
+      "question_id": "35",
+      "source_question_id": "35",
+      "text": "How are external models or dependencies validated?",
+      "answer": "Version pinning and review"
+    },
+    {
+      "flow_id": "Q36",
+      "question_id": "36",
+      "source_question_id": "36",
+      "text": "Are embeddings or vector databases protected against unauthorized access?",
+      "answer": "Partially protected"
+    },
+    {
+      "flow_id": "Q37",
+      "question_id": "37",
+      "source_question_id": "37",
+      "text": "Which misuse scenarios are most plausible for this LLM deployment?",
+      "answer": [
+        "Prompt injection to override instructions",
+        "Sensitive data extraction",
+        "Unauthorized action triggering"
+      ]
+    },
+    {
+      "flow_id": "Q38",
+      "question_id": "38",
+      "source_question_id": "38",
+      "text": "What operational weaknesses could increase LLM-related security risks?",
+      "answer": [
+        "Insufficient monitoring",
+        "Weak access control hygiene"
+      ]
+    },
+    {
+      "flow_id": "Q39",
+      "question_id": "39",
+      "source_question_id": "39",
+      "text": "Does the system rely on LLM responses for automated decision making?",
+      "answer": "Yes, moderate-impact decisions"
+    },
+    {
+      "flow_id": "Q40",
+      "question_id": "40",
+      "source_question_id": "40",
+      "text": "Is the system single-tenant or multi-tenant?",
+      "answer": "Multi-tenant with weak or unclear isolation"
+    },
+    {
+      "flow_id": "Q41",
+      "question_id": "41",
+      "source_question_id": "41",
+      "text": "How is user identity propagated across system components (LLM, tools, retrieval)?",
+      "answer": "User identity partially propagated"
+    },
+    {
+      "flow_id": "Q42",
+      "question_id": "42",
+      "source_question_id": "42",
+      "text": "Who can modify prompts, policies, or retrieval sources?",
+      "answer": [
+        "Administrators via admin panel"
+      ]
+    },
+    {
+      "flow_id": "Q43",
+      "question_id": "43",
+      "source_question_id": "43",
+      "text": "Can user inputs or retrieved content be reused for model training, fine-tuning, or future indexing?",
+      "answer": "Yes, for indexing only"
+    },
+    {
+      "flow_id": "Q44",
+      "question_id": "44",
+      "source_question_id": "44",
+      "text": "Are LLM tool permissions separated by action type (read, write, admin, destructive)?",
+      "answer": "Basic separation (read vs write)"
+    },
+    {
+      "flow_id": "Q45",
+      "question_id": "45",
+      "source_question_id": "45",
+      "text": "Can the LLM access secrets, credentials, or hidden system instructions at runtime?",
+      "answer": "Access to limited non-sensitive configuration"
+    },
+    {
+      "flow_id": "Q46",
+      "question_id": "46",
+      "source_question_id": "46",
+      "text": "Is conversation or memory data isolated per user, session, or tenant?",
+      "answer": "User-level isolation"
+    },
+    {
+      "flow_id": "Q47",
+      "question_id": "47",
+      "source_question_id": "47",
+      "text": "Do logs or monitoring systems store full prompts, responses, or sensitive content?",
+      "answer": "Logs contain full prompts and responses"
+    },
+    {
+      "flow_id": "Q48",
+      "question_id": "48",
+      "source_question_id": "48",
+      "text": "Which web application entry points can initiate or influence the LLM workflow?",
+      "answer": [
+        "Public chat page",
+        "Authenticated user dashboard",
+        "Admin/operator panel"
+      ]
+    },
+    {
+      "flow_id": "Q49",
+      "question_id": "49",
+      "source_question_id": "49",
+      "text": "Are LLM-related routes or endpoints separated from general application functionality with dedicated access controls?",
+      "answer": "Partially separated"
+    },
+    {
+      "flow_id": "Q50",
+      "question_id": "50",
+      "source_question_id": "50",
+      "text": "Is the user's authenticated session or role revalidated before each LLM request or tool action is processed?",
+      "answer": "Partially revalidated"
+    },
+    {
+      "flow_id": "Q51",
+      "question_id": "51",
+      "source_question_id": "51",
+      "text": "Are browser-origin protections applied to LLM-triggered state-changing actions?",
+      "answer": "Partially enforced"
+    },
+    {
+      "flow_id": "Q52",
+      "question_id": "52",
+      "source_question_id": "52",
+      "text": "How is cross-origin access controlled for LLM or AI-related API endpoints?",
+      "answer": "Broad but intentional allowlist"
+    },
+    {
+      "flow_id": "Q53",
+      "question_id": "53",
+      "source_question_id": "53",
+      "text": "Can LLM tool calls access objects or records using user-controlled identifiers?",
+      "answer": "Yes, with partial authorization checks"
+    },
+    {
+      "flow_id": "Q54",
+      "question_id": "54",
+      "source_question_id": "54",
+      "text": "Can LLM-generated or LLM-selected parameters control which object fields are read or updated through APIs?",
+      "answer": "Yes, with partial validation"
+    },
+    {
+      "flow_id": "Q55",
+      "question_id": "55",
+      "source_question_id": "55",
+      "text": "Can the LLM influence API functions with different privilege levels such as user, admin, or operator actions?",
+      "answer": "Yes, through a shared backend service account"
+    },
+    {
+      "flow_id": "Q56",
+      "question_id": "56",
+      "source_question_id": "56",
+      "text": "Does the LLM or orchestration layer use a shared service account when calling internal APIs?",
+      "answer": "Yes, broad shared service account"
+    },
+    {
+      "flow_id": "Q57",
+      "question_id": "57",
+      "source_question_id": "57",
+      "text": "Are LLM-accessible API schemas, function definitions, or tool manifests reviewed for excessive capabilities?",
+      "answer": "Partially reviewed"
+    },
+    {
+      "flow_id": "Q58",
+      "question_id": "58",
+      "source_question_id": "58",
+      "text": "Are API endpoints exposed to the LLM inventoried and classified by sensitivity?",
+      "answer": "Partial inventory"
+    },
+    {
+      "flow_id": "Q59",
+      "question_id": "59",
+      "source_question_id": "59",
+      "text": "Can the LLM access deprecated, debug, staging, or undocumented APIs?",
+      "answer": "Possibly, but restricted"
+    },
+    {
+      "flow_id": "Q60",
+      "question_id": "60",
+      "source_question_id": "60",
+      "text": "How are third-party API responses handled before being inserted into LLM context?",
+      "answer": "Basic validation only"
+    },
+    {
+      "flow_id": "Q61",
+      "question_id": "61",
+      "source_question_id": "61",
+      "text": "Can external API content or metadata contain instructions that may be interpreted by the LLM?",
+      "answer": "Yes, with basic filtering only"
+    },
+    {
+      "flow_id": "Q62",
+      "question_id": "62",
+      "source_question_id": "62",
+      "text": "Can the LLM request arbitrary URLs or network locations through web browsing, fetch, webhook, or API tools?",
+      "answer": "Only allowlisted domains are reachable"
+    },
+    {
+      "flow_id": "Q63",
+      "question_id": "63",
+      "source_question_id": "63",
+      "text": "Are outbound network calls from the LLM tool environment restricted to approved destinations?",
+      "answer": "Partially restricted"
+    },
+    {
+      "flow_id": "Q64",
+      "question_id": "64",
+      "source_question_id": "64",
+      "text": "Can LLM-generated output be rendered as Markdown, HTML, links, scripts, or rich content in a web interface?",
+      "answer": "Markdown with sanitization"
+    },
+    {
+      "flow_id": "Q65",
+      "question_id": "65",
+      "source_question_id": "65",
+      "text": "Is LLM-generated structured output used to build database queries, search filters, commands, or API requests?",
+      "answer": "Yes, with partial validation"
+    },
+    {
+      "flow_id": "Q66",
+      "question_id": "66",
+      "source_question_id": "66",
+      "text": "Are dangerous output patterns such as executable code, URLs, SQL fragments, or command fragments blocked before downstream use?",
+      "answer": "Partially blocked"
+    },
+    {
+      "flow_id": "Q67",
+      "question_id": "67",
+      "source_question_id": "67",
+      "text": "How are file uploads for LLM processing validated before parsing, indexing, or retrieval?",
+      "answer": "Basic type and size validation"
+    },
+    {
+      "flow_id": "Q68",
+      "question_id": "68",
+      "source_question_id": "68",
+      "text": "Can uploaded or retrieved documents affect future users through shared indexes, caches, or retrieval stores?",
+      "answer": "Yes, shared stores may affect other users"
+    },
+    {
+      "flow_id": "Q69",
+      "question_id": "69",
+      "source_question_id": "69",
+      "text": "Are RAG sources protected against unauthorized modification or poisoning through web or API workflows?",
+      "answer": "Partially protected"
+    },
+    {
+      "flow_id": "Q70",
+      "question_id": "70",
+      "source_question_id": "70",
+      "text": "Can administrators or operators modify LLM prompts, policies, tools, or RAG sources through a web admin interface?",
+      "answer": "Yes, with basic controls"
+    },
+    {
+      "flow_id": "Q71",
+      "question_id": "71",
+      "source_question_id": "71",
+      "text": "Are changes to prompts, policies, tools, and retrieval sources versioned and auditable?",
+      "answer": "Versioned but no approval workflow"
+    },
+    {
+      "flow_id": "Q72",
+      "question_id": "72",
+      "source_question_id": "72",
+      "text": "How are secrets used by LLM tools, plugins, or API connectors stored and scoped?",
+      "answer": "Environment/config secrets with limited scope"
+    },
+    {
+      "flow_id": "Q73",
+      "question_id": "73",
+      "source_question_id": "73",
+      "text": "Is sensitive LLM traffic encrypted between browser, backend, orchestration layer, model provider, and tool APIs?",
+      "answer": "Partially encrypted"
+    },
+    {
+      "flow_id": "Q74",
+      "question_id": "74",
+      "source_question_id": "74",
+      "text": "Are LLM prompts, responses, tool calls, and API failures logged as security-relevant events?",
+      "answer": "Logged without alerting"
+    },
+    {
+      "flow_id": "Q75",
+      "question_id": "75",
+      "source_question_id": "75",
+      "text": "Can abnormal LLM or API behavior fail open and still complete actions?",
+      "answer": "Some non-critical failures may continue safely"
+    },
+    {
+      "flow_id": "Q76",
+      "question_id": "76",
+      "source_question_id": "76",
+      "text": "Are model, tool, or API errors exposed to users in a way that reveals prompts, stack traces, internal endpoints, or secrets?",
+      "answer": "Partial sanitization"
+    },
+    {
+      "flow_id": "Q77",
+      "question_id": "77",
+      "source_question_id": "77",
+      "text": "Are token, cost, request, and tool-execution limits enforced across users, tenants, and API clients?",
+      "answer": "Basic global limits only"
+    },
+    {
+      "flow_id": "Q78",
+      "question_id": "78",
+      "source_question_id": "78",
+      "text": "Can a user trigger expensive LLM operations, recursive tool calls, large retrievals, or high-volume API workflows?",
+      "answer": "Yes, partially bounded"
+    },
+    {
+      "flow_id": "Q79",
+      "question_id": "79",
+      "source_question_id": "79",
+      "text": "Can the LLM trigger sensitive business flows such as refunds, account changes, notifications, approvals, or ticket escalation?",
+      "answer": [
+        "Notifications or external messages",
+        "Ticket escalation or priority changes"
+      ]
+    },
+    {
+      "flow_id": "Q80",
+      "question_id": "80",
+      "source_question_id": "80",
+      "text": "Are LLM-triggered business flows protected with confirmation, step-up authentication, or human approval based on risk level?",
+      "answer": "Only high-risk actions require approval"
+    },
+    {
+      "flow_id": "Q81",
+      "question_id": "81",
+      "source_question_id": "81",
+      "text": "Which major communication paths are not clearly protected with HTTPS, TLS, or mTLS?",
+      "answer": [
+        "Backend/API to LLM or model service",
+        "Backend/API to internal tool/service APIs",
+        "Backend/API to external providers"
+      ]
+    },
+    {
+      "flow_id": "Q82",
+      "question_id": "82",
+      "source_question_id": "82",
+      "text": "Which major communication paths carry sensitive data such as prompts, PII, credentials, retrieved context, or tool results?",
+      "answer": [
+        "Browser to web application",
+        "Web application to backend/API",
+        "Backend/API to LLM or model service",
+        "Backend/API to vector database or storage",
+        "Logging or monitoring pipeline"
+      ]
+    }
+  ]
+}

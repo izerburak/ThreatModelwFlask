@@ -27,7 +27,7 @@ def list_models(app_config=None, timeout=5):
     return payload.get("models", [])
 
 
-def chat(messages, app_config=None, timeout=120, json_mode=False):
+def chat(messages, app_config=None, timeout=120, json_mode=False, response_format=None, options=None):
     config = get_ollama_config(app_config)
     cleaned_messages = _normalize_messages(messages)
 
@@ -37,8 +37,14 @@ def chat(messages, app_config=None, timeout=120, json_mode=False):
         "stream": False,
         "think": False,
     }
-    if json_mode:
+    # response_format may be a JSON Schema dict (Ollama structured outputs, which
+    # constrains generation to the schema) or the literal string "json".
+    if response_format is not None:
+        payload["format"] = response_format
+    elif json_mode:
         payload["format"] = "json"
+    if options:
+        payload["options"] = options
 
     response = _request_json(f"{config['host']}/api/chat", payload=payload, timeout=timeout)
     assistant_message = response.get("message") or {}

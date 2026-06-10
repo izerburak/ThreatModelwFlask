@@ -1,4 +1,5 @@
 import json
+import logging
 from threading import Thread
 from pathlib import Path
 
@@ -44,6 +45,8 @@ from app.utils.save_utils import (
 
 
 LLM_SEC_SESSION_KEY = "llm_sec_flow"
+
+LOGGER = logging.getLogger(__name__)
 
 main = Blueprint("main", __name__)
 
@@ -878,7 +881,9 @@ def _run_pipeline_background(pipeline_id, app_root_path, app_config):
     try:
         orchestrator.run_until_risk_analysis(pipeline_id)
     except Exception:
-        pass
+        # Per-step errors are already recorded in the manifest; log the traceback too
+        # so background failures are diagnosable instead of silently swallowed.
+        LOGGER.exception("Background pipeline %s failed", pipeline_id)
 
 
 def _dfd_preview_payload(payload):

@@ -1,0 +1,100 @@
+{
+  "schema_version": "llmsec.arch_extract.cleaned.v1",
+  "system_summary": {
+    "purpose": "This document provides a comprehensive overview of the security and operational controls implemented in a system that integrates Large Language Models (LLMs) with various backend services, APIs, and user interfaces. It outlines the current state of security measures, access controls, data handling, and risk mitigation strategies.",
+    "llm_role": "",
+    "deployment": "The system is deployed with a multi-tier architecture, including a web application layer, backend API layer, orchestration layer, and external model service providers. Communication between these layers is critical for the system's functionality.",
+    "exposure": "",
+    "confidence": "The system has a moderate level of security maturity. While many foundational controls are in place, there are notable gaps in encryption, access control, and logging practices that could be exploited by attackers."
+  },
+  "architecture": {
+    "actors": [],
+    "entry_points": [],
+    "components": [
+      "Web Application Layer: Handles user interactions, authentication, and front-end rendering.",
+      "Backend API Layer: Manages business logic, data validation, and communication with internal services.",
+      "Orchestration Layer: Coordinates LLM operations, tool calls, and API interactions.",
+      "Model Service Providers: External LLM services that the system interacts with for processing user queries.",
+      "Data Storage: Includes databases, vector stores, and caches for storing user data, model outputs, and intermediate results."
+    ],
+    "data_stores": [],
+    "external_services": [],
+    "trust_boundaries": [],
+    "data_flows": [
+      "User Input → Web Application → Backend API → Orchestration Layer → LLM/Model Service",
+      "LLM Output → Orchestration Layer → Backend API → Web Application → User",
+      "User Data → Web Application → Backend API → Data Storage",
+      "Data Storage → Backend API → Orchestration Layer → LLM/Model Service"
+    ]
+  },
+  "security_controls": {
+    "authentication": [],
+    "authorization": [],
+    "input_validation": [],
+    "output_validation": [],
+    "logging_monitoring": [],
+    "rate_limiting": [],
+    "secrets_management": [],
+    "encryption": [
+      "Partial encryption of sensitive data in transit between the browser, backend, and model service providers.",
+      "Encryption of data at rest is not explicitly mentioned, but some secrets are stored in environment variables with limited scope."
+    ]
+  },
+  "risk_signals": {
+    "misuse_scenarios": [
+      "LLM could be used to generate malicious content or trigger unintended business flows (e.g., notifications, ticket escalations).",
+      "LLM could be used to access sensitive APIs or internal systems through shared service accounts.",
+      "LLM could be used to inject malicious code or commands into the system through unvalidated user inputs or API responses."
+    ],
+    "operational_weaknesses": [
+      "Lack of full encryption for all communication paths, including internal API calls and data transfers.",
+      "Limited access control and separation of duties for LLM tool permissions.",
+      "Insufficient logging and monitoring of LLM-related activities, which could lead to undetected security incidents.",
+      "Shared service accounts with broad permissions could be exploited to access sensitive systems.",
+      "Lack of versioning and approval workflows for changes to LLM prompts, policies, and RAG sources."
+    ],
+    "owasp_llm_candidates": []
+  },
+  "dfd": {
+    "actors": [],
+    "interfaces": [],
+    "processes": [
+      "Web Application Layer: Handles user interactions, authentication, and front-end rendering.",
+      "Backend API Layer: Manages business logic, data validation, and communication with internal services.",
+      "Orchestration Layer: Coordinates LLM operations, tool calls, and API interactions.",
+      "Model Service Providers: External LLM services that the system interacts with for processing user queries.",
+      "Data Storage: Includes databases, vector stores, and caches for storing user data, model outputs, and intermediate results."
+    ],
+    "data_stores": [],
+    "external_systems": [],
+    "tools": [],
+    "trust_boundaries": [],
+    "data_flows": [
+      "User Input → Web Application → Backend API → Orchestration Layer → LLM/Model Service",
+      "LLM Output → Orchestration Layer → Backend API → Web Application → User",
+      "User Data → Web Application → Backend API → Data Storage",
+      "Data Storage → Backend API → Orchestration Layer → LLM/Model Service"
+    ]
+  },
+  "architecture_signals": {
+    "actors": [],
+    "entry_points": [],
+    "runtime_components": [
+      "Web Application Layer: Handles user interactions, authentication, and front-end rendering.",
+      "Backend API Layer: Manages business logic, data validation, and communication with internal services.",
+      "Orchestration Layer: Coordinates LLM operations, tool calls, and API interactions.",
+      "Model Service Providers: External LLM services that the system interacts with for processing user queries.",
+      "Data Storage: Includes databases, vector stores, and caches for storing user data, model outputs, and intermediate results."
+    ],
+    "data_stores": [],
+    "external_systems": [],
+    "tools_actions": [],
+    "trust_boundary_hints": [],
+    "data_movement_hints": [
+      "User Input → Web Application → Backend API → Orchestration Layer → LLM/Model Service",
+      "LLM Output → Orchestration Layer → Backend API → Web Application → User",
+      "User Data → Web Application → Backend API → Data Storage",
+      "Data Storage → Backend API → Orchestration Layer → LLM/Model Service"
+    ]
+  }
+}

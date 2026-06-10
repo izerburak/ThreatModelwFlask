@@ -9,6 +9,67 @@ from app.services.ollama_client import chat
 
 PROMPT_FILENAME = "Response-Extractor-prompt.txt"
 
+# JSON Schema handed to Ollama structured outputs so even an 8B model is constrained
+# to the expected extraction shape (instead of inventing a questions/answers blob).
+_STR_LIST = {"type": "array", "items": {"type": "string"}}
+EXTRACT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "schema_version": {"type": "string"},
+        "system_summary": {
+            "type": "object",
+            "properties": {
+                "purpose": {"type": "string"},
+                "llm_role": {"type": "string"},
+                "deployment": {"type": "string"},
+                "exposure": {"type": "string"},
+                "confidence": {"type": "string"},
+            },
+        },
+        "architecture": {
+            "type": "object",
+            "properties": {
+                "actors": _STR_LIST,
+                "entry_points": _STR_LIST,
+                "components": _STR_LIST,
+                "data_stores": _STR_LIST,
+                "external_services": _STR_LIST,
+                "trust_boundaries": _STR_LIST,
+                "data_flows": _STR_LIST,
+            },
+        },
+        "security_controls": {
+            "type": "object",
+            "properties": {
+                "authentication": _STR_LIST,
+                "authorization": _STR_LIST,
+                "input_validation": _STR_LIST,
+                "output_validation": _STR_LIST,
+                "logging_monitoring": _STR_LIST,
+                "rate_limiting": _STR_LIST,
+                "secrets_management": _STR_LIST,
+                "encryption": _STR_LIST,
+            },
+        },
+        "risk_signals": {
+            "type": "object",
+            "properties": {
+                "misuse_scenarios": _STR_LIST,
+                "operational_weaknesses": _STR_LIST,
+                "owasp_llm_candidates": _STR_LIST,
+            },
+        },
+    },
+    "required": ["system_summary", "architecture", "security_controls", "risk_signals"],
+}
+
+_RETRY_REMINDER = (
+    "Your previous answer did not match the required schema. Return ONLY a JSON object whose "
+    "top-level keys are system_summary, architecture, security_controls, and risk_signals, "
+    "populated strictly from the provided answers. Do not invent questions or answers and do not "
+    "add any other top-level keys."
+)
+
 
 def generate_llm_extract(app_root_path, metadata, response_file, app_config=None):
     response_payload = _load_response_payload(app_root_path, response_file)
@@ -22,34 +83,43 @@ def generate_llm_extract(app_root_path, metadata, response_file, app_config=None
         "answers": _answer_records_for_prompt(response_payload, answers_by_flow_id),
     }
 
-    llm_response = chat(
-        [
+    user_content = json.dumps(user_payload, indent=2, ensure_ascii=False)
+
+    parsed_extract = None
+    last_candidate = None
+    raw_content = ""
+    model_name = None
+    # Up to two schema-constrained, deterministic (temperature 0) attempts; the
+    # retry appends a strict reminder before falling back to answer-derived data.
+    for attempt in range(2):
+        messages = [
             {"role": "system", "content": prompt_text},
-            {"role": "user", "content": json.dumps(user_payload, indent=2, ensure_ascii=False)},
-        ],
-        app_config,
-        json_mode=True,
-    )
-    raw_content = llm_response["message"]["content"]
-    parsed_extract = parse_extract_json(raw_content)
+            {"role": "user", "content": user_content},
+        ]
+        if attempt:
+            messages.append({"role": "user", "content": _RETRY_REMINDER})
+        llm_response = chat(
+            messages,
+            app_config,
+            response_format=EXTRACT_SCHEMA,
+            options={"temperature": 0},
+        )
+        raw_content = llm_response["message"]["content"]
+        model_name = llm_response.get("model")
+        last_candidate = parse_extract_json(raw_content)
+        if isinstance(last_candidate, dict) and _has_extraction_content(last_candidate):
+            parsed_extract = last_candidate
+            break
+
     if parsed_extract is None:
         raw_path = save_raw_extract_text(app_root_path, build_raw_extract_filename(response_file), raw_content)
-        parsed_extract = build_fallback_extract(
-            metadata,
-            response_file,
-            answers_by_flow_id,
-            "LLM returned a response that could not be parsed as JSON.",
-            raw_path.name,
+        reason = (
+            "LLM returned JSON, but it did not contain recognizable extraction fields."
+            if isinstance(last_candidate, dict)
+            else "LLM returned a response that could not be parsed as JSON."
         )
-    elif not _has_extraction_content(parsed_extract):
-        raw_path = save_raw_extract_text(app_root_path, build_raw_extract_filename(response_file), raw_content)
-        parsed_extract = build_fallback_extract(
-            metadata,
-            response_file,
-            answers_by_flow_id,
-            "LLM returned JSON, but it did not contain recognizable extraction fields.",
-            raw_path.name,
-        )
+        parsed_extract = build_fallback_extract(metadata, response_file, answers_by_flow_id, reason, raw_path.name)
+
     parsed_extract = clean_arch_extract_v4(parsed_extract)
 
     extract_filename = build_extract_filename(response_file)
@@ -60,7 +130,7 @@ def generate_llm_extract(app_root_path, metadata, response_file, app_config=None
         "raw": json.dumps(parsed_extract, indent=2, ensure_ascii=False),
         "parsed": parsed_extract,
         "saved_path": str(saved_path),
-        "model": llm_response.get("model"),
+        "model": model_name,
         "parse_warning": parsed_extract.get("llm_parse_error") if isinstance(parsed_extract, dict) else None,
     }
 

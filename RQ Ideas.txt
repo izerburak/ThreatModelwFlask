@@ -1,0 +1,28 @@
+THESIS RESEARCH QUESTION IDEAS
+(LLM-assisted, deterministic-first threat modeling for LLM-enabled applications)
+
+== Option A — Reference: human expert ==
+
+Main:
+To what extent does domain-specific fine-tuning of a local LLM (qwen3:8b) improve the accuracy of its risk classification and the quality of its mitigations, relative to its base version, when evaluated against expert security judgment within a deterministic-first, questionnaire-driven threat-modeling system?
+
+Sub:
+A1. To what extent does fine-tuning improve agreement with expert-assigned OWASP risk levels compared to the base model?
+A2. To what extent does fine-tuning improve the relevance, correctness, and specificity of mitigations, as rated by experts?
+A3. To what extent does fine-tuning reduce false positives (risks experts judge not applicable)?
+
+== Option B — Reference: existing AI threat-modeling tool (e.g., STRIDE GPT) ==
+
+Main:
+To what extent does a deterministic-first system with a fine-tuned local LLM produce risk assessments and mitigations comparable to an established LLM-based threat-modeling tool (e.g., STRIDE GPT), and to what extent does fine-tuning narrow the gap relative to the base model?
+
+Sub:
+B1. To what extent do the fine-tuned model's risks and mitigations align with those of the reference AI tool (coverage and overlap)?
+B2. To what extent does fine-tuning increase this alignment compared to the base model?
+B3. To what extent does the deterministic-first design yield higher reproducibility and grounding than the free-form AI tool?
+B4. When a strong LLM acts as a blind judge, to what extent is the fine-tuned output preferred over the base output?
+
+== Cross-cutting (applies to both) ==
+
+C1. To what extent does the deterministic-first architecture preserve output reliability and reproducibility regardless of the LLM's quality (base vs fine-tuned)?
+C2. To what extent does questionnaire-driven, OWASP-mapped analysis reduce hallucinated risks compared to free-form LLM generation?

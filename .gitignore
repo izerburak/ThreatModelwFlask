@@ -13,3 +13,4 @@ responses/
 .directory
 venv-win/
 .tmp-test
+.claude/

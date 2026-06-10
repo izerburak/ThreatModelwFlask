@@ -313,6 +313,18 @@
                     </div>
                     <div class="risk-level {{ risk.risk_level|lower }}">{{ risk.risk_level }}</div>
                 </div>
+                {% if risk.llm_assessment %}
+                <div class="risk-evidence" style="border-left:3px solid #8b5cf6; padding-left:8px;">
+                    <strong>LLM review:</strong>
+                    {{ risk.llm_assessment.assessed_level or "—" }}
+                    {% if risk.llm_assessment.priority %} · {{ risk.llm_assessment.priority }}{% endif %}
+                    {% if not risk.llm_assessment.applies %} · marked not applicable{% endif %}
+                    <span class="risk-muted">(deterministic baseline: {{ risk.risk_level }})</span>
+                    {% if risk.llm_assessment.rationale %}
+                    <div class="risk-muted">{{ risk.llm_assessment.rationale }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
                 {% if risk.why %}
                 <div class="risk-evidence">{{ risk.why|join(" ") }}</div>
                 {% endif %}
