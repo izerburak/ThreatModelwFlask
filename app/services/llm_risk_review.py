@@ -26,7 +26,10 @@ _SYSTEM_PROMPT = (
     "- assign a calibrated assessed_level (Low/Medium/High/Critical) using impact x likelihood "
     "reasoning;\n"
     "- give a short rationale grounded ONLY in the provided answers/evidence;\n"
-    "- optionally set priority (P1/P2/P3).\n"
+    "- optionally set priority (P1/P2/P3);\n"
+    "- propose 1-3 CONTEXT-SPECIFIC mitigations grounded in the provided answers (not generic "
+    "boilerplate): each with a short title, a concrete action that references the system's actual "
+    "components/answers, and a priority (High/Medium/Low).\n"
     "Hard rules: do NOT invent new risks or codes — only assess the codes provided; do NOT add "
     "facts beyond the provided answers. Return JSON only, matching the requested schema."
 )
@@ -89,6 +92,7 @@ def review_risk_analysis(risk_analysis, answers_by_flow_id, app_config=None, tim
             "assessed_level": level if level in RISK_LEVELS else None,
             "rationale": str(item.get("rationale") or "").strip(),
             "priority": item.get("priority") if item.get("priority") in ("P1", "P2", "P3") else None,
+            "mitigations": _clean_mitigations(item.get("mitigations")),
         }
 
     applied = 0
@@ -169,13 +173,50 @@ def _review_schema(codes):
                         "assessed_level": {"type": "string", "enum": RISK_LEVELS},
                         "rationale": {"type": "string"},
                         "priority": {"type": "string", "enum": ["P1", "P2", "P3"]},
+                        "mitigations": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {"type": "string"},
+                                    "action": {"type": "string"},
+                                    "priority": {"type": "string", "enum": ["High", "Medium", "Low"]},
+                                    "owner_hint": {"type": "string"},
+                                    "verification": {"type": "string"},
+                                },
+                                "required": ["title", "action"],
+                            },
+                        },
                     },
-                    "required": ["code", "applies", "assessed_level", "rationale"],
+                    "required": ["code", "applies", "assessed_level", "rationale", "mitigations"],
                 },
             }
         },
         "required": ["assessments"],
     }
+
+
+def _clean_mitigations(mitigations):
+    if not isinstance(mitigations, list):
+        return []
+    cleaned = []
+    for item in mitigations[:4]:
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title") or "").strip()
+        action = str(item.get("action") or "").strip()
+        if not title and not action:
+            continue
+        cleaned.append(
+            {
+                "title": title or action[:60],
+                "action": action,
+                "priority": item.get("priority") if item.get("priority") in ("High", "Medium", "Low") else None,
+                "owner_hint": str(item.get("owner_hint") or "").strip() or None,
+                "verification": str(item.get("verification") or "").strip() or None,
+            }
+        )
+    return cleaned
 
 
 def _parse_assessments(content):

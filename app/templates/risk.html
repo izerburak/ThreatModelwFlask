@@ -323,6 +323,12 @@
                     {% if risk.llm_assessment.rationale %}
                     <div class="risk-muted">{{ risk.llm_assessment.rationale }}</div>
                     {% endif %}
+                    {% if risk.llm_assessment.mitigations %}
+                    <div class="risk-muted"><strong>LLM mitigations (context-specific):</strong></div>
+                    {% for m in risk.llm_assessment.mitigations %}
+                    <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} — {{ m.action }}{% endif %}</div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
                 {% endif %}
                 {% if risk.why %}
