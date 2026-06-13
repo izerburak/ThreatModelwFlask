@@ -3,6 +3,8 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
+from app.services.dread_scoring import index_answers, score_code
+
 
 OWASP_LLM_2025 = {
     "LLM01": "Prompt Injection",
@@ -260,6 +262,8 @@ def unify_risks(extract_risks, mapped_risks):
         bucket["sources"].add("Questionnaire")
         if risk.get("score") is not None:
             bucket["score"] = max(bucket.get("score") or 0, risk.get("score") or 0)
+        if risk.get("dread"):
+            bucket["dread"] = risk["dread"]
         evidence = risk.get("evidence") if isinstance(risk.get("evidence"), list) else []
         bucket["question_evidence"].extend(item for item in evidence if isinstance(item, dict))
 
@@ -294,10 +298,10 @@ def _mapped_question_risks_by_framework(questions, answers):
 
 
 def _mapped_question_risks(questions, answers, framework_key="owasp_llm"):
-    # OWASP Risk Rating style: risk = impact x likelihood, both bounded (1-5).
-    # Likelihood is adjusted by the polarity of the actual answer, so a "safe"
-    # answer lowers the level instead of every answered question inflating it
-    # (the old additive severity*confidence sum drove almost everything to Critical).
+    # Code discovery + evidence here; the risk level/score come from the
+    # deterministic DREAD scorer (dread_scoring.score_code) applied per code to
+    # the questionnaire answers. The legacy impact/likelihood figures are kept on
+    # each risk for reference, but DREAD drives risk_level. See dread_scoring.py.
     grouped = defaultdict(lambda: {"impact": 0, "likelihood": 0.0, "evidence": []})
 
     for flow_id, answer in answers.items():
@@ -342,19 +346,20 @@ def _mapped_question_risks(questions, answers, framework_key="owasp_llm"):
             bucket["likelihood"] = max(bucket["likelihood"], likelihood)
             bucket["evidence"].append(evidence)
 
+    idx = index_answers(answers)
     risks = []
     for code, bucket in grouped.items():
-        impact = bucket["impact"]
-        likelihood = bucket["likelihood"]
+        dread = score_code(code, idx)
         risks.append(
             {
                 "code": code,
                 "name": _risk_name(framework_key, code),
                 "framework": framework_key,
-                "risk_level": _calibrated_level(impact, likelihood),
-                "score": round(impact * likelihood),
-                "impact": impact,
-                "likelihood": round(likelihood, 2),
+                "risk_level": dread["band"],
+                "score": dread["total"],
+                "dread": dread,
+                "impact": bucket["impact"],
+                "likelihood": round(bucket["likelihood"], 2),
                 "evidence": bucket["evidence"],
             }
         )
@@ -407,6 +412,7 @@ def _unified_risk_bucket(code, name):
         "name": str(name or OWASP_LLM_2025.get(code) or code).strip(),
         "risk_level": "Low",
         "score": 0,
+        "dread": None,
         "sources": set(),
         "why": [],
         "extract_evidence": [],

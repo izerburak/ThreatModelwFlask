@@ -1,7 +1,7 @@
 """Optional, constrained local-LLM reasoning layer over the deterministic risk list.
 
-The deterministic engine (`risk_analysis_service`) produces the canonical risk set, scores,
-and baseline levels. This layer asks a local LLM to *review* those candidates only — it cannot
+The deterministic engine (`risk_analysis_service`) produces the canonical risk set, DREAD scores,
+and baseline levels. This layer asks a local LLM to *review* those candidates only - it cannot
 invent new risks because the output `code` field is constrained (via Ollama structured outputs)
 to the closed set of deterministic candidate codes. Every assessment is grounded in the supplied
 answers/evidence. The deterministic `risk_level` always remains the baseline; the LLM result is
@@ -20,17 +20,17 @@ _SYSTEM_PROMPT = (
     "You are a security reviewer refining a deterministic threat-model risk list for an "
     "LLM-enabled application.\n"
     "You receive the questionnaire answers and a FIXED set of candidate risks that a deterministic "
-    "engine already mapped from those answers (each with a baseline level and supporting evidence).\n"
+    "engine already mapped from those answers (each with a DREAD score, baseline level, and supporting evidence).\n"
     "For EACH candidate risk you must:\n"
     "- decide whether it genuinely applies given the answers (applies: true/false);\n"
-    "- assign a calibrated assessed_level (Low/Medium/High/Critical) using impact x likelihood "
-    "reasoning;\n"
+    "- assign a calibrated assessed_level (Low/Medium/High/Critical) using the supplied DREAD "
+    "dimensions and answer evidence;\n"
     "- give a short rationale grounded ONLY in the provided answers/evidence;\n"
     "- optionally set priority (P1/P2/P3);\n"
     "- propose 1-3 CONTEXT-SPECIFIC mitigations grounded in the provided answers (not generic "
     "boilerplate): each with a short title, a concrete action that references the system's actual "
     "components/answers, and a priority (High/Medium/Low).\n"
-    "Hard rules: do NOT invent new risks or codes — only assess the codes provided; do NOT add "
+    "Hard rules: do NOT invent new risks or codes - only assess the codes provided; do NOT add "
     "facts beyond the provided answers. Return JSON only, matching the requested schema."
 )
 
@@ -131,6 +131,8 @@ def _candidate_risks(risk_analysis):
                 "code": code,
                 "name": risk.get("name") or code,
                 "baseline_level": risk.get("risk_level") or "Medium",
+                "dread": risk.get("dread") if isinstance(risk.get("dread"), dict) else None,
+                "score": risk.get("score"),
                 "evidence": _evidence_summary(risk),
             }
         )
@@ -231,3 +233,4 @@ def _parse_assessments(content):
     if isinstance(data, list):
         return data
     return None
+

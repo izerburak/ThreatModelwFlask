@@ -37,6 +37,42 @@
 > **Phase 3 done (2026-06-11) — robustness/cleanup:** background pipeline failures are now logged
 > (no longer swallowed); `/add-question` writes both `questionsDb.json` copies in sync and wires the
 > new question into the QaT flow so it is reachable (verified end-to-end). All 67 tests still pass.
+>
+> **Phase 4 done (2026-06-13) — risk scoring migrated to DREAD; mitigation is now LLM-first.**
+> This SUPERSEDES the "impact × likelihood / OWASP-Risk-Rating" wording in the Phase 1 block and §7,
+> and the "mitigations are deterministic-only / the LLM does not write mitigations" wording in §3/§9/
+> §13/§15.
+> 1. **Risk scoring is now DREAD** (`app/services/dread_scoring.py`, wired into
+>    `risk_analysis_service._mapped_question_risks`). Each OWASP risk (LLM/Web/API code) is scored on the
+>    five DREAD dimensions (Damage, Reproducibility, Exploitability, Affected users, Discoverability),
+>    each 1-3, summed 5-15, banded 14/12/9 → Low/Medium/High/Critical. Scores are DETERMINISTIC from the
+>    questionnaire answers (each rule cites its source question → reproducible + auditable):
+>    Exploitability/Affected/Discoverability are system-exposure signals (kept independent to avoid
+>    correlation inflation); Damage is per-code (data/agency/availability/integrity drivers);
+>    Reproducibility is control-consistency. Verified on a 2804-record dataset → Critical 21% / High 36%
+>    / Medium 33% / Low 11% with real cross-code and cross-system discrimination. Legacy impact×likelihood
+>    figures are retained per risk for reference but no longer drive `risk_level`. `risk.html` shows a
+>    "DREAD n/15 — D# R# E# A# Dc#" line. All 67 tests pass after the migration.
+> 2. **Methodological basis (citable):** DREAD-for-LLM is anchored to a peer-reviewed paper — Zahid et
+>    al., "Securing Educational LLMs: A Generalised Taxonomy of Attacks on LLMs and DREAD Risk
+>    Assessment". We ADAPT it (deterministic, questionnaire-grounded, per-OWASP-code) rather than
+>    replicate its manual/subjective expert scoring on attack types — and that determinism is the
+>    contribution (it fixes the subjectivity the paper itself acknowledges). Frame as adaptation, not
+>    replication; do NOT claim their 0–10/average/NIST-band scheme.
+> 3. **Mitigation is now LLM-first with a deterministic fallback** (corrects §9/§13/§15). The constrained
+>    local-LLM layer `llm_risk_review.py` (already wired into `pipeline_orchestrator.run_risk_analysis`)
+>    produces context-specific, answer-grounded mitigations per risk, enum-locked to the deterministic
+>    candidate codes (no invented risks). `risk.html` shows the LLM mitigations when available and falls
+>    back to the deterministic `OWASP_MITIGATIONS` only when the LLM is unavailable. Mitigations are
+>    therefore NO LONGER "deterministic-only"; the OWASP library is the safety-net/fallback. The system
+>    still works fully without the LLM (graceful degradation preserved).
+> 4. **Fine-tuning dataset (external to repo, experimental):** an SFT dataset was DREAD-relabeled with
+>    the SAME deterministic scorer, so the engine, the training labels, and the cited paper are all
+>    aligned on DREAD. Distinct sets (varied 2804 + simple 1500 + simple 700) live outside the repo
+>    (`Desktop\training\train_dread_{700,1500,2804}.json`) with a DREAD-ready Qwen3-8B LoRA script. Note:
+>    an LLM-based relabel of the same data collapsed to ~80% Critical — direct evidence that an
+>    uncalibrated LLM cannot discriminate, motivating the deterministic scorer. Still external work, not
+>    part of the Flask app.
 
 ---
 

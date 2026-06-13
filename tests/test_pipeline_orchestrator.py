@@ -44,36 +44,22 @@ class PipelineOrchestratorTests(unittest.TestCase):
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_pipeline_uses_single_raw_extraction_artifact(self):
+    def test_pipeline_manifest_excludes_llm_extraction_step(self):
         orchestrator = PipelineOrchestrator(str(self.app_dir))
         manifest = orchestrator.create_pipeline(self.response_file, project_name="Docs")
-
-        with patch("app.services.pipeline_orchestrator.generate_llm_extract") as mock_generate:
-            mock_generate.return_value = {
-                "parsed": {
-                    "system_summary": {
-                        "purpose": "Docs assistant",
-                        "exposure": "Unknown",
-                        "architecture_style": "Unknown",
-                        "overall_dfd_confidence": "Low",
-                    },
-                    "dfd": {},
-                }
-            }
-            orchestrator.generate_extraction(manifest["pipeline_id"])
 
         pipeline_dir = self.root / "pipelines" / manifest["pipeline_id"]
         updated_manifest = orchestrator.get_manifest(manifest["pipeline_id"])
 
-        self.assertTrue((pipeline_dir / "extraction_raw.json").exists())
+        self.assertTrue((pipeline_dir / "response.json").exists())
+        self.assertFalse((pipeline_dir / "extraction_raw.json").exists())
         self.assertFalse((pipeline_dir / "llm_extraction.json").exists())
         self.assertFalse((pipeline_dir / "extraction_reviewed.json").exists())
-        self.assertIn("llm_extraction_generated", updated_manifest["steps"])
+        self.assertNotIn("llm_extraction_generated", updated_manifest["steps"])
+        self.assertNotIn("garak_plan_created", updated_manifest["steps"])
+        self.assertIn("dfd_generated", updated_manifest["steps"])
+        self.assertIn("risk_analysis_completed", updated_manifest["steps"])
         self.assertNotIn("extraction_reviewed", updated_manifest["steps"])
-        self.assertEqual(
-            updated_manifest["steps"]["llm_extraction_generated"]["artifact"],
-            "extraction_raw.json",
-        )
 
     def test_pipeline_dfd_uses_static_mapper_without_extraction_artifact(self):
         orchestrator = PipelineOrchestrator(str(self.app_dir))

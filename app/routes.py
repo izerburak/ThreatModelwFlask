@@ -36,7 +36,6 @@ from app.services.extract_to_reactflow import extract_to_reactflow
 from app.services.llm_extract_service import generate_llm_extract
 from app.services.pipeline_orchestrator import PIPELINE_STEPS, PipelineOrchestrator
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis, suggested_extract_filename, unify_risks
-from app.services.garak_service import garak_report_path, garak_status
 from app.services.static_dfd_mapper import build_static_dfd_from_answers
 from app.utils.save_utils import (
     append_question_to_catalog,
@@ -149,25 +148,6 @@ def llm_chat():
         ollama_model=ollama_config["model"],
         ollama_host=ollama_config["host"],
     )
-
-
-@main.route("/garak")
-def garak():
-    return render_template(
-        "garak.html",
-        active_tab="garak",
-        garak_status=garak_status(current_app.root_path),
-    )
-
-
-@main.route("/garak/reports/<path:report_path>")
-def garak_report(report_path):
-    try:
-        report_file = garak_report_path(current_app.root_path, report_path)
-    except (FileNotFoundError, ValueError):
-        abort(404, description="Garak report not found.")
-
-    return send_file(report_file)
 
 
 @main.route("/pipeline")
@@ -309,20 +289,6 @@ def pipeline_detail(pipeline_id):
         if risk_preview
         else None,
     )
-
-
-@main.route("/pipeline/<pipeline_id>/garak-plan", methods=["POST"])
-def pipeline_garak_plan(pipeline_id):
-    orchestrator = _pipeline_orchestrator()
-    try:
-        orchestrator.create_garak_plan(pipeline_id)
-        flash("Garak plan created from saved OWASP risks.", "success")
-    except FileNotFoundError:
-        flash("Risk analysis artifact is required before creating a Garak plan.", "danger")
-    except (ValueError, json.JSONDecodeError) as exc:
-        flash(str(exc), "danger")
-
-    return redirect(url_for("main.pipeline_detail", pipeline_id=pipeline_id))
 
 
 @main.route("/api/pipeline/<pipeline_id>/manifest")

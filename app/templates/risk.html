@@ -208,7 +208,6 @@
         <h1>Risk Analysis &amp; Mitigation</h1>
         <p>
             Review pipeline-generated OWASP LLM risks, quick wins, and mitigation guidance.
-            Garak planning remains optional after this analysis is reviewed.
         </p>
     </div>
 
@@ -282,13 +281,22 @@
         {% set mitigations = analysis.unified_risks|selectattr("mitigations")|list %}
         {% if mitigations %}
         <div class="risk-list">
-            {% for risk in mitigations %}
+            {% for risk in analysis.unified_risks %}
+            {% if risk.llm_assessment and risk.llm_assessment.mitigations %}
             <article class="risk-item">
-                <div class="risk-code">{{ risk.code }} - {{ risk.name }}</div>
+                <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(LLM, context-specific)</span></div>
+                {% for m in risk.llm_assessment.mitigations %}
+                <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} - {{ m.action }}{% endif %}</div>
+                {% endfor %}
+            </article>
+            {% elif risk.mitigations %}
+            <article class="risk-item">
+                <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(OWASP fallback)</span></div>
                 {% for mitigation in risk.mitigations %}
                 <div class="risk-mitigation">{{ mitigation }}</div>
                 {% endfor %}
             </article>
+            {% endif %}
             {% endfor %}
         </div>
         {% else %}
@@ -313,12 +321,15 @@
                     </div>
                     <div class="risk-level {{ risk.risk_level|lower }}">{{ risk.risk_level }}</div>
                 </div>
+                {% if risk.dread %}
+                <div class="risk-muted">DREAD {{ risk.dread.total }}/15 - D{{ risk.dread.damage }} R{{ risk.dread.reproducibility }} E{{ risk.dread.exploitability }} A{{ risk.dread.affected_users }} Dc{{ risk.dread.discoverability }}</div>
+                {% endif %}
                 {% if risk.llm_assessment %}
                 <div class="risk-evidence" style="border-left:3px solid #8b5cf6; padding-left:8px;">
                     <strong>LLM review:</strong>
-                    {{ risk.llm_assessment.assessed_level or "—" }}
-                    {% if risk.llm_assessment.priority %} · {{ risk.llm_assessment.priority }}{% endif %}
-                    {% if not risk.llm_assessment.applies %} · marked not applicable{% endif %}
+                    {{ risk.llm_assessment.assessed_level or "-" }}
+                    {% if risk.llm_assessment.priority %} | {{ risk.llm_assessment.priority }}{% endif %}
+                    {% if not risk.llm_assessment.applies %} | marked not applicable{% endif %}
                     <span class="risk-muted">(deterministic baseline: {{ risk.risk_level }})</span>
                     {% if risk.llm_assessment.rationale %}
                     <div class="risk-muted">{{ risk.llm_assessment.rationale }}</div>
@@ -326,7 +337,7 @@
                     {% if risk.llm_assessment.mitigations %}
                     <div class="risk-muted"><strong>LLM mitigations (context-specific):</strong></div>
                     {% for m in risk.llm_assessment.mitigations %}
-                    <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} — {{ m.action }}{% endif %}</div>
+                    <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} - {{ m.action }}{% endif %}</div>
                     {% endfor %}
                     {% endif %}
                 </div>
@@ -346,9 +357,11 @@
                     </ul>
                 </div>
                 {% endif %}
+                {% if not (risk.llm_assessment and risk.llm_assessment.mitigations) %}
                 {% for mitigation in risk.mitigations %}
                 <div class="risk-mitigation">{{ mitigation }}</div>
                 {% endfor %}
+                {% endif %}
             </article>
             {% endfor %}
         </div>
@@ -363,3 +376,4 @@
     {% endif %}
 </div>
 {% endblock %}
+

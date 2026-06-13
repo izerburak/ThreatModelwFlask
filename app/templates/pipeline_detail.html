@@ -1,12 +1,8 @@
 {% extends "layout.html" %}
 {% set step_labels = {
     "response_saved": "Questionnaire Response",
-    "llm_extraction_generated": "LLM Extraction",
-    "extraction_generated": "LLM Extraction",
-    "extraction_reviewed": "LLM Extraction",
     "dfd_generated": "DFD Generated",
-    "risk_analysis_completed": "Risk Analysis",
-    "garak_plan_created": "Garak Plan"
+    "risk_analysis_completed": "Risk Analysis"
 } %}
 {% block extra_head %}
 <style>
@@ -311,9 +307,6 @@
                 </div>
             </div>
             <a class="btn btn-outline-primary" href="{{ url_for('main.pipeline_manifest_api', pipeline_id=manifest.pipeline_id) }}">Manifest JSON</a>
-            <form method="post" action="{{ url_for('main.pipeline_garak_plan', pipeline_id=manifest.pipeline_id) }}">
-                <button class="btn btn-primary" type="submit" {% if not risks_done %}disabled{% endif %}>Create Garak Plan</button>
-            </form>
         </div>
     </section>
 
@@ -326,6 +319,7 @@
                 <div class="artifact-title mb-2">Pipeline workspace</div>
                 <div class="output-path">{{ pipeline_workspace }}</div>
             </div>
+            {% if risks_done %}
             {% if dfd_preview %}
             <div class="dfd-preview">
                 <div class="d-flex justify-content-between gap-3 align-items-start flex-wrap">
@@ -384,6 +378,11 @@
                 </div>
             </div>
             {% endif %}
+            {% else %}
+            <div class="artifact-name">
+                Outputs are being prepared. The DFD and risk mitigation summary will appear together when the risk analysis is complete.
+            </div>
+            {% endif %}
         </div>
     </section>
 
@@ -400,14 +399,18 @@
                             <div class="artifact-title">{{ artifact.name }}</div>
                             <div class="artifact-name">
                                 {% if artifact.exists %}
+                                {% if risks_done %}
                                 {{ artifact.path }}
+                                {% else %}
+                                Created; waiting for the final pipeline result.
+                                {% endif %}
                                 {% else %}
                                 Not created yet.
                                 {% endif %}
                             </div>
                         </div>
                         <div>
-                            {% if artifact.exists %}
+                            {% if artifact.exists and risks_done %}
                             {% if artifact.name == "dfd_reactflow.json" and dfd_view_url %}
                             <a class="btn btn-outline-primary btn-sm" href="{{ dfd_view_url }}">Show DFD</a>
                             {% elif artifact.name == "risks.json" and risk_view_url %}
@@ -451,12 +454,12 @@
                         </div>
                         <div class="status-meta">
                             Artifact: {{ step.artifact }}
-                            {% if artifact and artifact.exists %}
+                            {% if risks_done and artifact and artifact.exists %}
                             <br>Path: {{ artifact.path }}
                             {% endif %}
                             {% if step.timestamp %}<br>Timestamp: {{ step.timestamp }}{% endif %}
                         </div>
-                        {% if artifact and artifact.exists %}
+                        {% if risks_done and artifact and artifact.exists %}
                         <a class="btn btn-outline-primary btn-sm status-artifact-link"
                             href="{% if step.artifact == 'dfd_reactflow.json' and dfd_view_url %}{{ dfd_view_url }}{% elif step.artifact == 'risks.json' and risk_view_url %}{{ risk_view_url }}{% else %}{{ artifact.url }}{% endif %}">
                             {% if step.artifact == "dfd_reactflow.json" and dfd_view_url %}Show DFD{% elif step.artifact == "risks.json" and risk_view_url %}See Risks{% else %}Open JSON{% endif %}
@@ -483,6 +486,7 @@
     const statusRows = new Map(
         Array.from(document.querySelectorAll("[data-step-name]")).map((row) => [row.dataset.stepName, row])
     );
+    let finalOutputsRendered = Boolean({{ risks_done|tojson }});
 
     function humanStepName(stepName) {
         return stepLabels[stepName] || stepName.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -531,6 +535,11 @@
         } else if (mainPipelineDone) {
             applyBadge(pipelineRunBadge, "completed");
             pipelineRunCopy.textContent = `Risk analysis is complete. Updated ${manifest.updated_at || "now"}.`;
+            if (!finalOutputsRendered) {
+                finalOutputsRendered = true;
+                window.location.reload();
+                return false;
+            }
         } else {
             applyBadge(pipelineRunBadge, "ready");
             pipelineRunCopy.textContent = `${manifest.status || "created"}. Updated ${manifest.updated_at || "now"}.`;

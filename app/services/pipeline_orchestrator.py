@@ -5,60 +5,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
-from app.services.llm_extract_service import generate_llm_extract, parse_extract_json
 from app.services.llm_risk_review import review_risk_analysis
-from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis
+from app.services.risk_analysis_service import build_risk_analysis
 from app.services.static_dfd_mapper import build_static_dfd_from_answers
 
 
 PIPELINE_ARTIFACTS = {
     "manifest.json",
     "response.json",
-    "llm_extraction.json",
-    "extraction_raw.json",
-    "extraction_reviewed.json",
     "dfd_reactflow.json",
     "risks.json",
-    "garak_plan.json",
 }
 
 PIPELINE_STEPS = {
     "response_saved": "response.json",
-    "llm_extraction_generated": "extraction_raw.json",
     "dfd_generated": "dfd_reactflow.json",
     "risk_analysis_completed": "risks.json",
-    "garak_plan_created": "garak_plan.json",
-}
-
-GARAK_RISK_MAPPING = {
-    "LLM01": {
-        "risk_name": "Prompt Injection",
-        "garak_focus": "Prompt injection, jailbreak, instruction override, and indirect prompt injection probes.",
-    },
-    "LLM02": {
-        "risk_name": "Sensitive Information Disclosure",
-        "garak_focus": "Sensitive data leakage, memorization, secret disclosure, and privacy exposure probes.",
-    },
-    "LLM05": {
-        "risk_name": "Improper Output Handling",
-        "garak_focus": "Unsafe output, dangerous content, structured output misuse, and downstream handling probes.",
-    },
-    "LLM06": {
-        "risk_name": "Excessive Agency",
-        "garak_focus": "Tool misuse, excessive action authority, and autonomous behavior probes.",
-    },
-    "LLM08": {
-        "risk_name": "Vector and Embedding Weaknesses",
-        "garak_focus": "RAG, embedding retrieval, context injection, and poisoned knowledge probes.",
-    },
-    "LLM09": {
-        "risk_name": "Misinformation",
-        "garak_focus": "Hallucination, factuality, false assertion, and unsupported claim probes.",
-    },
-    "LLM10": {
-        "risk_name": "Unbounded Consumption",
-        "garak_focus": "Abuse, resource usage, denial-of-wallet, and repeated workload probes.",
-    },
 }
 
 
@@ -113,37 +75,6 @@ class PipelineOrchestrator:
     def pipeline_workspace(self, pipeline_id):
         return self._pipeline_dir(pipeline_id)
 
-    def generate_extraction(self, pipeline_id):
-        manifest = self._load_manifest(pipeline_id)
-        self._mark_running(manifest, "llm_extraction_generated")
-        try:
-            metadata = {
-                "project_name": manifest.get("project_name") or Path(manifest["source_response"]).stem,
-                "dfd_name": manifest.get("dfd_name"),
-                "auditor_name": manifest.get("auditor_name"),
-                "description": "Pipeline-generated LLM extraction.",
-            }
-            extract = generate_llm_extract(
-                self.app_root_path,
-                metadata,
-                manifest["source_response"],
-                self.app_config,
-            )
-            parsed = extract.get("parsed") if isinstance(extract, dict) else None
-            if not isinstance(parsed, dict):
-                parsed = parse_extract_json(extract.get("raw")) if isinstance(extract, dict) else None
-            if not isinstance(parsed, dict):
-                parsed = {}
-
-            self._write_artifact(pipeline_id, "extraction_raw.json", parsed)
-            self._mark_step_done(manifest, "llm_extraction_generated")
-            return parsed
-        except Exception as exc:
-            self._mark_step_error(manifest, "llm_extraction_generated", str(exc))
-            raise
-        finally:
-            self._save_manifest(manifest)
-
     def generate_dfd(self, pipeline_id):
         manifest = self._load_manifest(pipeline_id)
         self._mark_running(manifest, "dfd_generated")
@@ -194,12 +125,10 @@ class PipelineOrchestrator:
         self._mark_running(manifest, "risk_analysis_completed")
         try:
             response_payload = self._load_artifact(pipeline_id, "response.json")
-            extract_payload = self._load_extraction_artifact(pipeline_id)
 
             risks = build_risk_analysis(
                 self.app_root_path,
                 response_payload if isinstance(response_payload, dict) else {},
-                extract_payload if isinstance(extract_payload, dict) else None,
             )
             # Optional, constrained local-LLM review on top of the deterministic baseline.
             # Best-effort: never raises; if the model is unavailable the baseline is unchanged.
@@ -217,47 +146,8 @@ class PipelineOrchestrator:
         finally:
             self._save_manifest(manifest)
 
-    def create_garak_plan(self, pipeline_id):
-        manifest = self._load_manifest(pipeline_id)
-        self._mark_running(manifest, "garak_plan_created")
-        try:
-            risks_payload = self._load_artifact(pipeline_id, "risks.json")
-            selected_risks = _selected_risks(risks_payload)
-            recommended_tests = []
-
-            for risk in selected_risks:
-                code = str(risk.get("code") or "").upper()
-                mapping = GARAK_RISK_MAPPING.get(code)
-                if not mapping:
-                    continue
-                recommended_tests.append(
-                    {
-                        "owasp_llm": code,
-                        "risk_name": risk.get("name") or mapping["risk_name"],
-                        "garak_focus": mapping["garak_focus"],
-                        "reason": _risk_reason(risk),
-                        "status": "planned",
-                    }
-                )
-
-            plan = {
-                "pipeline_id": pipeline_id,
-                "created_at": _utc_now(),
-                "selected_risks": selected_risks,
-                "recommended_tests": recommended_tests,
-            }
-            self._write_artifact(pipeline_id, "garak_plan.json", plan)
-            self._mark_step_done(manifest, "garak_plan_created")
-            return plan
-        except Exception as exc:
-            self._mark_step_error(manifest, "garak_plan_created", str(exc))
-            raise
-        finally:
-            self._save_manifest(manifest)
-
     def run_until_risk_analysis(self, pipeline_id):
         self.generate_dfd(pipeline_id)
-        self.generate_extraction(pipeline_id)
         self.run_risk_analysis(pipeline_id)
         return self.get_manifest(pipeline_id)
 
@@ -330,19 +220,6 @@ class PipelineOrchestrator:
             raise FileNotFoundError(artifact_name)
         return json.loads(artifact_path.read_text(encoding="utf-8"))
 
-    def _load_optional_artifact(self, pipeline_id, artifact_name):
-        try:
-            return self._load_artifact(pipeline_id, artifact_name)
-        except (FileNotFoundError, json.JSONDecodeError, ValueError):
-            return None
-
-    def _load_extraction_artifact(self, pipeline_id):
-        for artifact_name in ("extraction_raw.json", "llm_extraction.json", "extraction_reviewed.json"):
-            payload = self._load_optional_artifact(pipeline_id, artifact_name)
-            if isinstance(payload, dict):
-                return payload
-        return None
-
     def _write_json(self, path, payload):
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -402,64 +279,11 @@ def _manifest_status(manifest):
     steps = manifest.get("steps") or {}
     if any(isinstance(step, dict) and step.get("error") for step in steps.values()):
         return "failed"
-    if steps.get("garak_plan_created", {}).get("done"):
-        return "garak_plan_created"
     if steps.get("risk_analysis_completed", {}).get("done"):
         return "risk_analysis_completed"
     if steps.get("dfd_generated", {}).get("done"):
         return "dfd_generated"
-    if steps.get("llm_extraction_generated", {}).get("done"):
-        return "llm_extraction_generated"
-    if steps.get("extraction_reviewed", {}).get("done"):
-        return "llm_extraction_generated"
-    if steps.get("extraction_generated", {}).get("done"):
-        return "llm_extraction_generated"
     return "created"
-
-
-def _selected_risks(risks_payload):
-    if not isinstance(risks_payload, dict):
-        return []
-
-    merged = {}
-    for source_name in ("extract_risks", "mapped_risks"):
-        risk_list = risks_payload.get(source_name)
-        if not isinstance(risk_list, list):
-            continue
-        for risk in risk_list:
-            if not isinstance(risk, dict):
-                continue
-            code = str(risk.get("code") or "").upper()
-            if not code:
-                continue
-            existing = merged.get(code)
-            if existing is None or RISK_RANK.get(risk.get("risk_level"), 0) > RISK_RANK.get(existing.get("risk_level"), 0):
-                merged[code] = {
-                    "code": code,
-                    "name": risk.get("name") or code,
-                    "risk_level": risk.get("risk_level") or "Medium",
-                    "source": source_name,
-                    "score": risk.get("score"),
-                    "why": risk.get("why") or "",
-                }
-
-    return sorted(
-        merged.values(),
-        key=lambda item: (-RISK_RANK.get(item.get("risk_level"), 0), item.get("code", "")),
-    )
-
-
-def _risk_reason(risk):
-    parts = [f"{risk.get('code')} was identified as {risk.get('risk_level', 'Medium')} risk"]
-    if risk.get("source") == "extract_risks":
-        parts.append("by the LLM extraction")
-    elif risk.get("source") == "mapped_risks":
-        parts.append("from questionnaire OWASP mappings")
-    if risk.get("score") is not None:
-        parts.append(f"with questionnaire score {risk.get('score')}")
-    if risk.get("why"):
-        parts.append(str(risk["why"]))
-    return ". ".join(part for part in parts if part) + "."
 
 
 def _answers_by_flow_id(response_payload):
