@@ -1,28 +1,86 @@
 THESIS RESEARCH QUESTION IDEAS
-(LLM-assisted, deterministic-first threat modeling for LLM-enabled applications)
+(Easy-to-use, deterministic-first, local-LLM-supported threat modeling for LLM-enabled applications)
 
-== Option A — Reference: human expert ==
+================================================================================
+ORIGIN / PROBLEM  (the gap the thesis addresses)
+================================================================================
+Existing threat-modeling tools - first and foremost the Microsoft Threat Modeling Tool - are both
+(a) hard to use (manual DFD drawing, STRIDE expertise required, overwhelming generic output) and
+(b) weak at risk assessment (template-based threats per element, no context-aware prioritization).
+This is made worse for LLM-enabled applications, which combine Web + API + LLM-specific attack
+surfaces at the same time.
 
-Main:
-To what extent does domain-specific fine-tuning of a local LLM (qwen3:8b) improve the accuracy of its risk classification and the quality of its mitigations, relative to its base version, when evaluated against expert security judgment within a deterministic-first, questionnaire-driven threat-modeling system?
+The thesis asks: can an easy-to-use, questionnaire-driven, deterministic-first tool with optional
+local-LLM support give more system-oriented output and more accurate risk scoring for LLM-enabled
+applications? Scope began broad over OWASP security categories, then narrowed to LLM-based
+applications (covering OWASP LLM + Web + API together; identify -> map -> score [DREAD] -> mitigate).
 
-Sub:
-A1. To what extent does fine-tuning improve agreement with expert-assigned OWASP risk levels compared to the base model?
-A2. To what extent does fine-tuning improve the relevance, correctness, and specificity of mitigations, as rated by experts?
-A3. To what extent does fine-tuning reduce false positives (risks experts judge not applicable)?
+Baselines / foils:  Microsoft TMT (incumbent) + STRIDE GPT (modern AI tool).
+Evaluation axes:     usability  AND  risk-assessment quality.
+Master's scope note: "to what extent" deliberately allows partial, honest answers - limitations and
+                     future work are legitimate outcomes, not failures. Illustrative evidence
+                     (step/effort comparison, case studies, score-distribution discrimination) is
+                     sufficient; exhaustive user studies / expert gold standards are not required.
 
-== Option B — Reference: existing AI threat-modeling tool (e.g., STRIDE GPT) ==
+================================================================================
+CURRENT RQ SET  (2026-06-14)
+================================================================================
 
-Main:
-To what extent does a deterministic-first system with a fine-tuned local LLM produce risk assessments and mitigations comparable to an established LLM-based threat-modeling tool (e.g., STRIDE GPT), and to what extent does fine-tuning narrow the gap relative to the base model?
+MAIN (umbrella):
+To what extent can an easy-to-use, questionnaire-driven, deterministic-first threat-modeling tool with
+optional local-LLM support overcome the usability and risk-assessment limitations of established
+threat-modeling tools (notably the Microsoft Threat Modeling Tool) for LLM-enabled applications?
 
-Sub:
-B1. To what extent do the fine-tuned model's risks and mitigations align with those of the reference AI tool (coverage and overlap)?
-B2. To what extent does fine-tuning increase this alignment compared to the base model?
-B3. To what extent does the deterministic-first design yield higher reproducibility and grounding than the free-form AI tool?
-B4. When a strong LLM acts as a blind judge, to what extent is the fine-tuned output preferred over the base output?
+SUB-RQs:
 
-== Cross-cutting (applies to both) ==
+RQ2 (usability):
+To what extent does a guided adaptive questionnaire reduce the security expertise and manual effort
+required to produce a threat model for an LLM-enabled application, compared to manual DFD-based tools
+such as the Microsoft Threat Modeling Tool?
 
-C1. To what extent does the deterministic-first architecture preserve output reliability and reproducibility regardless of the LLM's quality (base vs fine-tuned)?
-C2. To what extent does questionnaire-driven, OWASP-mapped analysis reduce hallucinated risks compared to free-form LLM generation?
+RQ3 (risk-scoring accuracy):
+To what extent does deterministic, questionnaire-grounded DREAD scoring produce more context-aware and
+discriminating risk prioritization than the generic, template-based assessment of the Microsoft Threat
+Modeling Tool and the free-form scoring of an LLM-based tool such as STRIDE GPT?
+
+RQ4 (unified identify + map):
+To what extent can a single adaptive questionnaire identify and map the security risks of an
+LLM-enabled application across the OWASP LLM, Web, and API categories together, relative to tools that
+address these surfaces separately or through a single taxonomy (e.g., STRIDE)?
+
+RQ5 (reproducibility + local LLM + mitigation):
+To what extent does a deterministic-first design with an optional, model-agnostic local LLM provide
+reproducible, auditable results and context-specific mitigations while avoiding hallucinated risks,
+regardless of the underlying model's capability?
+
+Structure note: RQ1 = main; RQ2-RQ5 = supporting dimensions (the usability + risk-quality axes, and
+the identify -> map -> score -> mitigate pipeline). For a tighter master's scope, RQ4 + RQ5 can be
+merged, or RQ5 partly moved to limitations/future work.
+
+================================================================================
+EARLIER ALTERNATIVES  (kept for reference - superseded by the set above)
+================================================================================
+
+== Option A - Reference: human expert ==
+Main: To what extent does domain-specific fine-tuning of a local LLM (qwen3:8b) improve the accuracy
+of its risk classification and the quality of its mitigations, relative to its base version, when
+evaluated against expert security judgment within a deterministic-first, questionnaire-driven
+threat-modeling system?
+  A1. ...improve agreement with expert-assigned OWASP risk levels vs the base model?
+  A2. ...improve the relevance, correctness, and specificity of mitigations, as rated by experts?
+  A3. ...reduce false positives (risks experts judge not applicable)?
+
+== Option B - Reference: existing AI threat-modeling tool (e.g., STRIDE GPT) ==
+Main: To what extent does a deterministic-first system with a fine-tuned local LLM produce risk
+assessments and mitigations comparable to an established LLM-based threat-modeling tool (e.g., STRIDE
+GPT), and to what extent does fine-tuning narrow the gap relative to the base model?
+  B1. ...align with the reference AI tool (coverage and overlap)?
+  B2. ...does fine-tuning increase this alignment vs the base model?
+  B3. ...does the deterministic-first design yield higher reproducibility and grounding?
+  B4. When a strong LLM acts as a blind judge, is the fine-tuned output preferred over base?
+
+== Cross-cutting ==
+C1. To what extent does the deterministic-first architecture preserve output reliability and
+reproducibility regardless of the LLM's quality (base vs fine-tuned)?
+C2. To what extent does questionnaire-driven, OWASP-mapped analysis reduce hallucinated risks compared
+to free-form LLM generation?

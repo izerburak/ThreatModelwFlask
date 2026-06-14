@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from jinja2 import FileSystemLoader
 
 try:
     from app import create_app
@@ -101,6 +102,7 @@ class PipelineStartApiTests(unittest.TestCase):
         )
         self.app = create_app()
         self.app.root_path = str(self.app_dir)
+        self.app.jinja_loader = FileSystemLoader(str(Path(__file__).resolve().parents[1] / "app" / "templates"))
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -126,6 +128,48 @@ class PipelineStartApiTests(unittest.TestCase):
 
         manifest_path = self.root / "pipelines" / payload["pipeline_id"] / "manifest.json"
         self.assertTrue(manifest_path.exists())
+
+    def test_completed_pipeline_detail_renders(self):
+        orchestrator = PipelineOrchestrator(str(self.app_dir))
+        manifest = orchestrator.create_pipeline(self.response_file, project_name="Docs", dfd_name="Docs Threat Model")
+        pipeline_id = manifest["pipeline_id"]
+        pipeline_dir = self.root / "pipelines" / pipeline_id
+
+        (pipeline_dir / "dfd_reactflow.json").write_text(
+            json.dumps(
+                {
+                    "nodes": [{"id": "actor_user", "type": "actor", "data": {"label": "User"}}],
+                    "edges": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+        (pipeline_dir / "risks.json").write_text(
+            json.dumps(
+                {
+                    "overall_status": "High",
+                    "unified_risks": [
+                        {
+                            "code": "LLM01",
+                            "name": "Prompt Injection",
+                            "risk_level": "High",
+                            "mitigations": ["Validate instructions before tool use."],
+                        }
+                    ],
+                    "quick_wins": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+        manifest["status"] = "risk_analysis_completed"
+        manifest["steps"]["dfd_generated"]["done"] = True
+        manifest["steps"]["risk_analysis_completed"]["done"] = True
+        (pipeline_dir / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+        response = self.client.get(f"/pipeline/{pipeline_id}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Docs Threat Model", response.data)
 
 
 if __name__ == "__main__":

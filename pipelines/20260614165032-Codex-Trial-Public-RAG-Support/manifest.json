@@ -1,0 +1,30 @@
+{
+  "pipeline_id": "20260614165032-Codex-Trial-Public-RAG-Support",
+  "project_name": "Codex Trial Public RAG Support",
+  "dfd_name": "Codex Trial Public RAG DFD",
+  "auditor_name": "Codex",
+  "source_response": "llmsec_2026-06-11_public-rag-support.json",
+  "created_at": "2026-06-14T16:50:32Z",
+  "updated_at": "2026-06-14T16:51:25Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-06-14T16:50:32Z",
+      "artifact": "response.json"
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-06-14T16:50:32Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-06-14T16:51:25Z",
+      "artifact": "risks.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260614165032-Codex-Trial-Public-RAG-DFD.json"
+}

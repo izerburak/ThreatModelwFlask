@@ -282,6 +282,7 @@ def pipeline_detail(pipeline_id):
         pipeline_workspace=str(pipeline_workspace),
         dfd_preview=dfd_preview,
         risk_preview=risk_preview,
+        risks_done=bool(manifest.get("steps", {}).get("risk_analysis_completed", {}).get("done")),
         dfd_view_url=url_for("main.dfd_mapper_lab", dfd=manifest.get("dfd_archive"))
         if manifest.get("dfd_archive")
         else None,
