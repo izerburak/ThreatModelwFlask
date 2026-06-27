@@ -251,10 +251,12 @@ def _resolve_qat_path(root_path):
 
 
 def _resolve_questions_path(root_path):
+    # Prefer the canonical app/questions copy (the 91-question DREAD questionnaire).
+    # TM-Questions is kept in sync by save_utils and acts as a fallback.
     candidate_paths = [
-        root_path / "TM-Questions" / "questionsDb.json",
         root_path / "app" / "questions" / "questionsDb.json",
         root_path / "questions" / "questionsDb.json",
+        root_path / "TM-Questions" / "questionsDb.json",
     ]
     for candidate_path in candidate_paths:
         if candidate_path.exists():

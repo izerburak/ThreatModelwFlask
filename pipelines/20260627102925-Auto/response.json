@@ -1,0 +1,236 @@
+{
+  "scenario": "Critical Autonomous Claims Workflow Agent",
+  "answers_by_flow_id": {
+    "Q1": "Agent or workflow automation component",
+    "Q2": [
+      "Anonymous public internet users",
+      "Authenticated public users",
+      "Internal employees only"
+    ],
+    "Q3": [
+      "Web-based chat interface",
+      "REST API endpoint",
+      "Third-party integration"
+    ],
+    "Q4": "Yes",
+    "Q5": [
+      "Direct user prompts",
+      "Uploaded files",
+      "Retrieved internal documents",
+      "External web content",
+      "API or database records"
+    ],
+    "Q6": [
+      "User text input only",
+      "File uploads",
+      "Web URLs",
+      "Email or ticket data",
+      "Public repositories"
+    ],
+    "Q7": [
+      "No preprocessing",
+      "RAG augmentation",
+      "Routing/classification"
+    ],
+    "Q8": [
+      "Internal knowledge base",
+      "Customer data",
+      "Source code"
+    ],
+    "Q9": [
+      "Frontend",
+      "Backend API",
+      "Auth service",
+      "Monitoring service"
+    ],
+    "Q10": "Global",
+    "Q11": "Agent workflow",
+    "Q12": [
+      "Search",
+      "Database",
+      "Internal APIs",
+      "Admin tools"
+    ],
+    "Q13": [
+      "Vector DB",
+      "SQL/NoSQL",
+      "File storage",
+      "Cloud storage"
+    ],
+    "Q14": "Directly",
+    "Q15": [
+      "Create or update tickets/records",
+      "Send emails or notifications",
+      "Execute workflows or transactions",
+      "Modify system configurations"
+    ],
+    "Q16": "Yes, in business-critical actions",
+    "Q17": "Hybrid deployment",
+    "Q18": "Yes, fallback or routing between models",
+    "Q19": "Dynamically generated at runtime",
+    "Q20": "Yes, through retrieved documents or memory",
+    "Q21": [
+      "Markdown or rich text",
+      "Structured JSON",
+      "Code or scripts",
+      "HTML or rendered content"
+    ],
+    "Q22": [
+      "User-facing web interface",
+      "Internal admin dashboard",
+      "API response consumed by other systems",
+      "Email, messaging, or notification channel",
+      "Directly used in backend automation"
+    ],
+    "Q23": [
+      "Public internet to web application",
+      "Web application to internal API",
+      "Internal API to model service",
+      "Cross-tenant or cross-user context boundary"
+    ],
+    "Q24": [
+      "Personally identifiable information (PII)",
+      "API keys or credentials",
+      "Internal operational documents",
+      "Customer support records"
+    ],
+    "Q25": "No authentication required",
+    "Q26": "No authorization controls",
+    "Q27": "No filtering applied",
+    "Q28": "No, same behavior for all users",
+    "Q29": [
+      "Public chat interface",
+      "RAG or document ingestion pipeline",
+      "Tool-calling or agent framework",
+      "Admin or internal operator interface",
+      "Model hosting or API integration layer"
+    ],
+    "Q30": "No safeguards",
+    "Q31": "Not validated",
+    "Q32": "No safeguards",
+    "Q33": "Basic application logs only",
+    "Q34": "No protections",
+    "Q35": "No validation process",
+    "Q36": "No dedicated protection",
+    "Q37": [
+      "Prompt injection to override instructions",
+      "Sensitive data extraction",
+      "Unauthorized action triggering",
+      "Misinformation or unsafe recommendations",
+      "Denial of service or excessive usage"
+    ],
+    "Q38": [
+      "Lack of security ownership",
+      "Insufficient monitoring",
+      "Poor prompt/change management",
+      "Weak access control hygiene",
+      "No incident response process for LLM misuse"
+    ],
+    "Q39": "Yes, high-impact or business-critical decisions",
+    "Q40": "Multi-tenant with weak or unclear isolation",
+    "Q41": "Shared system identity only",
+    "Q42": [
+      "Developers only",
+      "Administrators via admin panel",
+      "Automated systems or pipelines"
+    ],
+    "Q43": "Yes, both indexing and training",
+    "Q44": "No separation of permissions",
+    "Q45": "Access to sensitive data such as API keys or credentials",
+    "Q46": "No isolation",
+    "Q47": "Logs contain full prompts and responses",
+    "Q48": [
+      "Public chat page",
+      "Authenticated user dashboard",
+      "Admin/operator panel",
+      "Embedded widget or iframe",
+      "Webhook or callback endpoint"
+    ],
+    "Q49": "No, shared with general application routes",
+    "Q50": "No, only checked at initial login",
+    "Q51": "No, state-changing actions can be triggered without origin protection",
+    "Q52": "Wildcard or overly permissive CORS",
+    "Q53": "Yes, without reliable object-level checks",
+    "Q54": "Yes, fields can be read or updated without strong controls",
+    "Q55": "Yes, privileged functions may be reachable without strong checks",
+    "Q56": "Yes, broad shared service account",
+    "Q57": "No formal review",
+    "Q58": "No reliable inventory",
+    "Q59": "Yes, some non-production or undocumented APIs are reachable",
+    "Q60": "Inserted directly into prompt context",
+    "Q61": "Yes, inserted without isolation",
+    "Q62": "Arbitrary URLs or internal addresses may be reachable",
+    "Q63": "No outbound restrictions",
+    "Q64": "HTML/rich content without reliable sanitization",
+    "Q65": "Yes, directly used with minimal validation",
+    "Q66": "No dedicated controls",
+    "Q67": "No validation",
+    "Q68": "Yes, shared stores may affect other users",
+    "Q69": "No dedicated protection",
+    "Q70": "Yes, controls are weak or unclear",
+    "Q71": "Not tracked",
+    "Q72": "Hardcoded or exposed secrets",
+    "Q73": "No or unclear encryption between some components",
+    "Q74": "Logged without alerting",
+    "Q75": "Failures may fall back to less restricted behavior",
+    "Q76": "Detailed internal errors may be exposed",
+    "Q77": "No effective limits",
+    "Q78": "Yes, with weak or unclear limits",
+    "Q79": [
+      "Refunds or payments",
+      "Account/profile changes",
+      "Notifications or external messages",
+      "Approvals or entitlement changes",
+      "Ticket escalation or priority changes"
+    ],
+    "Q80": "No additional controls",
+    "Q81": [
+      "Browser to web application",
+      "Web application to backend/API",
+      "Backend/API to LLM or model service",
+      "Backend/API to vector database or storage",
+      "Backend/API to internal tool/service APIs",
+      "Backend/API to external providers"
+    ],
+    "Q82": [
+      "Browser to web application",
+      "Web application to backend/API",
+      "Backend/API to LLM or model service",
+      "Backend/API to vector database or storage",
+      "Backend/API to internal tool/service APIs",
+      "Backend/API to external providers",
+      "Logging or monitoring pipeline"
+    ],
+    "Q83": [
+      "Plain text prompts only",
+      "Structured JSON",
+      "XML or YAML",
+      "Markdown or rich text",
+      "HTML or rendered content",
+      "Code or scripts",
+      "Documents such as PDF, DOCX, or TXT",
+      "Images or multimodal input"
+    ],
+    "Q84": "Yes, parsed and inserted with minimal validation",
+    "Q85": [
+      "Web frontend",
+      "API gateway",
+      "Backend API",
+      "LLM orchestrator",
+      "RAG retriever",
+      "Vector database",
+      "Relational or NoSQL database",
+      "File storage",
+      "Cloud storage",
+      "Tool execution runtime",
+      "External model provider API",
+      "Logging or monitoring pipeline"
+    ],
+    "Q86": "Public internet-scale user base",
+    "Q87": "Severe impact such as large-scale data breach, fraud, or critical service disruption",
+    "Q88": "Long-term retention without clear deletion controls",
+    "Q89": "No defined process",
+    "Q90": "No testing performed",
+    "Q91": "State-changing or sensitive actions can be replayed without strong controls"
+  }
+}

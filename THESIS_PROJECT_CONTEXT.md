@@ -133,10 +133,9 @@
 - `app/templates/llm.html`, `add_question.html` — developer/utility tools.
 
 ### Legacy / out-of-scope components
-- **Garak is NOT part of this project and is excluded from scope.** Any Garak-related files,
-  routes, or dependencies still physically present in the repository are leftovers to be ignored
-  (and ideally removed); do not treat Garak as a feature of this system and do not describe it in
-  thesis material.
+- **Garak is NOT part of this project and is excluded from scope.** It has been fully removed from
+  the repository (no source, routes, dependencies, or report files); do not treat Garak as a feature
+  of this system and do not describe it in thesis material.
 - **Fine-tuning / training** — **absent from this repository**. Any fine-tuning experiments are
   **external/experimental thesis work**, separate from the Flask application.
 - `app/utils/questionnaire_flow.py` (legacy engine, unused), `LLM-Prompts/LLM_Prompt*.txt` (legacy

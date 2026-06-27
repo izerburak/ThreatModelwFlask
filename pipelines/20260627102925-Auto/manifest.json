@@ -1,0 +1,30 @@
+{
+  "pipeline_id": "20260627102925-Auto",
+  "project_name": "Auto",
+  "dfd_name": "Auto Threat Model",
+  "auditor_name": "burak",
+  "source_response": "critical_autonomous_claims_workflow_agent_response_20260627.json",
+  "created_at": "2026-06-27T10:29:25Z",
+  "updated_at": "2026-06-27T10:32:15Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-06-27T10:29:25Z",
+      "artifact": "response.json"
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-06-27T10:29:25Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-06-27T10:32:15Z",
+      "artifact": "risks.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260627102925-Auto-Threat-Model.json"
+}

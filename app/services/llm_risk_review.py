@@ -53,6 +53,13 @@ def review_risk_analysis(risk_analysis, answers_by_flow_id, app_config=None, tim
         "answers_by_flow_id": answers_by_flow_id if isinstance(answers_by_flow_id, dict) else {},
         "candidate_risks": candidates,
     }
+    # Ground the review in the generated DFD and the DREAD signal summary when the
+    # deterministic analysis carried them (spec: threat identification stays grounded
+    # in questionnaire + DFD + deterministic candidates + DREAD evidence).
+    if isinstance(risk_analysis.get("dfd_payload"), dict):
+        user_payload["dfd_payload"] = risk_analysis["dfd_payload"]
+    if isinstance(risk_analysis.get("dread_signal_summary"), dict):
+        user_payload["dread_signal_summary"] = risk_analysis["dread_signal_summary"]
 
     try:
         response = chat(
@@ -133,6 +140,9 @@ def _candidate_risks(risk_analysis):
                 "baseline_level": risk.get("risk_level") or "Medium",
                 "dread": risk.get("dread") if isinstance(risk.get("dread"), dict) else None,
                 "score": risk.get("score"),
+                "strongest_dimensions": risk.get("strongest_dimensions") or [],
+                "affected_assets": risk.get("affected_assets") or [],
+                "missing_information": risk.get("missing_information") or [],
                 "evidence": _evidence_summary(risk),
             }
         )

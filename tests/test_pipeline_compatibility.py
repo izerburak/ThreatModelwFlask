@@ -120,31 +120,53 @@ class PipelineCompatibilityTests(unittest.TestCase):
         self.assertEqual(saved_payload["answers"][1]["text"], NEW_STYLE_QUESTION["text"])
         self.assertNotIn("category", saved_payload["answers"][1])
 
+        # Risk discovery is now catalog + DREAD driven (no per-question owasp arrays,
+        # no severity_weight/confidence_weight). Codes are derived from the *answers*.
         risk_payload = build_risk_analysis(str(self.app_dir), saved_payload)
         self.assertEqual(risk_payload["answers_analyzed"], 2)
-        self.assertEqual({risk["code"] for risk in risk_payload["owasp_llm"]}, {"LLM01", "LLM09"})
-        self.assertEqual([risk["code"] for risk in risk_payload["owasp_web"]], ["A01:2025"])
-        self.assertEqual([risk["code"] for risk in risk_payload["owasp_api"]], ["API2:2023"])
 
-    def test_legacy_context_fields_are_optional_but_still_mappable(self):
+        llm_codes = {risk["code"] for risk in risk_payload["owasp_llm"]}
+        self.assertIn("LLM01", llm_codes)  # prompt injection always applies to an LLM surface
+
+        # Every risk must be DREAD-scored, level-banded, and grounded in answers that
+        # were actually present (Q1 or Q48 only) - never a question that was not asked.
+        present_questions = {"Q1", "Q48"}
+        for risk in risk_payload["unified_risks"]:
+            self.assertIsInstance(risk["dread"], dict)
+            self.assertIn("average", risk["dread"])
+            self.assertIn(risk["risk_level"], {"Low", "Medium", "High", "Critical"})
+            self.assertTrue(risk["question_evidence"], f"{risk['code']} has no grounded evidence")
+            for item in risk["question_evidence"]:
+                self.assertIn(item["question"], present_questions)
+
+    def test_legacy_q1_q82_only_record_still_works(self):
+        # An old record with only Q1-Q82 must not crash and must surface grounded risks;
+        # the missing Q83-Q91 signals are reported as missing_information, not errors.
         response_payload = {
             "answers_by_flow_id": {
                 "Q2": ["Anonymous public internet users"],
+                "Q4": "Yes",
+                "Q24": ["Personally identifiable information (PII)"],
             }
         }
 
         risk_payload = build_risk_analysis(str(self.app_dir), response_payload)
         mapped_codes = {risk["code"] for risk in risk_payload["owasp_llm"]}
 
-        self.assertIn("LLM01", mapped_codes)
-        self.assertIn("LLM10", mapped_codes)
-        evidence = [
-            item
-            for risk in risk_payload["owasp_llm"]
-            for item in risk.get("evidence", [])
-            if item.get("question") == "Q2"
-        ]
-        self.assertTrue(any(item.get("dfd_impact") == ["actor", "trust_boundary", "data_flow"] for item in evidence))
+        self.assertIn("LLM01", mapped_codes)   # always applies
+        self.assertIn("LLM10", mapped_codes)   # anonymous public surface (Q2)
+        self.assertIn("LLM02", mapped_codes)   # sensitive data (Q4/Q24)
+
+        # Evidence only cites questions that were answered.
+        for risk in risk_payload["unified_risks"]:
+            for item in risk["question_evidence"]:
+                self.assertIn(item["question"], {"Q2", "Q4", "Q24"})
+
+        # Missing new-question signals are reported (spec-mandated messages), not errors.
+        missing = " ".join(risk_payload["missing_information"])
+        self.assertIn("User/tenant scale was not provided.", risk_payload["missing_information"])
+        self.assertIn("Business/regulatory impact was not provided.", risk_payload["missing_information"])
+        self.assertIn("Replay/reproducibility behavior was not provided.", risk_payload["missing_information"])
 
     def test_owasp_framework_code_names_are_resolved(self):
         self.assertEqual(_risk_name("owasp_llm", "LLM06"), "Excessive Agency")

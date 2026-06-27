@@ -33,11 +33,16 @@ def append_question_to_catalog(question_text: str, options: list):
         "options": clean_options,
         "category": "",
         "scope": [],
-        "owasp_llm": [],
-        "owasp_web": [],
-        "owasp_api": [],
-        "severity_weight": 1,
-        "confidence_weight": 1,
+        # DREAD-oriented schema: dimensions the question informs + per-dimension
+        # importance weights (1-5). Defaults are conservative; edit per question.
+        "dread_dimensions": [],
+        "dread_weights": {
+            "damage": 1,
+            "reproducibility": 1,
+            "exploitability": 1,
+            "affected_users": 1,
+            "discoverability": 1,
+        },
     }
     questions.append(new_question)
 

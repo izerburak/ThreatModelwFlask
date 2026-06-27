@@ -76,7 +76,19 @@ def _answered_to_q42_with_q20_from_rag():
 
 class QuestionnaireFlowTests(unittest.TestCase):
     def test_loads_all_questions_from_catalog(self):
-        self.assertEqual(len(_engine().question_catalog), 82)
+        # The DREAD questionnaire has 91 questions; the count must not be hardcoded
+        # elsewhere - it is derived dynamically from questionsDb.json.
+        catalog = _engine().question_catalog
+        self.assertEqual(len(catalog), 91)
+        self.assertIn("Q85", catalog)
+        self.assertIn("Q91", catalog)
+
+    def test_new_questions_are_reachable_in_flow(self):
+        # Q83-Q91 must be wired into the flow so the questionnaire can ask them.
+        engine = _engine()
+        flow_ids = set(engine.flow_definition["questions"].keys())
+        for number in range(83, 92):
+            self.assertIn(f"Q{number}", flow_ids, f"Q{number} is not wired into the flow")
 
     def test_scenario_a_public_web_llm(self):
         answers = {

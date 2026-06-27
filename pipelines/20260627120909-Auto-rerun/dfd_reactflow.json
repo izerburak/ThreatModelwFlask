@@ -1,0 +1,6133 @@
+{
+  "nodes": [
+    {
+      "id": "actor_public_user",
+      "type": "custom",
+      "position": {
+        "x": 0,
+        "y": 535
+      },
+      "data": {
+        "label": "Public Internet User",
+        "nodeType": "actor",
+        "role": "actor",
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Anonymous public internet users"
+        ],
+        "kind": "human"
+      }
+    },
+    {
+      "id": "actor_authenticated_user",
+      "type": "custom",
+      "position": {
+        "x": 0,
+        "y": 100
+      },
+      "data": {
+        "label": "Authenticated User",
+        "nodeType": "actor",
+        "role": "actor",
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Authenticated public users"
+        ],
+        "kind": "human"
+      }
+    },
+    {
+      "id": "actor_internal_employee",
+      "type": "custom",
+      "position": {
+        "x": 0,
+        "y": 390
+      },
+      "data": {
+        "label": "Internal Employee",
+        "nodeType": "actor",
+        "role": "actor",
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Internal employees only"
+        ],
+        "kind": "human"
+      }
+    },
+    {
+      "id": "actor_third_party_system",
+      "type": "custom",
+      "position": {
+        "x": 0,
+        "y": 680
+      },
+      "data": {
+        "label": "Third-party System",
+        "nodeType": "actor",
+        "role": "actor",
+        "source": "static_mapper",
+        "evidence": [
+          "Q3: Third-party integration"
+        ],
+        "kind": "system"
+      }
+    },
+    {
+      "id": "actor_external_service",
+      "type": "custom",
+      "position": {
+        "x": 0,
+        "y": 245
+      },
+      "data": {
+        "label": "External Service",
+        "nodeType": "actor",
+        "role": "actor",
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Webhook or callback endpoint"
+        ],
+        "kind": "system"
+      }
+    },
+    {
+      "id": "entry_web_chat",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 825
+      },
+      "data": {
+        "label": "Web Chat Interface",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page"
+        ],
+        "kind": "web",
+        "controls": [
+          {
+            "question_id": "Q25",
+            "answer": "No authentication required",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q26",
+            "answer": "No authorization controls",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q34",
+            "answer": "No protections",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q49",
+            "answer": "No, shared with general application routes",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q50",
+            "answer": "No, only checked at initial login",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q51",
+            "answer": "No, state-changing actions can be triggered without origin protection",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry_rest_api",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 390
+      },
+      "data": {
+        "label": "REST API Endpoint",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: API gateway",
+          "Q3: REST API endpoint"
+        ],
+        "kind": "api",
+        "controls": [
+          {
+            "question_id": "Q25",
+            "answer": "No authentication required",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q26",
+            "answer": "No authorization controls",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q34",
+            "answer": "No protections",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q49",
+            "answer": "No, shared with general application routes",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q50",
+            "answer": "No, only checked at initial login",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q52",
+            "answer": "Wildcard or overly permissive CORS",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q77",
+            "answer": "No effective limits",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry_third_party_integration",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 535
+      },
+      "data": {
+        "label": "Third-party Integration",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q3: Third-party integration"
+        ],
+        "kind": "integration"
+      }
+    },
+    {
+      "id": "entry_user_dashboard",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 680
+      },
+      "data": {
+        "label": "User Dashboard",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Authenticated user dashboard"
+        ],
+        "kind": "web",
+        "controls": [
+          {
+            "question_id": "Q25",
+            "answer": "No authentication required",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q49",
+            "answer": "No, shared with general application routes",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q50",
+            "answer": "No, only checked at initial login",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q51",
+            "answer": "No, state-changing actions can be triggered without origin protection",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry_admin_panel",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 100
+      },
+      "data": {
+        "label": "Admin / Operator Panel",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Admin/operator panel"
+        ],
+        "kind": "admin",
+        "controls": [
+          {
+            "question_id": "Q42",
+            "answer": "Developers only",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q42",
+            "answer": "Administrators via admin panel",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q42",
+            "answer": "Automated systems or pipelines",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry_embedded_widget",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 245
+      },
+      "data": {
+        "label": "Embedded Widget",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Embedded widget or iframe"
+        ],
+        "kind": "web"
+      }
+    },
+    {
+      "id": "entry_webhook",
+      "type": "custom",
+      "position": {
+        "x": 260,
+        "y": 970
+      },
+      "data": {
+        "label": "Webhook / Callback Endpoint",
+        "nodeType": "process",
+        "role": "interface",
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Webhook or callback endpoint"
+        ],
+        "kind": "webhook"
+      }
+    },
+    {
+      "id": "process_preprocessor",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 390
+      },
+      "data": {
+        "label": "Input Processing Layer",
+        "nodeType": "process",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation"
+        ],
+        "kind": "preprocessor",
+        "controls": [
+          {
+            "question_id": "Q30",
+            "answer": "No safeguards",
+            "meaning": "Prompt injection safeguard evidence; do not create standalone DFD node."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "Plain text prompts only",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "Structured JSON",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "XML or YAML",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "Markdown or rich text",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "HTML or rendered content",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "Code or scripts",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "Documents such as PDF, DOCX, or TXT",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q83",
+            "answer": "Images or multimodal input",
+            "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer."
+          },
+          {
+            "question_id": "Q84",
+            "answer": "Yes, parsed and inserted with minimal validation",
+            "meaning": "Input parsing/validation behaviour before content reaches the LLM context."
+          }
+        ]
+      }
+    },
+    {
+      "id": "process_orchestrator",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 245
+      },
+      "data": {
+        "label": "Orchestration Layer",
+        "nodeType": "process",
+        "role": "orchestrator",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Backend API",
+          "Q85: LLM orchestrator",
+          "Q11: Agent workflow",
+          "Q18: Yes, fallback or routing between models"
+        ],
+        "kind": "orchestrator",
+        "controls": [
+          {
+            "question_id": "Q26",
+            "answer": "No authorization controls",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "process_tool_layer",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 680
+      },
+      "data": {
+        "label": "Tool / Action Layer",
+        "nodeType": "process",
+        "role": "tool",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes"
+        ],
+        "kind": "tool_layer",
+        "controls": [
+          {
+            "question_id": "Q28",
+            "answer": "No, same behavior for all users",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Public chat interface",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "RAG or document ingestion pipeline",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Tool-calling or agent framework",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Admin or internal operator interface",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Model hosting or API integration layer",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Prompt injection to override instructions",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Sensitive data extraction",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Unauthorized action triggering",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Misinformation or unsafe recommendations",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Denial of service or excessive usage",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q41",
+            "answer": "Shared system identity only",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q44",
+            "answer": "No separation of permissions",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q45",
+            "answer": "Access to sensitive data such as API keys or credentials",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q56",
+            "answer": "Yes, broad shared service account",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q57",
+            "answer": "No formal review",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q75",
+            "answer": "Failures may fall back to less restricted behavior",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q77",
+            "answer": "No effective limits",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q78",
+            "answer": "Yes, with weak or unclear limits",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q80",
+            "answer": "No additional controls",
+            "meaning": "Approval or confirmation control for sensitive actions."
+          }
+        ]
+      }
+    },
+    {
+      "id": "process_api_connector",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 100
+      },
+      "data": {
+        "label": "API Connector",
+        "nodeType": "process",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q14: Directly",
+          "Q60: Inserted directly into prompt context",
+          "Q61: Yes, inserted without isolation",
+          "Q62: Arbitrary URLs or internal addresses may be reachable",
+          "Q63: No outbound restrictions"
+        ],
+        "kind": "api_connector",
+        "controls": [
+          {
+            "question_id": "Q45",
+            "answer": "Access to sensitive data such as API keys or credentials",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q58",
+            "answer": "No reliable inventory",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q59",
+            "answer": "Yes, some non-production or undocumented APIs are reachable",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q75",
+            "answer": "Failures may fall back to less restricted behavior",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "process_rag_orchestrator",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 535
+      },
+      "data": {
+        "label": "RAG Orchestrator",
+        "nodeType": "process",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code"
+        ],
+        "controls": [
+          {
+            "question_id": "Q27",
+            "answer": "No filtering applied",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Public chat interface",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "RAG or document ingestion pipeline",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Tool-calling or agent framework",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Admin or internal operator interface",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Model hosting or API integration layer",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "llm_gateway",
+      "type": "custom",
+      "position": {
+        "x": 820,
+        "y": 285
+      },
+      "data": {
+        "label": "LLM Gateway / Model Adapter",
+        "nodeType": "llm",
+        "role": "llm",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment"
+        ],
+        "controls": [
+          {
+            "question_id": "Q28",
+            "answer": "No, same behavior for all users",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Public chat interface",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "RAG or document ingestion pipeline",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Tool-calling or agent framework",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Admin or internal operator interface",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q29",
+            "answer": "Model hosting or API integration layer",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Prompt injection to override instructions",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Sensitive data extraction",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Unauthorized action triggering",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Misinformation or unsafe recommendations",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q37",
+            "answer": "Denial of service or excessive usage",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "external_model_provider",
+      "type": "custom",
+      "position": {
+        "x": 820,
+        "y": 140
+      },
+      "data": {
+        "label": "Hybrid / External Model Provider",
+        "nodeType": "llm",
+        "role": "external",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment"
+        ],
+        "controls": [
+          {
+            "question_id": "Q35",
+            "answer": "No validation process",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "store_vector_db",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 1405
+      },
+      "data": {
+        "label": "Vector Database",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Vector database",
+          "Q13: Vector DB"
+        ],
+        "kind": "vector_db",
+        "controls": [
+          {
+            "question_id": "Q32",
+            "answer": "No safeguards",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q36",
+            "answer": "No dedicated protection",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "store_database",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 535
+      },
+      "data": {
+        "label": "Application Database",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Vector database",
+          "Q85: Relational or NoSQL database",
+          "Q13: SQL/NoSQL"
+        ],
+        "kind": "application_database",
+        "data_classification": [
+          "Q24: Personally identifiable information (PII)",
+          "Q24: API keys or credentials",
+          "Q24: Internal operational documents",
+          "Q24: Customer support records"
+        ]
+      }
+    },
+    {
+      "id": "store_file_storage",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 680
+      },
+      "data": {
+        "label": "File Storage",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: File storage",
+          "Q13: File storage"
+        ],
+        "kind": "file_storage"
+      }
+    },
+    {
+      "id": "store_cloud_storage",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 100
+      },
+      "data": {
+        "label": "Cloud Storage",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Cloud storage",
+          "Q13: Cloud storage"
+        ],
+        "kind": "cloud_storage"
+      }
+    },
+    {
+      "id": "store_knowledge_base",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 970
+      },
+      "data": {
+        "label": "Internal Knowledge Base",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q8: Internal knowledge base"
+        ],
+        "kind": "knowledge_base",
+        "data_classification": [
+          "Q24: Personally identifiable information (PII)",
+          "Q24: API keys or credentials",
+          "Q24: Internal operational documents",
+          "Q24: Customer support records"
+        ],
+        "controls": [
+          {
+            "question_id": "Q32",
+            "answer": "No safeguards",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "store_customer_data",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 390
+      },
+      "data": {
+        "label": "Customer Data Store",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q8: Customer data"
+        ],
+        "kind": "customer_data",
+        "data_classification": [
+          "Q24: Personally identifiable information (PII)",
+          "Q24: API keys or credentials",
+          "Q24: Internal operational documents",
+          "Q24: Customer support records"
+        ],
+        "controls": [
+          {
+            "question_id": "Q32",
+            "answer": "No safeguards",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "store_source_code",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 1260
+      },
+      "data": {
+        "label": "Source Code Repository",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q8: Source code"
+        ],
+        "kind": "source_code"
+      }
+    },
+    {
+      "id": "store_conversation_history",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 245
+      },
+      "data": {
+        "label": "Conversation History Store",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q10: Global"
+        ],
+        "kind": "conversation_history",
+        "data_classification": [
+          "Q24: Personally identifiable information (PII)",
+          "Q24: API keys or credentials",
+          "Q24: Internal operational documents",
+          "Q24: Customer support records"
+        ],
+        "controls": [
+          {
+            "question_id": "Q46",
+            "answer": "No isolation",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "store_index_training_data",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 825
+      },
+      "data": {
+        "label": "Indexing / Training Data Store",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q43: Yes, both indexing and training"
+        ],
+        "kind": "index_training"
+      }
+    },
+    {
+      "id": "store_llm_logs",
+      "type": "custom",
+      "position": {
+        "x": 1100,
+        "y": 1115
+      },
+      "data": {
+        "label": "LLM Logs",
+        "nodeType": "database",
+        "role": "data_store",
+        "source": "static_mapper",
+        "evidence": [
+          "Q47: Logs contain full prompts and responses"
+        ],
+        "kind": "logs"
+      }
+    },
+    {
+      "id": "tool_search",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 1260
+      },
+      "data": {
+        "label": "Search Tool",
+        "nodeType": "process",
+        "role": "tool",
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Search"
+        ],
+        "kind": "search"
+      }
+    },
+    {
+      "id": "tool_database",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 970
+      },
+      "data": {
+        "label": "Database Tool",
+        "nodeType": "process",
+        "role": "tool",
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Database"
+        ],
+        "kind": "database",
+        "controls": [
+          {
+            "question_id": "Q53",
+            "answer": "Yes, without reliable object-level checks",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q54",
+            "answer": "Yes, fields can be read or updated without strong controls",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool_internal_api",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 1115
+      },
+      "data": {
+        "label": "Internal API Tool",
+        "nodeType": "process",
+        "role": "tool",
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs"
+        ],
+        "kind": "internal_api",
+        "controls": [
+          {
+            "question_id": "Q41",
+            "answer": "Shared system identity only",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q53",
+            "answer": "Yes, without reliable object-level checks",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q54",
+            "answer": "Yes, fields can be read or updated without strong controls",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q55",
+            "answer": "Yes, privileged functions may be reachable without strong checks",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q56",
+            "answer": "Yes, broad shared service account",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q58",
+            "answer": "No reliable inventory",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q59",
+            "answer": "Yes, some non-production or undocumented APIs are reachable",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool_admin",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 825
+      },
+      "data": {
+        "label": "Admin Tool",
+        "nodeType": "process",
+        "role": "tool",
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Admin tools"
+        ],
+        "kind": "admin",
+        "controls": [
+          {
+            "question_id": "Q55",
+            "answer": "Yes, privileged functions may be reachable without strong checks",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "business_ticketing",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 970
+      },
+      "data": {
+        "label": "Ticketing System",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q15: Create or update tickets/records",
+          "Q79: Ticket escalation or priority changes"
+        ],
+        "kind": "ticketing"
+      }
+    },
+    {
+      "id": "business_notifications",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 680
+      },
+      "data": {
+        "label": "Notification System",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q15: Send emails or notifications",
+          "Q79: Notifications or external messages"
+        ],
+        "kind": "notifications"
+      }
+    },
+    {
+      "id": "business_workflow",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 1115
+      },
+      "data": {
+        "label": "Workflow Engine",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q15: Execute workflows or transactions"
+        ],
+        "kind": "workflow"
+      }
+    },
+    {
+      "id": "business_configuration",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 390
+      },
+      "data": {
+        "label": "Configuration Management",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q15: Modify system configurations"
+        ],
+        "kind": "configuration",
+        "controls": [
+          {
+            "question_id": "Q42",
+            "answer": "Developers only",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q42",
+            "answer": "Administrators via admin panel",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q42",
+            "answer": "Automated systems or pipelines",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "business_payments",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 825
+      },
+      "data": {
+        "label": "Payments or Refunds",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q79: Refunds or payments"
+        ],
+        "kind": "payments"
+      }
+    },
+    {
+      "id": "business_accounts",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 100
+      },
+      "data": {
+        "label": "Account Management",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q79: Account/profile changes"
+        ],
+        "kind": "accounts"
+      }
+    },
+    {
+      "id": "business_approvals",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 245
+      },
+      "data": {
+        "label": "Approvals / Entitlements",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q79: Approvals or entitlement changes"
+        ],
+        "kind": "approvals",
+        "controls": [
+          {
+            "question_id": "Q80",
+            "answer": "No additional controls",
+            "meaning": "Approval or confirmation control for sensitive actions."
+          }
+        ]
+      }
+    },
+    {
+      "id": "business_decisioning",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 535
+      },
+      "data": {
+        "label": "Automated Decision Flow",
+        "nodeType": "external_api",
+        "role": "action",
+        "source": "static_mapper",
+        "evidence": [
+          "Q39: Yes, high-impact or business-critical decisions"
+        ],
+        "kind": "decisioning"
+      }
+    },
+    {
+      "id": "external_web",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 1550
+      },
+      "data": {
+        "label": "External Web Content",
+        "nodeType": "external_api",
+        "role": "external",
+        "source": "static_mapper",
+        "evidence": [
+          "Q5: External web content",
+          "Q6: Web URLs"
+        ],
+        "kind": "web_content"
+      }
+    },
+    {
+      "id": "external_api",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 1260
+      },
+      "data": {
+        "label": "External API",
+        "nodeType": "external_api",
+        "role": "external",
+        "source": "static_mapper",
+        "evidence": [
+          "Q14: Directly"
+        ],
+        "kind": "external_api"
+      }
+    },
+    {
+      "id": "external_network",
+      "type": "custom",
+      "position": {
+        "x": 1380,
+        "y": 1405
+      },
+      "data": {
+        "label": "External Network Destinations",
+        "nodeType": "external_api",
+        "role": "external",
+        "source": "static_mapper",
+        "evidence": [
+          "Q62: Arbitrary URLs or internal addresses may be reachable"
+        ],
+        "kind": "network"
+      }
+    },
+    {
+      "id": "process_logging_monitoring",
+      "type": "custom",
+      "position": {
+        "x": 820,
+        "y": 560
+      },
+      "data": {
+        "label": "Logging and Monitoring",
+        "nodeType": "process",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q33: Basic application logs only",
+          "Q74: Logged without alerting"
+        ],
+        "controls": [
+          {
+            "question_id": "Q38",
+            "answer": "Lack of security ownership",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q38",
+            "answer": "Insufficient monitoring",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q38",
+            "answer": "Poor prompt/change management",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q38",
+            "answer": "Weak access control hygiene",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          },
+          {
+            "question_id": "Q38",
+            "answer": "No incident response process for LLM misuse",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "boundary_public_internet",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 1115
+      },
+      "data": {
+        "label": "Public Internet Boundary",
+        "nodeType": "trust_boundary",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Anonymous public internet users",
+          "Q2: Authenticated public users",
+          "Q23: Public internet to web application",
+          "Q85: Web frontend",
+          "Q85: API gateway"
+        ],
+        "kind": "trust_boundary",
+        "boundaryType": "public_internet",
+        "contains": [
+          "actor_public_user",
+          "actor_authenticated_user",
+          "entry_web_chat",
+          "entry_embedded_widget",
+          "entry_rest_api"
+        ]
+      }
+    },
+    {
+      "id": "boundary_web_to_internal_api",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 1405
+      },
+      "data": {
+        "label": "Web to Internal API Boundary",
+        "nodeType": "trust_boundary",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q23: Web application to internal API"
+        ],
+        "kind": "trust_boundary",
+        "boundaryType": "web_to_internal_api",
+        "contains": [
+          "entry_web_chat",
+          "entry_user_dashboard",
+          "entry_rest_api",
+          "process_orchestrator",
+          "process_preprocessor"
+        ]
+      }
+    },
+    {
+      "id": "boundary_internal_api_to_model",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 970
+      },
+      "data": {
+        "label": "Internal API to Model Service Boundary",
+        "nodeType": "trust_boundary",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q23: Internal API to model service"
+        ],
+        "kind": "trust_boundary",
+        "boundaryType": "internal_api_to_model",
+        "contains": [
+          "process_orchestrator",
+          "process_preprocessor",
+          "llm_gateway",
+          "external_model_provider"
+        ]
+      }
+    },
+    {
+      "id": "boundary_tenant",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 1260
+      },
+      "data": {
+        "label": "Tenant Isolation Boundary",
+        "nodeType": "trust_boundary",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q40: Multi-tenant with weak or unclear isolation",
+          "Q23: Cross-tenant or cross-user context boundary"
+        ],
+        "kind": "trust_boundary",
+        "boundaryType": "tenant",
+        "contains": [
+          "actor_authenticated_user",
+          "store_conversation_history",
+          "store_customer_data",
+          "store_vector_db"
+        ],
+        "controls": [
+          {
+            "question_id": "Q46",
+            "answer": "No isolation",
+            "meaning": "Control/risk evidence attached to existing architecture nodes."
+          }
+        ]
+      }
+    },
+    {
+      "id": "boundary_external_provider",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 825
+      },
+      "data": {
+        "label": "External Provider Boundary",
+        "nodeType": "trust_boundary",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q17: Hybrid deployment",
+          "Q85: External model provider API"
+        ],
+        "kind": "trust_boundary",
+        "boundaryType": "external_provider",
+        "contains": [
+          "llm_gateway",
+          "external_model_provider"
+        ]
+      }
+    },
+    {
+      "id": "boundary_external_api",
+      "type": "custom",
+      "position": {
+        "x": 540,
+        "y": 680
+      },
+      "data": {
+        "label": "External API Boundary",
+        "nodeType": "trust_boundary",
+        "role": "process",
+        "source": "static_mapper",
+        "evidence": [
+          "Q14: Directly",
+          "Q60: Inserted directly into prompt context",
+          "Q61: Yes, inserted without isolation",
+          "Q62: Arbitrary URLs or internal addresses may be reachable",
+          "Q63: No outbound restrictions"
+        ],
+        "kind": "trust_boundary",
+        "boundaryType": "external_api",
+        "contains": [
+          "process_api_connector",
+          "external_api",
+          "external_network",
+          "external_web"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_actor_authenticated_user_to_entry_embedded_widget_authenticated_request",
+      "source": "actor_authenticated_user",
+      "target": "entry_embedded_widget",
+      "label": "Authenticated request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Authenticated public users",
+          "Q48: Embedded widget or iframe",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Authenticated request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Authenticated User",
+        "target_label": "Embedded Widget",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_authenticated_user_to_entry_rest_api_authenticated_request",
+      "source": "actor_authenticated_user",
+      "target": "entry_rest_api",
+      "label": "Authenticated request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Authenticated public users",
+          "Q85: API gateway",
+          "Q3: REST API endpoint",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Authenticated request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Authenticated User",
+        "target_label": "REST API Endpoint",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q85",
+          "Q3",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_authenticated_user_to_entry_user_dashboard_authenticated_request",
+      "source": "actor_authenticated_user",
+      "target": "entry_user_dashboard",
+      "label": "Authenticated request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Authenticated public users",
+          "Q48: Authenticated user dashboard",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Authenticated request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Authenticated User",
+        "target_label": "User Dashboard",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_authenticated_user_to_entry_web_chat_authenticated_request",
+      "source": "actor_authenticated_user",
+      "target": "entry_web_chat",
+      "label": "Authenticated request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Authenticated public users",
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Authenticated request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Authenticated User",
+        "target_label": "Web Chat Interface",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q85",
+          "Q3",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_external_service_to_entry_webhook_integration_request",
+      "source": "actor_external_service",
+      "target": "entry_webhook",
+      "label": "Integration request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Webhook or callback endpoint",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Integration request",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "External Service",
+        "target_label": "Webhook / Callback Endpoint",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_internal_employee_to_entry_user_dashboard_user_prompt_request",
+      "source": "actor_internal_employee",
+      "target": "entry_user_dashboard",
+      "label": "User prompt / request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Internal employees only",
+          "Q48: Authenticated user dashboard",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "User prompt / request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Internal Employee",
+        "target_label": "User Dashboard",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_public_user_to_entry_embedded_widget_user_prompt_request",
+      "source": "actor_public_user",
+      "target": "entry_embedded_widget",
+      "label": "User prompt / request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Anonymous public internet users",
+          "Q48: Embedded widget or iframe",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "User prompt / request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Public Internet User",
+        "target_label": "Embedded Widget",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_public_user_to_entry_rest_api_user_prompt_request",
+      "source": "actor_public_user",
+      "target": "entry_rest_api",
+      "label": "User prompt / request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Anonymous public internet users",
+          "Q85: API gateway",
+          "Q3: REST API endpoint",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "User prompt / request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Public Internet User",
+        "target_label": "REST API Endpoint",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q85",
+          "Q3",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_public_user_to_entry_web_chat_user_prompt_request",
+      "source": "actor_public_user",
+      "target": "entry_web_chat",
+      "label": "User prompt / request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q2: Anonymous public internet users",
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "User prompt / request",
+        "flow_type": "user_request",
+        "direction": "request",
+        "source_label": "Public Internet User",
+        "target_label": "Web Chat Interface",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q2",
+          "Q85",
+          "Q3",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_third_party_system_to_entry_third_party_integration_integration_request",
+      "source": "actor_third_party_system",
+      "target": "entry_third_party_integration",
+      "label": "Integration request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q3: Third-party integration",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Integration request",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Third-party System",
+        "target_label": "Third-party Integration",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q3",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_actor_third_party_system_to_entry_webhook_integration_request",
+      "source": "actor_third_party_system",
+      "target": "entry_webhook",
+      "label": "Integration request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q3: Third-party integration",
+          "Q48: Webhook or callback endpoint",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Integration request",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Third-party System",
+        "target_label": "Webhook / Callback Endpoint",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q3",
+          "Q48",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Public Internet -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_embedded_widget_to_process_preprocessor_llm_request",
+      "source": "entry_embedded_widget",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Embedded widget or iframe",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "Embedded Widget",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_rest_api_to_process_preprocessor_llm_request",
+      "source": "entry_rest_api",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: API gateway",
+          "Q3: REST API endpoint",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "REST API Endpoint",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q3",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_third_party_integration_to_process_preprocessor_llm_request",
+      "source": "entry_third_party_integration",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q3: Third-party integration",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "Third-party Integration",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q3",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_user_dashboard_to_process_preprocessor_llm_request",
+      "source": "entry_user_dashboard",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Authenticated user dashboard",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "User Dashboard",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_web_chat_to_process_preprocessor_llm_request",
+      "source": "entry_web_chat",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "Web Chat Interface",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q3",
+          "Q48",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_webhook_to_process_preprocessor_llm_request",
+      "source": "entry_webhook",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Webhook or callback endpoint",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "Webhook / Callback Endpoint",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_preprocessor_to_process_orchestrator_prepared_prompt",
+      "source": "process_preprocessor",
+      "target": "process_orchestrator",
+      "label": "Prepared prompt",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q85: Backend API",
+          "Q85: LLM orchestrator",
+          "Q11: Agent workflow",
+          "Q18: Yes, fallback or routing between models"
+        ],
+        "flow_label": "Prepared prompt",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "Input Processing Layer",
+        "target_label": "Orchestration Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Prepared prompt",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q85",
+          "Q11",
+          "Q18"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_orchestrator_to_process_rag_orchestrator_orchestrated_request",
+      "source": "process_orchestrator",
+      "target": "process_rag_orchestrator",
+      "label": "Orchestrated request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Backend API",
+          "Q85: LLM orchestrator",
+          "Q11: Agent workflow",
+          "Q18: Yes, fallback or routing between models",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code"
+        ],
+        "flow_label": "Orchestrated request",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Orchestration Layer",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Orchestrated request",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q85",
+          "Q11",
+          "Q18",
+          "Q7",
+          "Q5",
+          "Q8"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_external_model_provider_model_api_request",
+      "source": "llm_gateway",
+      "target": "external_model_provider",
+      "label": "Model API request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q81: Backend/API to external providers",
+          "Q82: Backend/API to external providers"
+        ],
+        "flow_label": "Model API request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "Hybrid / External Model Provider",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Transport unclear",
+          "External service"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII"
+        ],
+        "data_carried": "prompt, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> External Services",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_external_model_provider_to_llm_gateway_model_response",
+      "source": "external_model_provider",
+      "target": "llm_gateway",
+      "label": "Model response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q81: Backend/API to external providers",
+          "Q82: Backend/API to external providers"
+        ],
+        "flow_label": "Model response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "Hybrid / External Model Provider",
+        "target_label": "LLM Gateway / Model Adapter",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Transport unclear",
+          "External service"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII"
+        ],
+        "data_carried": "prompt, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "External Services -> AI / Model Processing Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_cloud_storage_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_cloud_storage",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q85: Cloud storage",
+          "Q13: Cloud storage",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Cloud Storage",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_store_cloud_storage_to_process_rag_orchestrator_retrieved_context",
+      "source": "store_cloud_storage",
+      "target": "process_rag_orchestrator",
+      "label": "Retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Cloud storage",
+          "Q13: Cloud storage",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieved context",
+        "flow_type": "rag_retrieval",
+        "direction": "response",
+        "source_label": "Cloud Storage",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q13",
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Data Storage Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_customer_data_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_customer_data",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Customer Data Store",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_store_customer_data_to_process_rag_orchestrator_retrieved_context",
+      "source": "store_customer_data",
+      "target": "process_rag_orchestrator",
+      "label": "Retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q8: Customer data",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieved context",
+        "flow_type": "rag_retrieval",
+        "direction": "response",
+        "source_label": "Customer Data Store",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q8",
+          "Q7",
+          "Q5",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Data Storage Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_file_storage_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_file_storage",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q85: File storage",
+          "Q13: File storage",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "File Storage",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_store_file_storage_to_process_rag_orchestrator_retrieved_context",
+      "source": "store_file_storage",
+      "target": "process_rag_orchestrator",
+      "label": "Retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: File storage",
+          "Q13: File storage",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieved context",
+        "flow_type": "rag_retrieval",
+        "direction": "response",
+        "source_label": "File Storage",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q13",
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Data Storage Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_knowledge_base_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_knowledge_base",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Internal Knowledge Base",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_store_knowledge_base_to_process_rag_orchestrator_retrieved_context",
+      "source": "store_knowledge_base",
+      "target": "process_rag_orchestrator",
+      "label": "Retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q8: Internal knowledge base",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieved context",
+        "flow_type": "rag_retrieval",
+        "direction": "response",
+        "source_label": "Internal Knowledge Base",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q8",
+          "Q7",
+          "Q5",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Data Storage Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_source_code_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_source_code",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Source Code Repository",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_store_source_code_to_process_rag_orchestrator_retrieved_context",
+      "source": "store_source_code",
+      "target": "process_rag_orchestrator",
+      "label": "Retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q8: Source code",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieved context",
+        "flow_type": "rag_retrieval",
+        "direction": "response",
+        "source_label": "Source Code Repository",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q8",
+          "Q7",
+          "Q5",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Data Storage Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_vector_db_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_vector_db",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q85: Vector database",
+          "Q13: Vector DB",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Vector Database",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_store_vector_db_to_process_rag_orchestrator_retrieved_context",
+      "source": "store_vector_db",
+      "target": "process_rag_orchestrator",
+      "label": "Retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Vector database",
+          "Q13: Vector DB",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieved context",
+        "flow_type": "rag_retrieval",
+        "direction": "response",
+        "source_label": "Vector Database",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q13",
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Data Storage Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_llm_gateway_prompt_retrieved_context",
+      "source": "process_rag_orchestrator",
+      "target": "llm_gateway",
+      "label": "Prompt + retrieved context",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q81: Backend/API to LLM or model service",
+          "Q82: Backend/API to LLM or model service"
+        ],
+        "flow_label": "Prompt + retrieved context",
+        "flow_type": "llm_inference_request",
+        "direction": "response",
+        "source_label": "RAG Orchestrator",
+        "target_label": "LLM Gateway / Model Adapter",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "prompt, retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q85",
+          "Q17",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> AI / Model Processing Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_process_tool_layer_tool_request",
+      "source": "llm_gateway",
+      "target": "process_tool_layer",
+      "label": "Tool request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q81: Backend/API to LLM or model service",
+          "Q82: Backend/API to LLM or model service"
+        ],
+        "flow_label": "Tool request",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "Tool / Action Layer",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "prompt, retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_tool_search_invoke_tool",
+      "source": "process_tool_layer",
+      "target": "tool_search",
+      "label": "Invoke tool",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Invoke tool",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Tool / Action Layer",
+        "target_label": "Search Tool",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_tool_database_invoke_tool",
+      "source": "process_tool_layer",
+      "target": "tool_database",
+      "label": "Invoke tool",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Invoke tool",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Tool / Action Layer",
+        "target_label": "Database Tool",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_tool_internal_api_invoke_tool",
+      "source": "process_tool_layer",
+      "target": "tool_internal_api",
+      "label": "Invoke tool",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Invoke tool",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Tool / Action Layer",
+        "target_label": "Internal API Tool",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_tool_admin_invoke_tool",
+      "source": "process_tool_layer",
+      "target": "tool_admin",
+      "label": "Invoke tool",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Invoke tool",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Tool / Action Layer",
+        "target_label": "Admin Tool",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_search_to_store_knowledge_base_search_query",
+      "source": "tool_search",
+      "target": "store_knowledge_base",
+      "label": "Search query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Search",
+          "Q8: Internal knowledge base",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Search query",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Search Tool",
+        "target_label": "Internal Knowledge Base",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_search_to_store_source_code_search_query",
+      "source": "tool_search",
+      "target": "store_source_code",
+      "label": "Search query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Search",
+          "Q8: Source code",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Search query",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Search Tool",
+        "target_label": "Source Code Repository",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_search_to_store_vector_db_search_query",
+      "source": "tool_search",
+      "target": "store_vector_db",
+      "label": "Search query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Search",
+          "Q85: Vector database",
+          "Q13: Vector DB",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Search query",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Search Tool",
+        "target_label": "Vector Database",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_search_to_store_file_storage_search_query",
+      "source": "tool_search",
+      "target": "store_file_storage",
+      "label": "Search query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Search",
+          "Q85: File storage",
+          "Q13: File storage",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Search query",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Search Tool",
+        "target_label": "File Storage",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_search_to_store_cloud_storage_search_query",
+      "source": "tool_search",
+      "target": "store_cloud_storage",
+      "label": "Search query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Search",
+          "Q85: Cloud storage",
+          "Q13: Cloud storage",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Search query",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "Search Tool",
+        "target_label": "Cloud Storage",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_database_to_store_database_database_operation",
+      "source": "tool_database",
+      "target": "store_database",
+      "label": "Database operation",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Database",
+          "Q85: Vector database",
+          "Q85: Relational or NoSQL database",
+          "Q13: SQL/NoSQL",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Database operation",
+        "flow_type": "api_or_storage_flow",
+        "direction": "request",
+        "source_label": "Database Tool",
+        "target_label": "Application Database",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_database_to_store_customer_data_database_operation",
+      "source": "tool_database",
+      "target": "store_customer_data",
+      "label": "Database operation",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Database",
+          "Q8: Customer data",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Database operation",
+        "flow_type": "api_or_storage_flow",
+        "direction": "request",
+        "source_label": "Database Tool",
+        "target_label": "Customer Data Store",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_database_to_store_file_storage_storage_operation",
+      "source": "tool_database",
+      "target": "store_file_storage",
+      "label": "Storage operation",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Database",
+          "Q85: File storage",
+          "Q13: File storage",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Storage operation",
+        "flow_type": "api_or_storage_flow",
+        "direction": "request",
+        "source_label": "Database Tool",
+        "target_label": "File Storage",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_database_to_store_cloud_storage_storage_operation",
+      "source": "tool_database",
+      "target": "store_cloud_storage",
+      "label": "Storage operation",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Database",
+          "Q85: Cloud storage",
+          "Q13: Cloud storage",
+          "Q81: Backend/API to internal tool/service APIs",
+          "Q82: Backend/API to internal tool/service APIs"
+        ],
+        "flow_label": "Storage operation",
+        "flow_type": "api_or_storage_flow",
+        "direction": "request",
+        "source_label": "Database Tool",
+        "target_label": "Cloud Storage",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Credentials possible",
+          "Transport unclear",
+          "Tool result"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "tool_result",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "tool result, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q12",
+          "Q85",
+          "Q13",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_ticketing_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_ticketing",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q15: Create or update tickets/records",
+          "Q79: Ticket escalation or priority changes"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Ticketing System",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q15",
+          "Q79"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_notifications_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_notifications",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q15: Send emails or notifications",
+          "Q79: Notifications or external messages"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Notification System",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q15",
+          "Q79"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_workflow_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_workflow",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q15: Execute workflows or transactions"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Workflow Engine",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q15"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_accounts_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_accounts",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q79: Account/profile changes"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Account Management",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q79"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_payments_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_payments",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q79: Refunds or payments"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Payments or Refunds",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q79"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_approvals_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_approvals",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q79: Approvals or entitlement changes"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Approvals / Entitlements",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q79"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_internal_api_to_business_decisioning_business_api_call",
+      "source": "tool_internal_api",
+      "target": "business_decisioning",
+      "label": "Business API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Internal APIs",
+          "Q39: Yes, high-impact or business-critical decisions"
+        ],
+        "flow_label": "Business API call",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Internal API Tool",
+        "target_label": "Automated Decision Flow",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Business API call",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q39"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_tool_admin_to_business_configuration_admin_configuration_change",
+      "source": "tool_admin",
+      "target": "business_configuration",
+      "label": "Admin configuration change",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q12: Admin tools",
+          "Q15: Modify system configurations"
+        ],
+        "flow_label": "Admin configuration change",
+        "flow_type": "tool_or_action_flow",
+        "direction": "request",
+        "source_label": "Admin Tool",
+        "target_label": "Configuration Management",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Admin configuration change",
+        "transport_state": "not_applicable",
+        "transport_security": "not_applicable",
+        "source_questions": [
+          "Q12",
+          "Q15"
+        ],
+        "badges": [],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_llm_gateway_tool_result",
+      "source": "process_tool_layer",
+      "target": "llm_gateway",
+      "label": "Tool result",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q81: Backend/API to LLM or model service",
+          "Q82: Backend/API to LLM or model service"
+        ],
+        "flow_label": "Tool result",
+        "flow_type": "tool_or_action_flow",
+        "direction": "response",
+        "source_label": "Tool / Action Layer",
+        "target_label": "LLM Gateway / Model Adapter",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "prompt, retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q17",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> AI / Model Processing Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_external_web_to_process_rag_orchestrator_untrusted_retrieved_content",
+      "source": "external_web",
+      "target": "process_rag_orchestrator",
+      "label": "Untrusted retrieved content",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q5: External web content",
+          "Q6: Web URLs",
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q81: Backend/API to external providers",
+          "Q82: Backend/API to external providers"
+        ],
+        "flow_label": "Untrusted retrieved content",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "External Web Content",
+        "target_label": "RAG Orchestrator",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Transport unclear",
+          "External service"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII"
+        ],
+        "data_carried": "prompt, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q5",
+          "Q6",
+          "Q7",
+          "Q8",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "External Services -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_external_api_direct_external_api_call",
+      "source": "process_tool_layer",
+      "target": "external_api",
+      "label": "Direct external API call",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Tool execution runtime",
+          "Q12: Search",
+          "Q12: Database",
+          "Q12: Internal APIs",
+          "Q12: Admin tools",
+          "Q15: Create or update tickets/records",
+          "Q15: Send emails or notifications",
+          "Q15: Execute workflows or transactions",
+          "Q15: Modify system configurations",
+          "Q79: Refunds or payments",
+          "Q79: Account/profile changes",
+          "Q79: Notifications or external messages",
+          "Q79: Approvals or entitlement changes",
+          "Q79: Ticket escalation or priority changes",
+          "Q14: Directly",
+          "Q81: Backend/API to external providers",
+          "Q82: Backend/API to external providers"
+        ],
+        "flow_label": "Direct external API call",
+        "flow_type": "api_or_storage_flow",
+        "direction": "request",
+        "source_label": "Tool / Action Layer",
+        "target_label": "External API",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Transport unclear",
+          "External service"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII"
+        ],
+        "data_carried": "prompt, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q12",
+          "Q15",
+          "Q79",
+          "Q14",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> External Services",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_api_connector_to_external_network_network_fetch",
+      "source": "process_api_connector",
+      "target": "external_network",
+      "label": "Network fetch",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q14: Directly",
+          "Q60: Inserted directly into prompt context",
+          "Q61: Yes, inserted without isolation",
+          "Q62: Arbitrary URLs or internal addresses may be reachable",
+          "Q63: No outbound restrictions",
+          "Q81: Backend/API to external providers",
+          "Q82: Backend/API to external providers"
+        ],
+        "flow_label": "Network fetch",
+        "flow_type": "data_flow",
+        "direction": "request",
+        "source_label": "API Connector",
+        "target_label": "External Network Destinations",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Transport unclear",
+          "External service"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII"
+        ],
+        "data_carried": "prompt, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q14",
+          "Q60",
+          "Q61",
+          "Q62",
+          "Q63",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> External Services",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_entry_embedded_widget_model_output",
+      "source": "llm_gateway",
+      "target": "entry_embedded_widget",
+      "label": "Model output",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q48: Embedded widget or iframe",
+          "Q73: No or unclear encryption between some components"
+        ],
+        "flow_label": "Model output",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "Embedded Widget",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary"
+        ],
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Model output",
+        "transport_state": "unclear",
+        "transport_security": "unclear",
+        "required_control": "TLS",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q48",
+          "Q73"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_entry_rest_api_model_output",
+      "source": "llm_gateway",
+      "target": "entry_rest_api",
+      "label": "Model output",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q85: API gateway",
+          "Q3: REST API endpoint",
+          "Q73: No or unclear encryption between some components"
+        ],
+        "flow_label": "Model output",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "REST API Endpoint",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary"
+        ],
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Model output",
+        "transport_state": "unclear",
+        "transport_security": "unclear",
+        "required_control": "TLS",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q3",
+          "Q73"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_entry_user_dashboard_model_output",
+      "source": "llm_gateway",
+      "target": "entry_user_dashboard",
+      "label": "Model output",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q48: Authenticated user dashboard",
+          "Q73: No or unclear encryption between some components"
+        ],
+        "flow_label": "Model output",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "User Dashboard",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary"
+        ],
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Model output",
+        "transport_state": "unclear",
+        "transport_security": "unclear",
+        "required_control": "TLS",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q48",
+          "Q73"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_entry_web_chat_model_output",
+      "source": "llm_gateway",
+      "target": "entry_web_chat",
+      "label": "Model output",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: External model provider API",
+          "Q17: Hybrid deployment",
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page",
+          "Q73: No or unclear encryption between some components"
+        ],
+        "flow_label": "Model output",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "Web Chat Interface",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary"
+        ],
+        "contains_sensitive_data": "unknown",
+        "data_carried": "Model output",
+        "transport_state": "unclear",
+        "transport_security": "unclear",
+        "required_control": "TLS",
+        "source_questions": [
+          "Q85",
+          "Q17",
+          "Q3",
+          "Q48",
+          "Q73"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> Application / Backend Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_embedded_widget_to_actor_authenticated_user_response",
+      "source": "entry_embedded_widget",
+      "target": "actor_authenticated_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Embedded widget or iframe",
+          "Q2: Authenticated public users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "Embedded Widget",
+        "target_label": "Authenticated User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_rest_api_to_actor_authenticated_user_response",
+      "source": "entry_rest_api",
+      "target": "actor_authenticated_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: API gateway",
+          "Q3: REST API endpoint",
+          "Q2: Authenticated public users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "REST API Endpoint",
+        "target_label": "Authenticated User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q3",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_user_dashboard_to_actor_authenticated_user_response",
+      "source": "entry_user_dashboard",
+      "target": "actor_authenticated_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Authenticated user dashboard",
+          "Q2: Authenticated public users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "User Dashboard",
+        "target_label": "Authenticated User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_web_chat_to_actor_authenticated_user_response",
+      "source": "entry_web_chat",
+      "target": "actor_authenticated_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page",
+          "Q2: Authenticated public users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "Web Chat Interface",
+        "target_label": "Authenticated User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q3",
+          "Q48",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_user_dashboard_to_actor_internal_employee_response",
+      "source": "entry_user_dashboard",
+      "target": "actor_internal_employee",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Authenticated user dashboard",
+          "Q2: Internal employees only",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "User Dashboard",
+        "target_label": "Internal Employee",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_embedded_widget_to_actor_public_user_response",
+      "source": "entry_embedded_widget",
+      "target": "actor_public_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Embedded widget or iframe",
+          "Q2: Anonymous public internet users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "Embedded Widget",
+        "target_label": "Public Internet User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_rest_api_to_actor_public_user_response",
+      "source": "entry_rest_api",
+      "target": "actor_public_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: API gateway",
+          "Q3: REST API endpoint",
+          "Q2: Anonymous public internet users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "REST API Endpoint",
+        "target_label": "Public Internet User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q3",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_web_chat_to_actor_public_user_response",
+      "source": "entry_web_chat",
+      "target": "actor_public_user",
+      "label": "Response",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q85: Web frontend",
+          "Q3: Web-based chat interface",
+          "Q48: Public chat page",
+          "Q2: Anonymous public internet users",
+          "Q81: Browser to web application",
+          "Q82: Browser to web application"
+        ],
+        "flow_label": "Response",
+        "flow_type": "llm_response",
+        "direction": "response",
+        "source_label": "Web Chat Interface",
+        "target_label": "Public Internet User",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q85",
+          "Q3",
+          "Q48",
+          "Q2",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Public Internet",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_llm_gateway_to_process_logging_monitoring_audit_log_event",
+      "source": "llm_gateway",
+      "target": "process_logging_monitoring",
+      "label": "Audit log event",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q33: Basic application logs only",
+          "Q74: Logged without alerting",
+          "Q81: Backend/API to LLM or model service",
+          "Q82: Backend/API to LLM or model service",
+          "Q82: Logging or monitoring pipeline"
+        ],
+        "flow_label": "Audit log event",
+        "flow_type": "logging_flow",
+        "direction": "event",
+        "source_label": "LLM Gateway / Model Adapter",
+        "target_label": "Logging and Monitoring",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Sensitive logs",
+          "Prompt/context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "response",
+          "PII"
+        ],
+        "data_carried": "prompt, response, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q33",
+          "Q74",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "AI / Model Processing Zone -> Admin / Operations Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_tool_layer_to_process_logging_monitoring_audit_log_event",
+      "source": "process_tool_layer",
+      "target": "process_logging_monitoring",
+      "label": "Audit log event",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q33: Basic application logs only",
+          "Q74: Logged without alerting",
+          "Q82: Logging or monitoring pipeline",
+          "Q73: No or unclear encryption between some components"
+        ],
+        "flow_label": "Audit log event",
+        "flow_type": "logging_flow",
+        "direction": "event",
+        "source_label": "Tool / Action Layer",
+        "target_label": "Logging and Monitoring",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive logs"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "response",
+          "PII"
+        ],
+        "data_carried": "prompt, response, PII",
+        "transport_state": "unclear",
+        "transport_security": "unclear",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q33",
+          "Q74",
+          "Q82",
+          "Q73"
+        ],
+        "boundary_path": "Application / Backend Zone -> Admin / Operations Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_logging_monitoring_to_store_llm_logs_prompt_response_logs",
+      "source": "process_logging_monitoring",
+      "target": "store_llm_logs",
+      "label": "Prompt/response logs",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q33: Basic application logs only",
+          "Q74: Logged without alerting",
+          "Q47: Logs contain full prompts and responses",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage",
+          "Q82: Logging or monitoring pipeline"
+        ],
+        "flow_label": "Prompt/response logs",
+        "flow_type": "llm_inference_request",
+        "direction": "response",
+        "source_label": "Logging and Monitoring",
+        "target_label": "LLM Logs",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Sensitive logs",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "response",
+          "PII"
+        ],
+        "data_carried": "prompt, response, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q33",
+          "Q74",
+          "Q47",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Admin / Operations Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_entry_admin_panel_to_process_preprocessor_llm_request",
+      "source": "entry_admin_panel",
+      "target": "process_preprocessor",
+      "label": "LLM request",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q48: Admin/operator panel",
+          "Q7: Routing/classification",
+          "Q83: Structured JSON",
+          "Q83: XML or YAML",
+          "Q83: Markdown or rich text",
+          "Q83: HTML or rendered content",
+          "Q83: Code or scripts",
+          "Q83: Documents such as PDF, DOCX, or TXT",
+          "Q83: Images or multimodal input",
+          "Q84: Yes, parsed and inserted with minimal validation",
+          "Q81: Web application to backend/API",
+          "Q82: Web application to backend/API"
+        ],
+        "flow_label": "LLM request",
+        "flow_type": "llm_inference_request",
+        "direction": "request",
+        "source_label": "Admin / Operator Panel",
+        "target_label": "Input Processing Layer",
+        "trust_boundary_crossed": false,
+        "crosses_trust_boundary": false,
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "badges": [
+          "Sensitive data",
+          "Prompt/context",
+          "Credentials possible",
+          "Transport unclear"
+        ],
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "prompt",
+          "PII",
+          "credentials"
+        ],
+        "data_carried": "prompt, PII, credentials",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q48",
+          "Q7",
+          "Q83",
+          "Q84",
+          "Q81",
+          "Q82"
+        ],
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_conversation_history_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_conversation_history",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q10: Global",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Conversation History Store",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q10",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    },
+    {
+      "id": "edge_process_rag_orchestrator_to_store_index_training_data_retrieval_query",
+      "source": "process_rag_orchestrator",
+      "target": "store_index_training_data",
+      "label": "Retrieval query",
+      "data": {
+        "source": "static_mapper",
+        "evidence": [
+          "Q7: RAG augmentation",
+          "Q5: Retrieved internal documents",
+          "Q8: Internal knowledge base",
+          "Q8: Customer data",
+          "Q8: Source code",
+          "Q43: Yes, both indexing and training",
+          "Q81: Backend/API to vector database or storage",
+          "Q82: Backend/API to vector database or storage"
+        ],
+        "flow_label": "Retrieval query",
+        "flow_type": "rag_retrieval",
+        "direction": "request",
+        "source_label": "RAG Orchestrator",
+        "target_label": "Indexing / Training Data Store",
+        "trust_boundary_crossed": true,
+        "crosses_trust_boundary": true,
+        "badges": [
+          "Trust boundary",
+          "Sensitive data",
+          "Retrieved context",
+          "Transport unclear"
+        ],
+        "transport_security": "unclear",
+        "transport_state": "unclear",
+        "transport_risk": true,
+        "sensitive_data": "sensitive",
+        "contains_sensitive_data": true,
+        "data_categories": [
+          "retrieved_context",
+          "PII"
+        ],
+        "data_carried": "retrieved context, PII",
+        "required_control": "TLS",
+        "combined_risk": "sensitive_data_over_unclear_transport",
+        "source_questions": [
+          "Q7",
+          "Q5",
+          "Q8",
+          "Q43",
+          "Q81",
+          "Q82"
+        ],
+        "boundary_path": "Application / Backend Zone -> Data Storage Zone",
+        "display_badges": [],
+        "visual_badges": []
+      }
+    }
+  ],
+  "metadata": {
+    "mapper_version": "static-dfd-v2",
+    "graph_mode": "canonical",
+    "canonical_graph": true,
+    "transport_security": null,
+    "sensitive_data_movement": null,
+    "normalized_answer_count": 91,
+    "warnings": [
+      "Direct external API access by the LLM or tool environment is inferred."
+    ],
+    "assumptions": [
+      "LLM Gateway / Model Adapter represents the logical model integration point.",
+      "External model provider is separated from the logical LLM gateway."
+    ],
+    "controls": [
+      {
+        "question_id": "Q25",
+        "answer": "No authentication required",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_web_chat",
+          "entry_rest_api",
+          "entry_user_dashboard"
+        ]
+      },
+      {
+        "question_id": "Q26",
+        "answer": "No authorization controls",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_web_chat",
+          "entry_rest_api",
+          "process_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q27",
+        "answer": "No filtering applied",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_rag_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q28",
+        "answer": "No, same behavior for all users",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q29",
+        "answer": "Public chat interface",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer",
+          "process_rag_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q29",
+        "answer": "RAG or document ingestion pipeline",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer",
+          "process_rag_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q29",
+        "answer": "Tool-calling or agent framework",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer",
+          "process_rag_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q29",
+        "answer": "Admin or internal operator interface",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer",
+          "process_rag_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q29",
+        "answer": "Model hosting or API integration layer",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer",
+          "process_rag_orchestrator"
+        ]
+      },
+      {
+        "question_id": "Q30",
+        "answer": "No safeguards",
+        "meaning": "Prompt injection safeguard evidence; do not create standalone DFD node.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q32",
+        "answer": "No safeguards",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "store_customer_data",
+          "store_knowledge_base",
+          "store_vector_db"
+        ]
+      },
+      {
+        "question_id": "Q34",
+        "answer": "No protections",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_web_chat",
+          "entry_rest_api"
+        ]
+      },
+      {
+        "question_id": "Q35",
+        "answer": "No validation process",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "external_model_provider"
+        ]
+      },
+      {
+        "question_id": "Q36",
+        "answer": "No dedicated protection",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "store_vector_db"
+        ]
+      },
+      {
+        "question_id": "Q37",
+        "answer": "Prompt injection to override instructions",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q37",
+        "answer": "Sensitive data extraction",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q37",
+        "answer": "Unauthorized action triggering",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q37",
+        "answer": "Misinformation or unsafe recommendations",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q37",
+        "answer": "Denial of service or excessive usage",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "llm_gateway",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q38",
+        "answer": "Lack of security ownership",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_logging_monitoring"
+        ]
+      },
+      {
+        "question_id": "Q38",
+        "answer": "Insufficient monitoring",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_logging_monitoring"
+        ]
+      },
+      {
+        "question_id": "Q38",
+        "answer": "Poor prompt/change management",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_logging_monitoring"
+        ]
+      },
+      {
+        "question_id": "Q38",
+        "answer": "Weak access control hygiene",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_logging_monitoring"
+        ]
+      },
+      {
+        "question_id": "Q38",
+        "answer": "No incident response process for LLM misuse",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_logging_monitoring"
+        ]
+      },
+      {
+        "question_id": "Q41",
+        "answer": "Shared system identity only",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_tool_layer",
+          "tool_internal_api"
+        ]
+      },
+      {
+        "question_id": "Q42",
+        "answer": "Developers only",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_admin_panel",
+          "business_configuration"
+        ]
+      },
+      {
+        "question_id": "Q42",
+        "answer": "Administrators via admin panel",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_admin_panel",
+          "business_configuration"
+        ]
+      },
+      {
+        "question_id": "Q42",
+        "answer": "Automated systems or pipelines",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_admin_panel",
+          "business_configuration"
+        ]
+      },
+      {
+        "question_id": "Q44",
+        "answer": "No separation of permissions",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q45",
+        "answer": "Access to sensitive data such as API keys or credentials",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_tool_layer",
+          "process_api_connector"
+        ]
+      },
+      {
+        "question_id": "Q46",
+        "answer": "No isolation",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "store_conversation_history",
+          "boundary_tenant"
+        ]
+      },
+      {
+        "question_id": "Q49",
+        "answer": "No, shared with general application routes",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_web_chat",
+          "entry_rest_api",
+          "entry_user_dashboard"
+        ]
+      },
+      {
+        "question_id": "Q50",
+        "answer": "No, only checked at initial login",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_web_chat",
+          "entry_user_dashboard",
+          "entry_rest_api"
+        ]
+      },
+      {
+        "question_id": "Q51",
+        "answer": "No, state-changing actions can be triggered without origin protection",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_web_chat",
+          "entry_user_dashboard"
+        ]
+      },
+      {
+        "question_id": "Q52",
+        "answer": "Wildcard or overly permissive CORS",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_rest_api"
+        ]
+      },
+      {
+        "question_id": "Q53",
+        "answer": "Yes, without reliable object-level checks",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "tool_database",
+          "tool_internal_api"
+        ]
+      },
+      {
+        "question_id": "Q54",
+        "answer": "Yes, fields can be read or updated without strong controls",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "tool_database",
+          "tool_internal_api"
+        ]
+      },
+      {
+        "question_id": "Q55",
+        "answer": "Yes, privileged functions may be reachable without strong checks",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "tool_internal_api",
+          "tool_admin"
+        ]
+      },
+      {
+        "question_id": "Q56",
+        "answer": "Yes, broad shared service account",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "tool_internal_api",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q57",
+        "answer": "No formal review",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q58",
+        "answer": "No reliable inventory",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "tool_internal_api",
+          "process_api_connector"
+        ]
+      },
+      {
+        "question_id": "Q59",
+        "answer": "Yes, some non-production or undocumented APIs are reachable",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "tool_internal_api",
+          "process_api_connector"
+        ]
+      },
+      {
+        "question_id": "Q75",
+        "answer": "Failures may fall back to less restricted behavior",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_tool_layer",
+          "process_api_connector"
+        ]
+      },
+      {
+        "question_id": "Q76",
+        "answer": "Detailed internal errors may be exposed",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": []
+      },
+      {
+        "question_id": "Q77",
+        "answer": "No effective limits",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "entry_rest_api",
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q78",
+        "answer": "Yes, with weak or unclear limits",
+        "meaning": "Control/risk evidence attached to existing architecture nodes.",
+        "target_node_ids": [
+          "process_tool_layer"
+        ]
+      },
+      {
+        "question_id": "Q80",
+        "answer": "No additional controls",
+        "meaning": "Approval or confirmation control for sensitive actions.",
+        "target_node_ids": [
+          "process_tool_layer",
+          "business_approvals"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "Plain text prompts only",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "Structured JSON",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "XML or YAML",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "Markdown or rich text",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "HTML or rendered content",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "Code or scripts",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "Documents such as PDF, DOCX, or TXT",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q83",
+        "answer": "Images or multimodal input",
+        "meaning": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      },
+      {
+        "question_id": "Q84",
+        "answer": "Yes, parsed and inserted with minimal validation",
+        "meaning": "Input parsing/validation behaviour before content reaches the LLM context.",
+        "target_node_ids": [
+          "process_preprocessor"
+        ]
+      }
+    ],
+    "unresolved_control_targets": [
+      {
+        "question_id": "Q35",
+        "answer": "No validation process",
+        "missing_target_node_ids": [
+          "llm_runtime"
+        ]
+      },
+      {
+        "question_id": "Q76",
+        "answer": "Detailed internal errors may be exposed",
+        "missing_target_node_ids": [
+          "process_output_validator"
+        ]
+      }
+    ],
+    "orphan_nodes": [],
+    "signals_summary": {
+      "actors": 5,
+      "entry_points": 7,
+      "data_stores": 10,
+      "tools": 4,
+      "trust_boundaries": 6
+    },
+    "pipeline_id": "20260627120909-Auto-rerun",
+    "pipeline_source": "static_dfd_mapper",
+    "display_name": "Auto-rerun DFD",
+    "project_name": "Auto-rerun",
+    "auditor_name": "",
+    "source_response": "critical_autonomous_claims_workflow_agent_response_20260627.json"
+  }
+}

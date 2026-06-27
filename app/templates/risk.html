@@ -193,10 +193,89 @@
         color: #94a3b8;
     }
 
+    .pipe-status {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .pipe-chip {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-left-width: 4px;
+        border-radius: 10px;
+        background: #0f172a;
+        padding: 0.8rem 0.95rem;
+        display: grid;
+        gap: 0.25rem;
+    }
+
+    .pipe-chip .pipe-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #94a3b8;
+    }
+
+    .pipe-chip .pipe-value {
+        font-weight: 700;
+        color: #e2e8f0;
+        font-size: 0.95rem;
+        overflow-wrap: anywhere;
+    }
+
+    .pipe-chip.ok {
+        border-left-color: #22c55e;
+    }
+
+    .pipe-chip.ok .pipe-value {
+        color: #bbf7d0;
+    }
+
+    .pipe-chip.bad {
+        border-left-color: #ef4444;
+    }
+
+    .pipe-chip.bad .pipe-value {
+        color: #fecaca;
+    }
+
+    .pipe-chip.warn {
+        border-left-color: #f59e0b;
+    }
+
+    .pipe-chip.warn .pipe-value {
+        color: #fde68a;
+    }
+
+    .pipe-chip.neutral {
+        border-left-color: #38bdf8;
+    }
+
+    .pipe-notes {
+        display: grid;
+        gap: 0.4rem;
+    }
+
+    .pipe-note {
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 8px;
+        background: #0f172a;
+        padding: 0.6rem 0.8rem;
+        color: #cbd5e1;
+        font-size: 0.88rem;
+        overflow-wrap: anywhere;
+    }
+
+    .pipe-note.bad {
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #fecaca;
+    }
+
     @media (max-width: 991px) {
         .risk-selector,
         .status-card,
-        .risk-summary-grid {
+        .risk-summary-grid,
+        .pipe-status {
             grid-template-columns: 1fr;
         }
     }
@@ -231,6 +310,48 @@
     {% endif %}
 
     {% if analysis %}
+    {% set ti = analysis.threat_identification or {} %}
+    {% set mm = analysis.mitigation_meta or {} %}
+    {% set ti_llm = ti.mode == 'template_guided_llm' and ti.status == 'completed' %}
+    {% set ti_fallback = ti.mode == 'deterministic_fallback' %}
+    {% set mm_llm = mm.status == 'completed' %}
+    {% set mm_fallback = mm.status == 'unavailable' %}
+    {% set mm_off = mm.status in ['disabled', 'skipped'] %}
+    <section class="pipe-status">
+        <div class="pipe-chip neutral">
+            <span class="pipe-label">Pipeline</span>
+            <span class="pipe-value">{{ analysis.pipeline_mode or 'deterministic' }}</span>
+        </div>
+        <div class="pipe-chip {{ 'ok' if ti_llm else ('bad' if ti_fallback else 'neutral') }}">
+            <span class="pipe-label">Threat identification</span>
+            <span class="pipe-value">
+                {% if ti_llm %}LLM &#10003;{% if ti.model %} &middot; {{ ti.model }}{% endif %}
+                {% elif ti_fallback %}Fallback &#10007;
+                {% else %}Deterministic{% endif %}
+            </span>
+        </div>
+        <div class="pipe-chip neutral">
+            <span class="pipe-label">DREAD scoring</span>
+            <span class="pipe-value">Deterministic &#10003;</span>
+        </div>
+        <div class="pipe-chip {{ 'ok' if mm_llm else ('warn' if mm_off else ('bad' if mm_fallback else 'neutral')) }}">
+            <span class="pipe-label">Mitigations</span>
+            <span class="pipe-value">
+                {% if mm_llm %}LLM &#10003;{% if mm.model %} &middot; {{ mm.model }}{% endif %}
+                {% elif mm_fallback %}Fallback &#10007;
+                {% elif mm_off %}{{ mm.status|capitalize }}
+                {% else %}Deterministic{% endif %}
+            </span>
+        </div>
+    </section>
+    {% if analysis.pipeline_warning or ti.message or mm.error %}
+    <div class="pipe-notes">
+        {% if analysis.pipeline_warning %}<div class="pipe-note bad">&#9888; {{ analysis.pipeline_warning }}</div>{% endif %}
+        {% if ti.message %}<div class="pipe-note">Threat identification: {{ ti.message }}</div>{% endif %}
+        {% if mm.error %}<div class="pipe-note bad">Mitigation fallback reason: {{ mm.error }}</div>{% endif %}
+    </div>
+    {% endif %}
+
     {% set status_class = analysis.overall_status|lower %}
     <div class="status-card">
         <div class="status-pill {{ status_class }}">{{ analysis.overall_status }}</div>
@@ -261,6 +382,22 @@
         </div>
     </div>
 
+    {% if analysis.missing_information %}
+    <section class="risk-panel">
+        <div class="risk-panel-header">
+            <h2>Missing Information &amp; Assumptions</h2>
+        </div>
+        <div class="risk-list">
+            {% for item in analysis.missing_information %}
+            <div class="risk-item risk-muted">{{ item }}</div>
+            {% endfor %}
+            {% for item in analysis.assumptions %}
+            <div class="risk-item risk-muted">Assumption: {{ item }}</div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     {% if analysis.quick_wins %}
     <section class="risk-panel">
         <div class="risk-panel-header">
@@ -282,7 +419,14 @@
         {% if mitigations %}
         <div class="risk-list">
             {% for risk in analysis.unified_risks %}
-            {% if risk.llm_assessment and risk.llm_assessment.mitigations %}
+            {% if risk.mitigation_actions %}
+            <article class="risk-item">
+                <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(LLM, context-specific)</span></div>
+                {% for m in risk.mitigation_actions %}
+                <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} - {{ m.action }}{% endif %}{% if m.validation_step %} <span class="risk-muted">(validate: {{ m.validation_step }})</span>{% endif %}</div>
+                {% endfor %}
+            </article>
+            {% elif risk.llm_assessment and risk.llm_assessment.mitigations %}
             <article class="risk-item">
                 <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(LLM, context-specific)</span></div>
                 {% for m in risk.llm_assessment.mitigations %}
@@ -322,7 +466,10 @@
                     <div class="risk-level {{ risk.risk_level|lower }}">{{ risk.risk_level }}</div>
                 </div>
                 {% if risk.dread %}
-                <div class="risk-muted">DREAD {{ risk.dread.total }}/15 - D{{ risk.dread.damage }} R{{ risk.dread.reproducibility }} E{{ risk.dread.exploitability }} A{{ risk.dread.affected_users }} Dc{{ risk.dread.discoverability }}</div>
+                <div class="risk-muted">DREAD {{ risk.dread.total }}/15 (avg {{ risk.dread.average }}) - D{{ risk.dread.damage }} R{{ risk.dread.reproducibility }} E{{ risk.dread.exploitability }} A{{ risk.dread.affected_users }} Dc{{ risk.dread.discoverability }}{% if risk.dread.strongest_dimensions %} - driven by {{ risk.dread.strongest_dimensions|join(", ") }}{% endif %}</div>
+                {% endif %}
+                {% if risk.affected_assets %}
+                <div class="risk-muted">Affected assets: {{ risk.affected_assets|join(", ") }}</div>
                 {% endif %}
                 {% if risk.llm_assessment %}
                 <div class="risk-evidence" style="border-left:3px solid #8b5cf6; padding-left:8px;">
@@ -369,6 +516,32 @@
         <div class="empty-panel">No risks were found for this pipeline.</div>
         {% endif %}
     </section>
+
+    {% if analysis.suggested_secondary_findings %}
+    <section class="risk-panel">
+        <div class="risk-panel-header">
+            <h2>Suggested Secondary Findings <span class="risk-muted">(advisory - outside the deterministic candidate set, not scored)</span></h2>
+        </div>
+        <div class="risk-list">
+            {% for finding in analysis.suggested_secondary_findings %}
+            <article class="risk-item">
+                <div class="risk-code">{{ finding.code or "No code" }}{% if finding.name %} - {{ finding.name }}{% endif %} <span class="risk-muted">({{ finding.status or "needs_more_info" }})</span></div>
+                {% if finding.threat_pattern %}<div class="risk-muted">Pattern: {{ finding.threat_pattern }}</div>{% endif %}
+                {% if finding.rationale %}<div class="risk-evidence">{{ finding.rationale }}</div>{% endif %}
+                {% if finding.evidence %}
+                <div class="risk-evidence">
+                    <ul>
+                        {% for item in finding.evidence[:4] %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
     {% elif not analysis_error %}
     <div class="risk-panel">
         <div class="empty-panel">Select a completed pipeline risk analysis to review mitigations.</div>

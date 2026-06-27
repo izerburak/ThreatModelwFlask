@@ -1,12 +1,18 @@
 import json
 import re
 import shutil
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
+from app.services.feature_flags import flag_enabled
 from app.services.llm_risk_review import review_risk_analysis
-from app.services.risk_analysis_service import build_risk_analysis
+from app.services.risk_analysis_service import (
+    ThreatIdentificationUnavailable,
+    build_risk_analysis,
+    build_threat_analysis,
+)
 from app.services.static_dfd_mapper import build_static_dfd_from_answers
 
 
@@ -125,18 +131,40 @@ class PipelineOrchestrator:
         self._mark_running(manifest, "risk_analysis_completed")
         try:
             response_payload = self._load_artifact(pipeline_id, "response.json")
+            response_payload = response_payload if isinstance(response_payload, dict) else {}
 
-            risks = build_risk_analysis(
-                self.app_root_path,
-                response_payload if isinstance(response_payload, dict) else {},
-            )
-            # Optional, constrained local-LLM review on top of the deterministic baseline.
-            # Best-effort: never raises; if the model is unavailable the baseline is unchanged.
-            risks = review_risk_analysis(
-                risks,
-                _answers_by_flow_id(response_payload),
-                self.app_config,
-            )
+            # The DFD step normally runs first; load the full graph so the new
+            # threat-identification + grounding stages can reference node/edge ids.
+            dfd_graph = None
+            if self.artifact_exists(pipeline_id, "dfd_reactflow.json"):
+                try:
+                    dfd_graph = self._load_artifact(pipeline_id, "dfd_reactflow.json")
+                except (FileNotFoundError, ValueError, json.JSONDecodeError):
+                    dfd_graph = None
+
+            risks = None
+            fallback_reason = None
+            fallback_detail = None
+            # Target-order pipeline (feature-flagged). Requires a DFD for grounding.
+            if not flag_enabled(self.app_config, "LLM_THREAT_IDENTIFICATION_ENABLED", True):
+                fallback_reason = "flag_disabled"
+            elif not isinstance(dfd_graph, dict):
+                fallback_reason = "no_dfd"
+            else:
+                try:
+                    risks = build_threat_analysis(self.app_root_path, response_payload, dfd_graph, self.app_config)
+                except ThreatIdentificationUnavailable as exc:
+                    fallback_reason = "llm_unavailable"
+                    fallback_detail = str(exc)
+                    print(f"[pipeline] threat identification unavailable; using deterministic baseline: {exc}", file=sys.stderr)
+                except Exception as exc:  # never block a valid risks.json (feature-flag contract)
+                    fallback_reason = "threat_path_error"
+                    fallback_detail = str(exc)
+                    print(f"[pipeline] threat-analysis path failed; using deterministic baseline: {exc}", file=sys.stderr)
+
+            if risks is None:
+                risks = self._deterministic_risk_analysis(response_payload, dfd_graph, fallback_reason, fallback_detail)
+
             self._write_artifact(pipeline_id, "risks.json", risks)
             self._mark_step_done(manifest, "risk_analysis_completed")
             return risks
@@ -145,6 +173,45 @@ class PipelineOrchestrator:
             raise
         finally:
             self._save_manifest(manifest)
+
+    def _deterministic_risk_analysis(self, response_payload, dfd_graph, reason=None, detail=None):
+        """Deterministic baseline risks.json (no template-guided LLM stages).
+
+        Used when the new pipeline is disabled or the LLM threat-identification stage
+        is unavailable, so a valid deterministic risks.json is always produced.
+        Optionally augments with the legacy constrained LLM risk review when
+        LEGACY_LLM_RISK_REVIEW_ENABLED is set. The result is stamped with provenance
+        (``pipeline_mode`` / ``threat_identification`` / ``pipeline_warning``) so the
+        artifact is self-describing about which path produced it and why.
+        """
+        risks = build_risk_analysis(
+            self.app_root_path,
+            response_payload if isinstance(response_payload, dict) else {},
+            dfd_payload=dfd_graph,
+        )
+        if flag_enabled(self.app_config, "LEGACY_LLM_RISK_REVIEW_ENABLED", False):
+            risks = review_risk_analysis(risks, _answers_by_flow_id(response_payload), self.app_config)
+
+        used_fallback = reason in ("llm_unavailable", "threat_path_error")
+        messages = {
+            "flag_disabled": "Template-guided LLM threat identification is disabled; deterministic baseline used.",
+            "no_dfd": "No DFD available for grounding; deterministic baseline used.",
+            "llm_unavailable": "Local LLM threat identification was unavailable; deterministic baseline used.",
+            "threat_path_error": "Template-guided pipeline failed; deterministic baseline used.",
+            None: "Deterministic baseline.",
+        }
+        message = messages.get(reason, messages[None])
+        if detail and used_fallback:
+            message = f"{message} ({detail})"
+        risks["pipeline_mode"] = "deterministic_fallback" if used_fallback else "deterministic_baseline"
+        risks["threat_identification"] = {
+            "mode": "deterministic_fallback" if used_fallback else "disabled",
+            "status": reason or "baseline",
+            "message": message,
+        }
+        if used_fallback:
+            risks["pipeline_warning"] = message
+        return risks
 
     def run_until_risk_analysis(self, pipeline_id):
         self.generate_dfd(pipeline_id)

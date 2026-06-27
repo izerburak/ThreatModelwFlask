@@ -1,0 +1,30 @@
+{
+  "pipeline_id": "20260627120909-Auto-rerun",
+  "project_name": "Auto-rerun",
+  "dfd_name": "Auto-rerun DFD",
+  "auditor_name": "",
+  "source_response": "critical_autonomous_claims_workflow_agent_response_20260627.json",
+  "created_at": "2026-06-27T12:09:09Z",
+  "updated_at": "2026-06-27T12:10:30Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-06-27T12:09:09Z",
+      "artifact": "response.json"
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-06-27T12:09:09Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-06-27T12:10:30Z",
+      "artifact": "risks.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260627120909-Auto-rerun-DFD.json"
+}

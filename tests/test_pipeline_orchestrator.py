@@ -57,7 +57,6 @@ class PipelineOrchestratorTests(unittest.TestCase):
         self.assertFalse((pipeline_dir / "llm_extraction.json").exists())
         self.assertFalse((pipeline_dir / "extraction_reviewed.json").exists())
         self.assertNotIn("llm_extraction_generated", updated_manifest["steps"])
-        self.assertNotIn("garak_plan_created", updated_manifest["steps"])
         self.assertIn("dfd_generated", updated_manifest["steps"])
         self.assertIn("risk_analysis_completed", updated_manifest["steps"])
         self.assertNotIn("extraction_reviewed", updated_manifest["steps"])

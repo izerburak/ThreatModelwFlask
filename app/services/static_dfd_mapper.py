@@ -159,6 +159,10 @@ def extract_architecture_signals(normalized_answers: dict[str, Any]) -> dict[str
         "assumptions": [],
     }
 
+    # Q85 is the authoritative component inventory: it seeds the canonical nodes
+    # first so scattered answers cannot produce a contradictory DFD. The inference
+    # extractors below then augment/merge evidence onto the same node ids.
+    _extract_component_inventory(signals, normalized_answers)
     _extract_actors(signals, normalized_answers)
     _extract_entry_points(signals, normalized_answers)
     _extract_core_processes(signals, normalized_answers)
@@ -317,6 +321,54 @@ def layout_graph(graph: dict[str, Any]) -> dict[str, Any]:
     return graph
 
 
+def _extract_component_inventory(signals: dict[str, Any], answers: dict[str, Any]) -> None:
+    """Primary node source: map the Q85 component inventory onto canonical nodes.
+
+    Each selected component is attached to the same node id the inference logic
+    uses, so Q85 and the per-question signals merge instead of conflicting. When
+    Q85 is absent or Unknown, this is a no-op and the inference logic (Q2/Q3/Q8/
+    Q9/Q11-Q14/Q17/Q21-Q23/Q48/Q81/Q82) acts as the fallback inventory.
+    """
+    values = _answer_values(answers, "Q85")
+    if not values:
+        return
+
+    def evidence_for(keyword: str) -> list[str]:
+        return _matching_evidence(answers, "Q85", (keyword,))
+
+    if _answers_contain(answers, "Q85", ("web frontend",)):
+        _add_signal(signals["entry_points"], "entry_web_chat", "Web Chat Interface", "web", evidence_for("web frontend"))
+    if _answers_contain(answers, "Q85", ("mobile client",)):
+        _add_signal(signals["actors"], "actor_mobile_client", "Mobile Client", "system", evidence_for("mobile client"))
+    if _answers_contain(answers, "Q85", ("api gateway",)):
+        _add_signal(signals["entry_points"], "entry_rest_api", "REST API Endpoint", "api", evidence_for("api gateway"))
+    if _answers_contain(answers, "Q85", ("backend api",)):
+        _add_signal(signals["processes"], "process_orchestrator", "Orchestration Layer", "orchestrator", evidence_for("backend api"), role="orchestrator")
+    if _answers_contain(answers, "Q85", ("llm orchestrator",)):
+        _add_signal(signals["processes"], "process_orchestrator", "Orchestration Layer", "orchestrator", evidence_for("llm orchestrator"), role="orchestrator")
+    if _answers_contain(answers, "Q85", ("rag retriever",)):
+        signals["rag"]["enabled"] = True
+        signals["rag"]["evidence"] = list(dict.fromkeys(signals["rag"]["evidence"] + evidence_for("rag retriever")))
+    if _answers_contain(answers, "Q85", ("vector database",)):
+        _add_signal(signals["data_stores"], "store_vector_db", "Vector Database", "vector_db", evidence_for("vector database"))
+    if _answers_contain(answers, "Q85", ("relational or nosql database", "nosql database")):
+        _add_signal(signals["data_stores"], "store_database", "Application Database", "application_database", evidence_for("database"))
+    if _answers_contain(answers, "Q85", ("file storage",)):
+        _add_signal(signals["data_stores"], "store_file_storage", "File Storage", "file_storage", evidence_for("file storage"))
+    if _answers_contain(answers, "Q85", ("cloud storage",)):
+        _add_signal(signals["data_stores"], "store_cloud_storage", "Cloud Storage", "cloud_storage", evidence_for("cloud storage"))
+    if _answers_contain(answers, "Q85", ("tool execution runtime",)):
+        _add_signal(signals["processes"], "process_tool_layer", "Tool / Action Layer", "tool_layer", evidence_for("tool execution runtime"), role="tool")
+    if _answers_contain(answers, "Q85", ("external model provider",)):
+        if not signals["model"].get("hosting"):
+            signals["model"]["hosting"] = "external"
+            signals["model"]["provider_label"] = "External Model Provider"
+        signals["model"]["evidence"].extend(evidence_for("external model provider"))
+    if _answers_contain(answers, "Q85", ("logging or monitoring pipeline",)):
+        signals["logging"]["enabled"] = True
+        signals["logging"]["evidence"] = list(dict.fromkeys(signals["logging"]["evidence"] + evidence_for("logging or monitoring pipeline")))
+
+
 def _extract_actors(signals: dict[str, Any], answers: dict[str, Any]) -> None:
     mappings = [
         ("anonymous public internet users", "actor_public_user", "Public Internet User", "human"),
@@ -361,6 +413,18 @@ def _extract_core_processes(signals: dict[str, Any], answers: dict[str, Any]) ->
     q7_evidence = _matching_evidence(answers, "Q7", ("input filtering", "prompt templating", "routing classification"))
     if q7_evidence:
         _add_signal(signals["preprocessing"], "process_preprocessor", "Input Processing Layer", "preprocessor", q7_evidence)
+
+    # Q83 (input formats) and Q84 (parsing/validation behaviour) define an input
+    # handling/parsing surface. Anything beyond plain text, or any parsing step,
+    # is represented by the Input Processing Layer so parsing risk is visible.
+    rich_format_markers = (
+        "uploaded", "structured json", "xml or yaml", "markdown or rich text", "html or rendered content",
+        "code or scripts", "documents such as", "images or multimodal", "audio or transcribed",
+    )
+    input_handling_evidence = _matching_evidence(answers, "Q83", rich_format_markers)
+    input_handling_evidence.extend(_matching_evidence(answers, "Q84", ("parsed",)))
+    if input_handling_evidence:
+        _add_signal(signals["preprocessing"], "process_preprocessor", "Input Processing Layer", "preprocessor", input_handling_evidence)
 
     rag_evidence = []
     rag_evidence.extend(_matching_evidence(answers, "Q7", ("rag augmentation",)))
@@ -540,8 +604,9 @@ def _extract_trust_boundaries(signals: dict[str, Any], answers: dict[str, Any]) 
             "Public Internet Boundary",
             "public_internet",
             _matching_evidence(answers, "Q2", ("anonymous public internet users", "authenticated public users"))
-            + _matching_evidence(answers, "Q23", ("public internet to web application",)),
-            ["actor_public_user", "actor_authenticated_user", "entry_web_chat", "entry_embedded_widget", "entry_rest_api"],
+            + _matching_evidence(answers, "Q23", ("public internet to web application",))
+            + _matching_evidence(answers, "Q85", ("web frontend", "mobile client", "api gateway")),
+            ["actor_public_user", "actor_authenticated_user", "actor_mobile_client", "entry_web_chat", "entry_embedded_widget", "entry_rest_api"],
         ),
         (
             "boundary_web_to_internal_api",
@@ -569,7 +634,8 @@ def _extract_trust_boundaries(signals: dict[str, Any], answers: dict[str, Any]) 
             "boundary_external_provider",
             "External Provider Boundary",
             "external_provider",
-            _matching_evidence(answers, "Q17", ("third party", "external vendor", "hybrid deployment")),
+            _matching_evidence(answers, "Q17", ("third party", "external vendor", "hybrid deployment"))
+            + _matching_evidence(answers, "Q85", ("external model provider",)),
             ["llm_gateway", "external_model_provider"],
         ),
         (
@@ -635,6 +701,8 @@ def _extract_controls(signals: dict[str, Any], answers: dict[str, Any]) -> None:
         "Q77": ["entry_rest_api", "process_tool_layer"],
         "Q78": ["process_tool_layer"],
         "Q80": ["process_tool_layer", "business_approvals"],
+        "Q83": ["process_preprocessor"],
+        "Q84": ["process_preprocessor"],
     }
 
     for question_id, targets in control_targets.items():
@@ -762,7 +830,9 @@ def _extract_warnings_and_assumptions(signals: dict[str, Any], answers: dict[str
         signals["warnings"].append("Tool layer exists but no specific tool target exists.")
     if _answers_contain(answers, "Q14", ("directly",)):
         signals["warnings"].append("Direct external API access by the LLM or tool environment is inferred.")
-    for question_id in ("Q2", "Q3", "Q8", "Q11", "Q12", "Q14", "Q17", "Q31", "Q33", "Q40", "Q47", "Q73", "Q81", "Q82"):
+    if not _answer_values(answers, "Q85"):
+        signals["warnings"].append("Q85 component inventory was not provided; nodes are inferred from other answers.")
+    for question_id in ("Q2", "Q3", "Q8", "Q11", "Q12", "Q14", "Q17", "Q31", "Q33", "Q40", "Q47", "Q73", "Q81", "Q82", "Q83", "Q84", "Q85"):
         if _answers_contain(answers, question_id, ("unknown",)):
             signals["warnings"].append(f"{question_id} is Unknown; static mapping may be incomplete.")
 
@@ -1565,6 +1635,9 @@ def _control_meaning(question_id: str) -> str:
         "Q30": "Prompt injection safeguard evidence; do not create standalone DFD node.",
         "Q40": "Tenant architecture evidence; tenant boundary may be created separately.",
         "Q80": "Approval or confirmation control for sensitive actions.",
+        "Q83": "Accepted input formats; widens the parsing/injection surface at the input layer.",
+        "Q84": "Input parsing/validation behaviour before content reaches the LLM context.",
+        "Q85": "Authoritative component inventory; primary source for DFD nodes.",
     }
     return meanings.get(question_id, "Control/risk evidence attached to existing architecture nodes.")
 
