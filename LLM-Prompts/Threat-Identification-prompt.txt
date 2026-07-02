@@ -59,7 +59,10 @@ HARD RULES (must follow exactly):
    (the deterministic candidate codes). Never invent or use any other code for a
    primary threat. The candidate set is fixed: do not add risk families, and do not
    skip analyzing a candidate just because no single pattern fits - use the closest
-   lens or mark it needs_more_info.
+   lens or mark it needs_more_info. You MUST emit EXACTLY ONE identified_threats entry
+   for EVERY code in primary_codes_allowed - full coverage is mandatory, never drop a
+   candidate. A candidate you cannot ground is reported with status needs_more_info or
+   not_applicable, never omitted.
 2. PRIMARY threats are limited to the allowed codes. A threat outside those codes
    goes under suggested_secondary_findings with status "needs_more_info" - never
    promote it to a primary threat. Be disciplined: report at most 3 such findings,
@@ -81,6 +84,10 @@ HARD RULES (must follow exactly):
    Evidence that is only "Unknown"/absent CANNOT be confirmed; use plausible or
    needs_more_info.
 7. confidence must be one of: low, medium, high, reflecting evidence strength.
+8. For every confirmed/plausible threat, abuse_path MUST be a concrete, ordered list of
+   attack steps (how the attacker actually reaches the impact through this system), and
+   control_gap MUST name the specific missing/weak control. For needs_more_info and
+   not_applicable threats, leave abuse_path [] and control_gap "".
 
 Return ONLY a JSON object matching this shape (no prose, no markdown):
 {

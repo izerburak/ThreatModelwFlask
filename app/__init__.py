@@ -18,12 +18,11 @@ def create_app():
     app.config["SECRET_KEY"] = "dev-secret-key-change-in-prod"
 
     # Feature flags for the template-guided local-LLM threat pipeline. Each is
-    # overridable via the matching environment variable. The new pipeline is on by
+    # overridable via the matching environment variable. The pipeline is on by
     # default and always degrades to a valid deterministic risks.json if the local
-    # LLM is unavailable; the legacy single-call risk review is off by default.
+    # LLM is unavailable.
     app.config["LLM_THREAT_IDENTIFICATION_ENABLED"] = _env_flag("LLM_THREAT_IDENTIFICATION_ENABLED", True)
     app.config["LLM_MITIGATION_GENERATION_ENABLED"] = _env_flag("LLM_MITIGATION_GENERATION_ENABLED", True)
-    app.config["LEGACY_LLM_RISK_REVIEW_ENABLED"] = _env_flag("LEGACY_LLM_RISK_REVIEW_ENABLED", False)
 
     from .routes import main
     app.register_blueprint(main)

@@ -1,37 +1,95 @@
-THESIS RESEARCH QUESTION IDEAS
-(Easy-to-use, deterministic-first, local-LLM-supported threat modeling for LLM-enabled applications)
+THESIS RESEARCH QUESTIONS
+(Deterministic-first, questionnaire-driven, local-LLM-supported threat modeling for
+ generic LLM-enabled applications)
 
 ================================================================================
-ORIGIN / PROBLEM  (the gap the thesis addresses)
+LOCKED RQ SET  (2026-07-03)   <-- CURRENT / AUTHORITATIVE
 ================================================================================
+
+ORIGIN / GAP (framing sentence for the introduction):
+Existing threat-modeling approaches often address Web, API, and LLM risks through separate
+taxonomies or workflows, while domain-specific solutions do not readily generalize. This thesis
+addresses this gap by investigating a unified questionnaire-driven workflow for modeling the
+combined attack surface of generic LLM-enabled applications.
+
+EVALUATION FRAMING (methodology):
+All evaluation is fully automatic and reproducible, relying on structural and grounding metrics
+rather than human raters or external tools. Fine-tuning is investigated as an experimental
+extension, not as a dependency of the proposed system. (Two hard constraints: NO human
+evaluation / testers, and NO external-tool comparison; the only comparison is internal --
+deterministic fallback vs base local LLM vs fine-tuned local LLM. Reproducibility claims attach
+to the deterministic layer -- DFD, risk mapping, DREAD scoring; the LLM threat-identification
+stage is stochastic and is characterized by variance over multiple runs, not claimed reproducible.)
+
+--------------------------------------------------------------------------------
+MAIN RQ
+--------------------------------------------------------------------------------
+To what extent can a deterministic-first, questionnaire-driven pipeline model the combined Web,
+API, and LLM attack surface of generic LLM-enabled applications -- deriving grounded data-flow
+diagrams and reproducible DREAD-based risk scores without manual modeling -- and what additional
+value does a constrained, optionally fine-tuned local LLM contribute to threat identification and
+mitigation generation?
+
+--------------------------------------------------------------------------------
+SUB-RQs
+--------------------------------------------------------------------------------
+
+RQ1 -- Unified deterministic pipeline:
+To what extent can a single adaptive questionnaire drive automatic data-flow-diagram generation,
+unified OWASP Web/API/LLM candidate-risk mapping, and deterministic DREAD scoring, thereby
+eliminating the manual diagram construction demanded by conventional threat-modeling tools?
+
+RQ2 -- Local LLM contribution:
+To what extent does a constrained local LLM enrich the deterministic baseline with system-specific
+threat descriptions, abuse paths, and control gaps -- and with more actionable mitigation detail --
+while remaining within its grounding constraints?
+
+RQ3 -- Guardrail effectiveness:
+To what extent do the deterministic constraints and grounding-validation layer prevent hallucinated
+risk codes, references to non-existent DFD elements, unsupported findings, and any LLM-driven
+alteration of deterministic risk severity?
+
+RQ4 -- Fine-tuning boundary:
+To what extent does fine-tuning a local model on grounded threat-modeling artifacts improve the
+conformance and specificity of its mitigation generation -- assessed through schema validity,
+evidence linkage, actionability, and system-specificity -- relative to the base model?
+
+Structure note: RQ1-RQ3 are the load-bearing contributions (all implemented and automatically
+measurable on the current system). RQ4 is the experimental frontier (fine-tuning runs remotely on
+VALAR HPC); "to what extent" absorbs a partial or inconclusive result, and RQ4 can degrade to a
+pilot-study + future-work chapter without weakening RQ1-RQ3.
+
+Measurement notes:
+- RQ1: DFD integrity (0 dangling/orphan/duplicate), architecture coverage, co-presence of Web+API+
+  LLM risks in one output, determinism check (same input -> byte-identical scores).
+- RQ2: system-specificity proxy = references to concrete DFD node/component names + answer-derived
+  entities vs a stoplist of generic security phrases; grounding rate; evidence linkage. Note two
+  kinds of "add": abuse_path/control_gap are 0 -> N (a whole category the baseline lacks), whereas
+  mitigation detail is generic -> specific (degree). Multiple runs + variance (LLM is stochastic).
+- RQ3: counts of out-of-enum codes stripped, hallucinated node/edge references caught, unsupported
+  findings downgraded, and LLM attempts to change severity (structurally 0).
+- RQ4: schema validity, evidence linkage, actionability fields present, system-specificity; base vs
+  fine-tuned via OLLAMA_MODEL, same input/temperature. Semantic/expert-judged quality is OUT OF
+  SCOPE (no human evaluation); RQ4 speaks to structural conformance and grounding only.
+
+================================================================================
+SUPERSEDED  (2026-06-14 set -- kept for reference; replaced by the LOCKED set above)
+================================================================================
+NOTE: this earlier set framed the thesis around external-tool comparison (Microsoft TMT + STRIDE
+GPT) and usability. As of 2026-07-03 those foils are DROPPED (no external-tool comparison, no human
+usability study). Kept only for provenance.
+
+ORIGIN / PROBLEM (2026-06-14):
 Existing threat-modeling tools - first and foremost the Microsoft Threat Modeling Tool - are both
 (a) hard to use (manual DFD drawing, STRIDE expertise required, overwhelming generic output) and
 (b) weak at risk assessment (template-based threats per element, no context-aware prioritization).
 This is made worse for LLM-enabled applications, which combine Web + API + LLM-specific attack
 surfaces at the same time.
 
-The thesis asks: can an easy-to-use, questionnaire-driven, deterministic-first tool with optional
-local-LLM support give more system-oriented output and more accurate risk scoring for LLM-enabled
-applications? Scope began broad over OWASP security categories, then narrowed to LLM-based
-applications (covering OWASP LLM + Web + API together; identify -> map -> score [DREAD] -> mitigate).
-
-Baselines / foils:  Microsoft TMT (incumbent) + STRIDE GPT (modern AI tool).
-Evaluation axes:     usability  AND  risk-assessment quality.
-Master's scope note: "to what extent" deliberately allows partial, honest answers - limitations and
-                     future work are legitimate outcomes, not failures. Illustrative evidence
-                     (step/effort comparison, case studies, score-distribution discrimination) is
-                     sufficient; exhaustive user studies / expert gold standards are not required.
-
-================================================================================
-CURRENT RQ SET  (2026-06-14)
-================================================================================
-
 MAIN (umbrella):
 To what extent can an easy-to-use, questionnaire-driven, deterministic-first threat-modeling tool with
 optional local-LLM support overcome the usability and risk-assessment limitations of established
 threat-modeling tools (notably the Microsoft Threat Modeling Tool) for LLM-enabled applications?
-
-SUB-RQs:
 
 RQ2 (usability):
 To what extent does a guided adaptive questionnaire reduce the security expertise and manual effort
@@ -53,15 +111,11 @@ To what extent does a deterministic-first design with an optional, model-agnosti
 reproducible, auditable results and context-specific mitigations while avoiding hallucinated risks,
 regardless of the underlying model's capability?
 
-Structure note: RQ1 = main; RQ2-RQ5 = supporting dimensions (the usability + risk-quality axes, and
-the identify -> map -> score -> mitigate pipeline). For a tighter master's scope, RQ4 + RQ5 can be
-merged, or RQ5 partly moved to limitations/future work.
+--------------------------------------------------------------------------------
+EARLIER ALTERNATIVES  (kept for reference)
+--------------------------------------------------------------------------------
 
-================================================================================
-EARLIER ALTERNATIVES  (kept for reference - superseded by the set above)
-================================================================================
-
-== Option A - Reference: human expert ==
+== Option A - Reference: human expert ==   (DROPPED: no human evaluation possible)
 Main: To what extent does domain-specific fine-tuning of a local LLM (qwen3:8b) improve the accuracy
 of its risk classification and the quality of its mitigations, relative to its base version, when
 evaluated against expert security judgment within a deterministic-first, questionnaire-driven
@@ -70,7 +124,7 @@ threat-modeling system?
   A2. ...improve the relevance, correctness, and specificity of mitigations, as rated by experts?
   A3. ...reduce false positives (risks experts judge not applicable)?
 
-== Option B - Reference: existing AI threat-modeling tool (e.g., STRIDE GPT) ==
+== Option B - Reference: existing AI threat-modeling tool (e.g., STRIDE GPT) ==   (DROPPED: no external-tool comparison)
 Main: To what extent does a deterministic-first system with a fine-tuned local LLM produce risk
 assessments and mitigations comparable to an established LLM-based threat-modeling tool (e.g., STRIDE
 GPT), and to what extent does fine-tuning narrow the gap relative to the base model?

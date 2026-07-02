@@ -7,7 +7,6 @@ from pathlib import Path
 
 from app.services.dfd_service import archive_dfd_graph, list_response_files, load_response_payload
 from app.services.feature_flags import flag_enabled
-from app.services.llm_risk_review import review_risk_analysis
 from app.services.risk_analysis_service import (
     ThreatIdentificationUnavailable,
     build_risk_analysis,
@@ -178,19 +177,16 @@ class PipelineOrchestrator:
         """Deterministic baseline risks.json (no template-guided LLM stages).
 
         Used when the new pipeline is disabled or the LLM threat-identification stage
-        is unavailable, so a valid deterministic risks.json is always produced.
-        Optionally augments with the legacy constrained LLM risk review when
-        LEGACY_LLM_RISK_REVIEW_ENABLED is set. The result is stamped with provenance
-        (``pipeline_mode`` / ``threat_identification`` / ``pipeline_warning``) so the
-        artifact is self-describing about which path produced it and why.
+        is unavailable, so a valid deterministic risks.json is always produced. The
+        result is stamped with provenance (``pipeline_mode`` / ``threat_identification``
+        / ``pipeline_warning``) so the artifact is self-describing about which path
+        produced it and why.
         """
         risks = build_risk_analysis(
             self.app_root_path,
             response_payload if isinstance(response_payload, dict) else {},
             dfd_payload=dfd_graph,
         )
-        if flag_enabled(self.app_config, "LEGACY_LLM_RISK_REVIEW_ENABLED", False):
-            risks = review_risk_analysis(risks, _answers_by_flow_id(response_payload), self.app_config)
 
         used_fallback = reason in ("llm_unavailable", "threat_path_error")
         messages = {

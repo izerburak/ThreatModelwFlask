@@ -18,7 +18,7 @@ from flask import (
     url_for,
 )
 
-from app.question_flow import clear_question_flow_caches, get_question_flow_engine
+from app.question_flow import get_question_flow_engine
 from app.services.dfd_service import (
     archive_dfd_graph,
     export_diagram_as_mermaid,
@@ -37,10 +37,7 @@ from app.services.llm_extract_service import generate_llm_extract
 from app.services.pipeline_orchestrator import PIPELINE_STEPS, PipelineOrchestrator
 from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis, suggested_extract_filename, unify_risks
 from app.services.static_dfd_mapper import build_static_dfd_from_answers
-from app.utils.save_utils import (
-    append_question_to_catalog,
-    save_adaptive_llm_sec_answers,
-)
+from app.utils.save_utils import save_adaptive_llm_sec_answers
 
 
 LLM_SEC_SESSION_KEY = "llm_sec_flow"
@@ -64,30 +61,6 @@ def home():
 @main.route("/favicon.ico")
 def favicon():
     return ("", 204)
-
-
-@main.route("/add-question", methods=["GET", "POST"])
-def add_question():
-    if request.method == "POST":
-        if not request.is_json:
-            return jsonify({"ok": False, "error": "Expected JSON"}), 400
-
-        payload = request.get_json()
-        text = payload.get("text", "").strip()
-        options = payload.get("options", []) or []
-
-        if not text:
-            return jsonify({"ok": False, "error": "question text required"}), 400
-
-        try:
-            qpath, new_q = append_question_to_catalog(text, options)
-            clear_question_flow_caches()
-        except Exception as e:
-            return jsonify({"ok": False, "error": str(e)}), 500
-
-        return jsonify({"ok": True, "path": qpath, "question": new_q})
-
-    return render_template("add_question.html", active_tab="add")
 
 
 @main.route("/dfd")

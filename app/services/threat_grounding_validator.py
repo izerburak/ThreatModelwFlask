@@ -111,16 +111,43 @@ def validate_threats(identification, dfd_graph, deterministic_risks):
             secondary.append(_as_secondary(raw, str(raw.get("code") or "").strip().upper(), raw.get("rationale")))
 
     identified_codes = {threat["code"] for threat in primary} | {threat["code"] for threat in downgraded}
-    report["unidentified_deterministic_codes"] = sorted(det_codes - identified_codes)
+    unidentified = sorted(det_codes - identified_codes)
+    report["unidentified_deterministic_codes"] = unidentified
     report["stripped_node_ids"] = sorted(set(report["stripped_node_ids"]))
     report["stripped_edge_ids"] = sorted(set(report["stripped_edge_ids"]))
     report["demoted_non_primary_codes"] = sorted(set(report["demoted_non_primary_codes"]))
+
+    # Deterministic backfill: a grounded candidate the LLM never addressed must not
+    # silently vanish (deterministic-first contract). It is surfaced as needs_more_info
+    # for transparency only - never scored or mitigated in V1.
+    unaddressed = [_as_unaddressed(det_by_code[code]) for code in unidentified]
+    if unaddressed:
+        report["notes"].append(
+            f"{len(unaddressed)} deterministic candidate(s) not addressed by the model; "
+            "surfaced as unaddressed_candidates (needs_more_info), not scored."
+        )
 
     return {
         "primary_threats": primary,
         "downgraded_threats": downgraded,
         "secondary_findings": secondary,
+        "unaddressed_candidates": unaddressed,
         "report": report,
+    }
+
+
+def _as_unaddressed(candidate):
+    """A grounded deterministic candidate the LLM did not address - transparency only."""
+    return {
+        "code": candidate.get("code"),
+        "name": candidate.get("name") or candidate.get("code"),
+        "framework": candidate.get("framework"),
+        "status": "needs_more_info",
+        "evidence": candidate.get("evidence") if isinstance(candidate.get("evidence"), list) else [],
+        "missing_information": list(candidate.get("missing_information") or []),
+        "rationale": "Deterministic candidate not addressed by the threat-identification model.",
+        "classification": "unaddressed_candidate",
+        "validated": False,
     }
 
 

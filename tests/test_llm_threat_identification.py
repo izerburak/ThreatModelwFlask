@@ -90,6 +90,57 @@ class ThreatIdentificationTests(unittest.TestCase):
         self.assertEqual(result["status"], "skipped")
         chat_mock.assert_not_called()
 
+    @patch("app.services.llm_threat_identification.chat")
+    def test_candidates_are_chunked_and_results_merged(self, chat_mock):
+        # chunk_size=1 -> one call per candidate; each chunk's enum is its single code.
+        def _per_chunk(messages, *args, **kwargs):
+            allowed = json.loads(messages[1]["content"])["instructions"]["primary_codes_allowed"]
+            code = allowed[0]
+            return _chat_return({
+                "identified_threats": [{
+                    "code": code, "name": code, "status": "plausible",
+                    "threat_pattern": "prompt_context_manipulation", "evidence": ["e"],
+                    "affected_nodes": [], "affected_edges": [], "abuse_path": ["s"],
+                    "control_gap": "gap", "confidence": "medium", "missing_information": [],
+                }],
+                "suggested_secondary_findings": [{"code": "API7:2023", "name": "SSRF", "status": "needs_more_info"}],
+            })
+
+        chat_mock.side_effect = _per_chunk
+        result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD,
+                                  {"LLM_THREAT_ID_CHUNK_SIZE": 1})
+
+        self.assertEqual(chat_mock.call_count, 2)  # LLM01 + LLM06 in separate calls
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["chunks_total"], 2)
+        self.assertEqual({t["code"] for t in result["identified_threats"]}, {"LLM01", "LLM06"})
+        # identical secondary finding from both chunks is de-duplicated.
+        self.assertEqual(len(result["suggested_secondary_findings"]), 1)
+
+    @patch("app.services.llm_threat_identification.chat")
+    def test_partial_when_some_chunks_fail(self, chat_mock):
+        calls = {"n": 0}
+
+        def _flaky(messages, *args, **kwargs):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise OllamaError("boom")
+            allowed = json.loads(messages[1]["content"])["instructions"]["primary_codes_allowed"]
+            return _chat_return({"identified_threats": [{
+                "code": allowed[0], "name": allowed[0], "status": "needs_more_info",
+                "threat_pattern": "prompt_context_manipulation", "evidence": [],
+                "affected_nodes": [], "affected_edges": [], "abuse_path": [],
+                "control_gap": "", "confidence": "low", "missing_information": []}],
+                "suggested_secondary_findings": []})
+
+        chat_mock.side_effect = _flaky
+        result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD,
+                                  {"LLM_THREAT_ID_CHUNK_SIZE": 1})
+        # one chunk failed, one succeeded -> partial, not unavailable.
+        self.assertEqual(result["status"], "partial")
+        self.assertEqual(result["chunks_succeeded"], 1)
+        self.assertEqual(len(result["identified_threats"]), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

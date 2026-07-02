@@ -89,6 +89,27 @@ class GroundingValidatorTests(unittest.TestCase):
         self.assertEqual(len(result["primary_threats"]), 1)
         self.assertEqual(result["primary_threats"][0]["status"], "confirmed")
 
+    def test_unaddressed_candidate_is_backfilled_not_scored(self):
+        # Deterministic set has LLM01 + LLM02, but the LLM only addresses LLM01.
+        # LLM02 must not vanish: it is backfilled as needs_more_info (not scored).
+        det = _det(answer="Yes") + [{
+            "code": "LLM02",
+            "name": "Sensitive Information Disclosure",
+            "framework": "owasp_llm",
+            "affected_assets": [],
+            "missing_information": ["Q24 not provided"],
+            "evidence": [{"question": "Q4", "text": "Sensitive data?", "answer": "Yes"}],
+        }]
+        result = validate_threats(_ident([_threat(affected_nodes=["llm_gateway"])]), DFD, det)
+        primary_codes = {t["code"] for t in result["primary_threats"]}
+        self.assertNotIn("LLM02", primary_codes)
+        self.assertIn("LLM02", result["report"]["unidentified_deterministic_codes"])
+        unaddressed = result["unaddressed_candidates"]
+        self.assertEqual(len(unaddressed), 1)
+        self.assertEqual(unaddressed[0]["code"], "LLM02")
+        self.assertEqual(unaddressed[0]["status"], "needs_more_info")
+        self.assertFalse(unaddressed[0]["validated"])
+
     def test_only_confirmed_or_plausible_proceed(self):
         threats = [
             _threat(affected_nodes=["llm_gateway"]),                       # confirmed

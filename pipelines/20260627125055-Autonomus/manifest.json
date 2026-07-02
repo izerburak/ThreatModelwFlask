@@ -1,0 +1,30 @@
+{
+  "pipeline_id": "20260627125055-Autonomus",
+  "project_name": "Autonomus",
+  "dfd_name": "Autonomus Threat Model",
+  "auditor_name": "Burak",
+  "source_response": "critical_autonomous_claims_workflow_agent_response_20260627.json",
+  "created_at": "2026-06-27T12:50:55Z",
+  "updated_at": "2026-06-27T12:52:21Z",
+  "status": "risk_analysis_completed",
+  "steps": {
+    "response_saved": {
+      "done": true,
+      "timestamp": "2026-06-27T12:50:55Z",
+      "artifact": "response.json"
+    },
+    "dfd_generated": {
+      "done": true,
+      "timestamp": "2026-06-27T12:50:55Z",
+      "artifact": "dfd_reactflow.json",
+      "error": null
+    },
+    "risk_analysis_completed": {
+      "done": true,
+      "timestamp": "2026-06-27T12:52:21Z",
+      "artifact": "risks.json",
+      "error": null
+    }
+  },
+  "dfd_archive": "20260627125055-Autonomus-Threat-Model.json"
+}

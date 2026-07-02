@@ -20,11 +20,13 @@ best-effort: if the model is unavailable / unparseable the result carries
 import json
 from pathlib import Path
 
+from app.services.feature_flags import config_int
 from app.services.ollama_client import OllamaError, chat
 from app.services.risk_catalog import all_catalog_codes
 from app.services.threat_template import pattern_ids
 
 PROMPT_FILENAME = "Threat-Identification-prompt.txt"
+DEFAULT_CHUNK_SIZE = 10
 
 STATUS_VALUES = ["confirmed", "plausible", "needs_more_info", "not_applicable"]
 CONFIDENCE_VALUES = ["low", "medium", "high"]
@@ -56,25 +58,84 @@ def identify_threats(app_root_path, answers_by_flow_id, deterministic_risks, ext
     edge_ids = _edge_ids(dfd_graph)
     prompt = _load_prompt(app_root_path)
 
-    user_payload = {
+    # qwen3:8b satisfices at ~10 candidates per call regardless of the prompt's
+    # "cover every candidate" rule, so the candidate set is split into chunks and
+    # one call is made per chunk; results are merged. The deterministic backfill in
+    # validate_threats remains the safety net for anything a chunk still drops.
+    chunk_size = config_int(app_config, "LLM_THREAT_ID_CHUNK_SIZE", DEFAULT_CHUNK_SIZE)
+    if chunk_size < 1:
+        chunk_size = len(primary_codes)
+    chunks = [primary_codes[i:i + chunk_size] for i in range(0, len(primary_codes), chunk_size)]
+
+    det_by_code = {str(risk.get("code") or "").strip().upper(): risk for risk in (deterministic_risks or []) if isinstance(risk, dict)}
+    base_payload = {
         "questionnaire_answers": answers_by_flow_id if isinstance(answers_by_flow_id, dict) else {},
-        "deterministic_risks": _slim_risks(deterministic_risks),
         "extraction_payload": extraction_payload if isinstance(extraction_payload, dict) else {},
         "dfd": {"nodes": _slim_nodes(dfd_graph), "edges": _slim_edges(dfd_graph)},
         "threat_patterns": pattern_ids(),
+    }
+
+    identified = []
+    secondary = []
+    model = None
+    succeeded = 0
+    last_error = None
+    for chunk_codes in chunks:
+        chunk_risks = [det_by_code[code] for code in chunk_codes if code in det_by_code]
+        parsed, model_name, error = _run_chunk(prompt, chunk_codes, chunk_risks, base_payload, node_ids, edge_ids, app_config, timeout)
+        if error is not None:
+            last_error = error
+            continue
+        succeeded += 1
+        model = model or model_name
+        if isinstance(parsed.get("identified_threats"), list):
+            identified.extend(parsed["identified_threats"])
+        if isinstance(parsed.get("suggested_secondary_findings"), list):
+            secondary.extend(parsed["suggested_secondary_findings"])
+
+    # All chunks failed -> the model is genuinely unavailable; caller falls back.
+    if succeeded == 0:
+        return {
+            "status": "unavailable",
+            "error": last_error or "Threat identification produced no usable output.",
+            "identified_threats": [],
+            "suggested_secondary_findings": [],
+        }
+
+    return {
+        "status": "completed" if succeeded == len(chunks) else "partial",
+        "model": model,
+        "chunks_total": len(chunks),
+        "chunks_succeeded": succeeded,
+        "identified_threats": identified,
+        "suggested_secondary_findings": _dedup_secondary(secondary),
+    }
+
+
+def _run_chunk(prompt, chunk_codes, chunk_risks, base_payload, node_ids, edge_ids, app_config, timeout):
+    """Run threat identification for one chunk of candidate codes.
+
+    Returns (parsed_dict, model_name, None) on success or (None, None, error_str) on
+    failure. The primary-code enum and deterministic_risks are restricted to this
+    chunk so the model focuses; secondary findings can still reference any code.
+    """
+    user_payload = {
+        **base_payload,
+        "deterministic_risks": _slim_risks(chunk_risks),
         "instructions": {
-            "primary_codes_allowed": primary_codes,
+            "primary_codes_allowed": chunk_codes,
             "rules": [
                 "identified_threats[].code MUST be one of primary_codes_allowed.",
+                "Emit EXACTLY ONE identified_threats entry for EVERY code in primary_codes_allowed; never skip a candidate. If a pattern does not fit, use the closest lens and set status needs_more_info or not_applicable.",
                 "Put any other risk idea under suggested_secondary_findings with status needs_more_info.",
                 "affected_nodes/affected_edges MUST use ids from dfd; never invent ids.",
                 "Do not compute DREAD, do not assign risk levels, do not write mitigations.",
                 "Unknown-only evidence cannot be confirmed; use plausible or needs_more_info.",
+                "For every confirmed/plausible threat, abuse_path MUST be a concrete ordered list of attack steps and control_gap MUST name the missing control. For needs_more_info/not_applicable, leave abuse_path [] and control_gap \"\".",
             ],
         },
     }
-
-    schema = _identification_schema(primary_codes, all_catalog_codes(), pattern_ids(), node_ids, edge_ids)
+    schema = _identification_schema(chunk_codes, all_catalog_codes(), pattern_ids(), node_ids, edge_ids)
 
     try:
         response = chat(
@@ -88,28 +149,27 @@ def identify_threats(app_root_path, answers_by_flow_id, deterministic_risks, ext
             options={"temperature": 0},
         )
     except (OllamaError, ValueError) as exc:
-        return {
-            "status": "unavailable",
-            "error": str(exc),
-            "identified_threats": [],
-            "suggested_secondary_findings": [],
-        }
+        return None, None, str(exc)
 
     parsed = _parse((response or {}).get("message", {}).get("content"))
     if parsed is None:
-        return {
-            "status": "unavailable",
-            "error": "Could not parse threat-identification output.",
-            "identified_threats": [],
-            "suggested_secondary_findings": [],
-        }
+        return None, None, "Could not parse threat-identification output."
+    return parsed, response.get("model"), None
 
-    return {
-        "status": "completed",
-        "model": response.get("model"),
-        "identified_threats": parsed.get("identified_threats") if isinstance(parsed.get("identified_threats"), list) else [],
-        "suggested_secondary_findings": parsed.get("suggested_secondary_findings") if isinstance(parsed.get("suggested_secondary_findings"), list) else [],
-    }
+
+def _dedup_secondary(findings):
+    """Merge secondary findings across chunks, de-duplicating by (code, name)."""
+    seen = set()
+    result = []
+    for finding in findings or []:
+        if not isinstance(finding, dict):
+            continue
+        key = (str(finding.get("code") or "").strip().upper(), str(finding.get("name") or "").strip().lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(finding)
+    return result
 
 
 def _identification_schema(primary_codes, secondary_codes, patterns, node_ids, edge_ids):
@@ -131,7 +191,7 @@ def _identification_schema(primary_codes, secondary_codes, patterns, node_ids, e
             "confidence": {"type": "string", "enum": CONFIDENCE_VALUES},
             "missing_information": {"type": "array", "items": {"type": "string"}},
         },
-        "required": ["code", "name", "status", "threat_pattern", "confidence", "evidence"],
+        "required": ["code", "name", "status", "threat_pattern", "confidence", "evidence", "abuse_path", "control_gap"],
     }
     secondary_item = {
         "type": "object",

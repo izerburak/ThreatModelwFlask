@@ -6,7 +6,6 @@ keeps the new template-guided threat-identification pipeline behind toggles:
 
     LLM_THREAT_IDENTIFICATION_ENABLED   (default: True)
     LLM_MITIGATION_GENERATION_ENABLED   (default: True)
-    LEGACY_LLM_RISK_REVIEW_ENABLED      (default: False)
 """
 
 import os

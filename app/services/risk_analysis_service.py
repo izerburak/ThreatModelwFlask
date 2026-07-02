@@ -945,6 +945,7 @@ def build_threat_analysis(app_root_path, response_payload, dfd_graph, app_config
         "deterministic_risks": deterministic_risks,
         "identified_threats": validation["primary_threats"] + validation["downgraded_threats"],
         "suggested_secondary_findings": validation["secondary_findings"],
+        "unaddressed_candidates": validation.get("unaddressed_candidates", []),
         "threat_validation_report": validation["report"],
         "mitigations": structured_mitigations,
         "mitigation_meta": {
@@ -963,14 +964,18 @@ def build_threat_analysis(app_root_path, response_payload, dfd_graph, app_config
             "mode": "template_guided_llm",
             "status": identification.get("status"),
             "model": identification.get("model"),
+            "chunks_total": identification.get("chunks_total"),
+            "chunks_succeeded": identification.get("chunks_succeeded"),
             "message": (
                 f"{len(validation['primary_threats'])} validated primary, "
                 f"{len(validation['downgraded_threats'])} downgraded, "
-                f"{len(validation['secondary_findings'])} secondary findings."
+                f"{len(validation['secondary_findings'])} secondary findings, "
+                f"{len(validation.get('unaddressed_candidates', []))} unaddressed candidates."
             ),
             "primary_count": len(validation["primary_threats"]),
             "downgraded_count": len(validation["downgraded_threats"]),
             "secondary_count": len(validation["secondary_findings"]),
+            "unaddressed_count": len(validation.get("unaddressed_candidates", [])),
         },
     }
 
