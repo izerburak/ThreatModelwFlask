@@ -1,9 +1,62 @@
-# PROJE DEVİR NOTU — START HERE (2026-07-03)
+# PROJE DEVİR NOTU — START HERE (güncelleme 2026-07-09)
 
-> Yeni bir makinede/Claude Code oturumunda devam ederken **önce bunu**, sonra `RQ Ideas.txt`
-> ("LOCKED RQ SET") ve `THESIS_PROJECT_CONTEXT.md`'yi oku. **Faz: kod DONDU, tez yazımı başlıyor.**
-> ✅ `THESIS_PROJECT_CONTEXT.md` 2026-07-03'te sıfırdan temiz yazıldı — güncel V1 akışını yansıtıyor
+> Yeni bir makinede/Claude Code oturumunda devam ederken **önce bunu**, sonra `RQ.txt`
+> (kanonik GÜNCEL RQ seti; eski `RQ Ideas.txt` SİLİNDİ) ve `THESIS_PROJECT_CONTEXT.md`'yi oku.
+> **Faz: kod DONDU, TEZ YAZIMI sürüyor.**
+> ✅ `THESIS_PROJECT_CONTEXT.md` güncel V1 akışını yansıtıyor
 > (eski extraction/`llm_risk_review`/MS-TMT-STRIDE-GPT/82-soru içeriği tamamen çıkarıldı).
+
+## TEZ RESMÎ KÜNYE (main.tex — Sabancı `sabanci-template`, OTORİTE)
+- **Title (EN):** *Automated Threat Modeling for LLM-Enabled Applications Using Local Large Language
+  Models and DREAD Risk Assessment*
+- **Başlık (TR):** *LLM-Destekli Uygulamalar için Yerel Büyük Dil Modelleri ve DREAD Risk
+  Değerlendirmesi Kullanarak Otomatik Tehdit Modelleme*
+- **Yazar:** Burak İzer · **Derece:** Master · **Program:** Cyber Security / Siber Güvenlik ·
+  **Enstitü:** Graduate School of Engineering and Natural Sciences
+- **Danışman:** Prof. Süha Orhun Mutluergil · **Jüri:** Assoc. Prof. Feyzullah Orçun Çetin,
+  Asst. Prof. Julio Hernandez-Castro · **Onay tarihi:** 01-06-2026
+- **Keywords (EN):** Threat modeling; LLM-enabled applications; Secure design; Automated DFD
+  generation; DREAD risk assessment; OWASP Top 10 (LLM/Web/API); LLM grounding; **LoRA-based
+  supervised fine-tuning**. → Fine-tune yöntemi = **LoRA** (SFT); anahtar kelime, ama merkezi RQ değil.
+- **Tez yapısı (main.tex `\import`):** `Chapters/Introduction/Chapter/Introduction` →
+  `Chapters/Chapter_2/Chapter/Chapter2` (background/related work) →
+  `Chapters/Metodology/Chapter/Metodology`; ardından bibliography + `Chapters/Chapter_2/Appendix/Appendix2`.
+  (Bu repo kökünde yalnız `thesis_intro_chapter1_v01.tex` var; asıl tez ağacı ayrı — muhtemelen Overleaf.)
+
+**Resmî ABSTRACT (EN, ≤250 kelime — main.tex'ten):** Threat modeling provides significant value
+during secure design, yet existing approaches remain difficult to apply because they often require
+manual DFD construction, STRIDE expertise, and produce generic, weakly contextualized outputs —
+amplified for LLM-enabled apps that combine web, API, and LLM components with overlapping attack
+surfaces modeled through separate taxonomies. The thesis investigates a **deterministic-first,
+questionnaire-driven** workflow for the combined attack surface of **generic** LLM-enabled
+applications. A single adaptive **91-question** questionnaire drives automatic static DFD generation,
+unified OWASP Web/API/LLM candidate-risk mapping, and **reproducible DREAD** scoring without manual
+modeling. The deterministic layer is the authoritative core; a **constrained local LLM** only
+enriches with system-specific threat descriptions, abuse paths, control gaps, and actionable
+mitigations — it does not generate the DFD, compute severity, or introduce primary risks outside the
+candidate set. A grounding validator removes hallucinated codes / non-existent DFD references.
+Evaluation uses automatic structural metrics comparing deterministic fallback vs base local LLM vs an
+**optionally fine-tuned** local LLM (same inputs): DFD integrity, risk coverage, grounding validity,
+schema conformance, system-specificity, mitigation actionability, prevention of LLM-driven severity
+changes. Even without the LLM, the deterministic fallback guarantees a valid risk output.
+> ⚠️ **Tutarlılık:** abstract "optionally fine-tuned" ifadesini **değerlendirme** cümlesinde
+> kullanıyor — bu OK ve tutarlı (fine-tune deneysel/opsiyonel). "optionally fine-tuned"ı yalnız
+> **MAIN RQ**'dan çıkardık (intro §1.3); abstract'a dokunmaya gerek yok.
+> **Definition — "generic LLM-enabled applications":** not restricted to a single vertical
+> (healthcare/finance) but sharing web/API entry points, LLM orchestration, retrieval/memory, tool
+> use, external services, logging/monitoring.
+
+## TEZ YAZIM DURUMU (2026-07-07)
+- **Bölüm 1 — Introduction: TASLAK YAZILDI** → `thesis_intro_chapter1_v01.tex` (motivasyon, 1.1
+  Problem, 1.2 Proposed Approach, 1.3 RQ'lar [Main + RQ1–RQ4], 1.4 Contributions [7 madde — 6.
+  sustainability update pipeline + 7. SFT dataset/fine-tuning eval eklendi], 1.5 Scope&Evaluation).
+  Citation'lar `% TODO-CITE` olarak işaretli. Açık borç: DREAD-seçimi intro'da motive edilmemiş
+  (STRIDE illüstratif; skorlama DREAD) — metodolojiye bırakılabilir.
+- **Metodoloji 3.1–3.6** drafted+verified (bkz. `THESIS_PROJECT_CONTEXT` companion notlar).
+- **Metodoloji 3.9 — "Model-Agnostic Local LLM Integration and Deterministic Resilience": YAZILDI**,
+  kodla doğrulandı, sıkıştırıldı (16→~12 paragraf + resilience tablosu). Küçük rötuş notu: fallback'te
+  deterministik mitigation her durumda iliştirilir (alternatif değil, taban).
+- **Sıradaki:** 3.7 DREAD bölümü; intro citation'larını doldur.
 
 ## PROJE NEDİR
 Flask tabanlı, **deterministik-first, anket güdümlü** tehdit modelleme aracı — LLM-tabanlı
@@ -19,7 +72,7 @@ ele alır; domain-specific çözümler (örn. healthcare) generalize olmaz. Tool
 birleşik, sisteme-yönelik, deterministik-first** bir akış.
 ⚠️ **Değerlendirme İÇSEL** (deterministic vs base LLM vs fine-tuned) — **dış araç kıyası YOK** (MS TMT
 ve STRIDE GPT foil olarak DÜŞTÜ) ve **insan/uzman değerlendirmesi YOK** (kullanıcı test ettiremiyor);
-tüm metrikler otomatik/yapısal. Ayrıntı: `RQ Ideas.txt` "LOCKED RQ SET".
+tüm metrikler otomatik/yapısal. Ayrıntı: `RQ.txt` (GÜNCEL RQ seti) + RQ DURUMU bölümü.
 
 ## GÜNCEL DURUM (working tree, 115/115 test geçiyor — V1 uncommitted)
 - Phases 1-4 + 91q DREAD migration + **V1 template-guided threat pipeline** (working tree'de, henüz
@@ -59,35 +112,46 @@ iyileşir. qwen3:8b base zayıf (uniform Critical→High) ama bu **modele özel,
 Büyük/uzak model = base'de bile iyi sonuç. Deterministik guardrail'ler model-swap'i güvenli kılar
 (halüsinasyon geri gelmez). **LLM'i "zayıf" diye genelleme — qwen3:8b'ye özel.**
 
-## FINE-TUNE (repo DIŞI, deneysel — DOKUNMA)
-VALAR HPC'de koşacak. Dataset (`Desktop\training\`, repoda değil): `train_dread_{700,1500,2804}.json`
-= 5004 kayıt, **aynı deterministik scorer'la** etiketli.
-- Input: `{project_metadata, questionnaire_answers, deterministic_risks(sadece kodlar),
-  extraction_payload, dfd_payload}`
-- Output: `{overall_status, risk_summary, risks[...DREAD bloğu dahil...], quick_wins, ...}`
-- Yani fine-tune = deterministik scorer'ı LLM'e **distile** etmek (base modelin "her şey Critical"
-  çöküşünü düzeltmek). Base model yerelde kalır; fine-tune remote, **karışma**.
+## FINE-TUNE (repo DIŞI, deneysel — DOKUNMA) — RQ2 & RQ4'ün ortak mekanizması
+> Not: fine-tuning artık tek bir RQ değil. **RQ2** = sabit bilgi setinde threat-ID etkinliğini
+> iyileştirme; **RQ4** = aynı fine-tune mekanizmasını update pipeline'dan gelen YENİ tehdit bilgisini
+> modele aktarmanın aracı olarak kullanma. İntroduction bu ikili rolü ayırıyor.
+VALAR HPC'de koşacak. **GÜNCEL dataset (2026-07-06) = görev-bölünmüş, chat-format** — `training/`
+altında (git'e yeni eklendi, untracked): `threatid_{3000,5000}.jsonl` (threat-ID görevi) +
+`mitigation_{3000,5000}.jsonl` (mitigation görevi). İkisi de **fine-tune-READY** (dedup düzeltildi,
+kayıtlar unique, 29 kod). ⚠️ **ESKİ `train_dread_{700,1500,2804}.json` ({input,output} risk-report
+seti) ARTIK OBSOLETE — kullanma.**
+- Fine-tune = iki LLM-destekli aşamayı (threat-ID + mitigation) deterministik-grounded artefaktlarla
+  **distile** etmek (base modelin "her şey Critical→High" çöküşünü düzeltmek). Base model yerelde
+  kalır; fine-tune remote, **karışma**.
+- Açık notlar: `secondary_findings=0`; dağılım Critical-ağırlıklı.
 - ⚠️ Dairesellik: değerlendirmede deterministik scorer'ı / aynı-dağılım etiketleri **gold-standard
   olarak kullanma** → trivial. Fine-tune sadece **yapısal conformance** (schema/grounding/actionability/
-  system-specificity) ile ölçülür; "semantic kalite daha iyi" iddiası kapsam DIŞI (insan değerlendirmesi
-  yok). SFT'de olmayan held-out test tut.
+  system-specificity) + **held-out** ile ölçülür; "semantic kalite daha iyi" iddiası kapsam DIŞI
+  (insan değerlendirmesi yok). SFT'de olmayan held-out test tut. (bkz. [[project-sft-dataset]])
 
-## RQ DURUMU (tam kilitli metin `RQ Ideas.txt` → "LOCKED RQ SET", 2026-07-03)
+## RQ DURUMU (GÜNCEL SET — kanonik metin `RQ.txt`, revize 2026-07-09)
+> ⚠️ **2026-07-09 REFRAME:** RQ seti eski "deterministic-first pipeline + LLM ne katkı sağlar"
+> çerçevesinden **LLM-merkezli**e çevrildi (bkz. [[feedback-local-llm-is-headline]]). Şema = **Main +
+> RQ1–RQ4** (eski "RQ1 + RQ1.1–1.4" ve daha eski deterministic-first RQ1–RQ4 metni ARTIK OBSOLETE).
+> Eski RQ1 (unified pipeline) ve RQ3 (guardrail) artık **RQ değil, contribution** (intro §1.4).
 Master scope: **"bir açık vardı → tool ne ölçüde patchledi"**; "to what extent" kısmi/dürüst cevaba
 izin verir. **Dış araç kıyası + insan değerlendirmesi YOK** (bkz. ÇIKIŞ NOKTASI). Özet:
-- **MAIN:** To what extent can a deterministic-first, questionnaire-driven pipeline model the combined
-  Web, API, and LLM attack surface of generic LLM-enabled applications — deriving grounded DFDs and
-  reproducible DREAD-based risk scores without manual modeling — and what additional value does a
-  constrained, optionally fine-tuned local LLM contribute to threat identification and mitigation
-  generation?
-- **RQ1 (unified pipeline):** anket → otomatik DFD + OWASP Web/API/LLM birleşik mapping + deterministik DREAD.
-- **RQ2 (LLM katkısı):** kısıtlı LLM, deterministik baseline'a sisteme-özgü tehdit + abuse_path/control_gap
-  + daha actionable mitigation ekliyor mu (grounding korunarak)?
-- **RQ3 (guardrail):** halüsinasyon kod / olmayan DFD referansı / desteksiz bulgu / LLM'in skoru değiştirmesi
-  engelleniyor mu?
-- **RQ4 (fine-tune sınırı, deneysel):** fine-tune mitigation conformance'ını (schema/evidence/actionability/
-  specificity) base'e göre iyileştiriyor mu?
-RQ1-RQ3 = taşıyıcı (hepsi inşa edildi, otomatik ölçülebilir); RQ4 = frontier (uzaktaki VALAR fine-tune).
+- **MAIN:** To what extent can local Large Language Models improve the threat modeling process for
+  LLM-integrated systems?
+- **RQ1 (threat identification):** yerel LLM'ler, TM sürecinde LLM-entegre sistemlere karşı tehditleri
+  ne ölçüde tanımlayabiliyor?
+- **RQ2 (effectiveness improvement):** yerel LLM'lerin tehdit tanımlama etkinliği nasıl iyileştirilebilir?
+  *(Mekanizma = supervised fine-tuning / LoRA.)*
+- **RQ3 (mitigation generation):** yerel LLM'ler, tanımlanan tehditler için ne ölçüde ilgili mitigation
+  stratejileri üretebiliyor?
+- **RQ4 (sustainability — deneysel):** LLM-destekli TM aracı, ortaya çıkan yeni saldırı vektörleri ve
+  değişen tehdit örüntüleriyle nasıl güncel tutulabilir? *(Güvenilir kaynaklardan gelen yeni tehdit/
+  mitigation bilgisini görev-özel eğitim verisine çevirip yerel LLM'i periyodik güncelleyen update
+  pipeline; grounding/traceability/reproducibility korunarak.)*
+RQ1 & RQ3 = taşıyıcı (inşa edildi, otomatik ölçülebilir). RQ2 & RQ4 = fine-tuning'e dayanan deneysel
+frontier (uzaktaki VALAR fine-tune; RQ2 = sabit bilgi setinde kalite, RQ4 = fine-tune'u YENİ bilgi
+aktarımının aracı olarak kullanma). Eski RQ metni için `git log` / önceki commit'ler.
 
 ## YENİ PC KURULUMU (temiz aktarım)
 1. Repoyu klonla/kopyala. Python 3.12 (mevcut makinede 3.12).
@@ -124,7 +188,7 @@ Testler **unittest** (pytest DEĞİL). `tests/` içinde `__init__.py` YOK → im
   araç/insan yok; deterministic vs base LLM vs fine-tuned, çok-koşum + varyans).
 - RQ1 için soru→OWASP eşlemesi hand-tagged → CWE/ASVS/ATLAS grounding + traceability matrisi (future
   work olarak da yazılabilir).
-- Fine-tune'u VALAR'da koşmak (repo dışı, RQ4 — deneysel uzantı; sonuçsuz çıkarsa future work).
+- Fine-tune'u VALAR'da koşmak (repo dışı, RQ2 & RQ4 — deneysel uzantı; sonuçsuz çıkarsa future work).
 - (Minör, tez-opsiyonel) orchestrator catch-all fallback + JSON-parse-error yolu için doğrudan
   unit test yok; `.env.example`/`config.py` yok (flag'ler `app/__init__.py` + env).
 

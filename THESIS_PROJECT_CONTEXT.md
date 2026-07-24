@@ -7,9 +7,18 @@
 > Tone is strict and honest.
 >
 > Repository root: `C:\Users\user\Desktop\ThreatModelwFlask` — branch `master`.
-> Rewritten clean on **2026-07-03** to reflect the FINAL (V1) pipeline. All earlier layered
-> "Phase 1-4 / LLM-extraction / llm_risk_review / MS-TMT-foil / 82-question" wording has been
-> removed as obsolete. Companion files: `HANDOFF.md` (start here) and `RQ Ideas.txt` ("LOCKED RQ SET").
+> Rewritten clean on **2026-07-03** to reflect the FINAL (V1) pipeline; **updated 2026-07-07** for the
+> finalized Chapter 1 / methodology 3.9. **Updated 2026-07-09** for the LLM-centric RQ reframe
+> (Main + RQ1–RQ4; sustainability is now RQ4). All earlier layered "Phase 1-4 / LLM-extraction /
+> llm_risk_review / MS-TMT-foil / 82-question" wording has been removed as obsolete. Companion files:
+> `HANDOFF.md` (start here) and `RQ.txt` (canonical current RQ set; old `RQ Ideas.txt` deleted).
+>
+> **OFFICIAL thesis title (main.tex):** *Automated Threat Modeling for LLM-Enabled Applications Using
+> Local Large Language Models and DREAD Risk Assessment* (TR: *LLM-Destekli Uygulamalar için Yerel
+> Büyük Dil Modelleri ve DREAD Risk Değerlendirmesi Kullanarak Otomatik Tehdit Modelleme*).
+> Author Burak İzer · MSc Cyber Security · advisor Prof. Süha Orhun Mutluergil · jury F. O. Çetin &
+> J. Hernandez-Castro. Fine-tune method = **LoRA** SFT. Full official abstract + committee + thesis
+> file structure (`Introduction` → `Chapter2` background → `Metodology` + appendix) in `HANDOFF.md`.
 
 ---
 
@@ -25,7 +34,10 @@ authoritative core; the local LLM is a constrained, grounded assistant.
 - Not an "LLM-generated" threat modeler. The LLM does **not** draw the DFD, does **not** compute
   risk severity, and cannot invent primary risks.
 - Not domain-specific. It targets **generic** LLM-enabled apps across the OWASP LLM + Web + API
-  surfaces together.
+  surfaces together. **Definition (Chapter 1):** *generic LLM-enabled applications* = systems not
+  restricted to a single vertical domain (e.g. healthcare, finance) but sharing common architectural
+  features — web/API entry points, LLM orchestration, retrieval/memory components, tool use, external
+  services, and logging/monitoring pipelines.
 - Not dependent on the LLM: with Ollama unavailable, a deterministic fallback still yields a valid
   `risks.json`.
 - Not production-hardened (dev `SECRET_KEY`, `debug=True`, file-based state, no auth).
@@ -44,29 +56,31 @@ do not readily generalize. This thesis addresses this gap by investigating a uni
 questionnaire-driven workflow for modeling the combined attack surface of generic LLM-enabled
 applications.* (Do **not** claim "no generic tool exists" — unfalsifiable.)
 
-## 3. Research questions (LOCKED — see `RQ Ideas.txt`)
+## 3. Research questions (CURRENT SET — see `RQ.txt`; reframed 2026-07-09, LLM-centric)
 
-**MAIN:** To what extent can a deterministic-first, questionnaire-driven pipeline model the combined
-Web, API, and LLM attack surface of generic LLM-enabled applications — deriving grounded data-flow
-diagrams and reproducible DREAD-based risk scores without manual modeling — and what additional value
-does a constrained, optionally fine-tuned local LLM contribute to threat identification and
-mitigation generation?
+> **2026-07-09 reframe:** the RQ set moved from the old "deterministic-first pipeline + what value does
+> the LLM add" framing to a **local-LLM-centric** framing. Scheme = **Main + RQ1–RQ4**. The old RQ1
+> (unified pipeline) and RQ3 (guardrail effectiveness) are now **contributions**, not research
+> questions (intro §1.4). Old deterministic-first RQ text is obsolete — see `git log` for history.
 
-- **RQ1 — Unified deterministic pipeline:** to what extent can a single adaptive questionnaire drive
-  automatic DFD generation, unified OWASP Web/API/LLM candidate-risk mapping, and deterministic DREAD
-  scoring, eliminating manual diagram construction?
-- **RQ2 — Local LLM contribution:** to what extent does a constrained local LLM enrich the
-  deterministic baseline with system-specific threat descriptions, abuse paths, control gaps, and
-  actionable mitigation detail, while staying within grounding constraints?
-- **RQ3 — Guardrail effectiveness:** to what extent do deterministic constraints and grounding
-  validation prevent hallucinated risk codes, references to non-existent DFD elements, unsupported
-  findings, and LLM-driven changes to deterministic severity?
-- **RQ4 — Fine-tuning boundary (experimental):** to what extent does fine-tuning a local model on
-  grounded artifacts improve the conformance and specificity of mitigation generation (schema
-  validity, evidence linkage, actionability, system-specificity) relative to the base model?
+**MAIN:** To what extent can local Large Language Models improve the threat modeling process for
+LLM-integrated systems?
 
-RQ1–RQ3 are load-bearing (implemented, automatically measurable now). RQ4 is the experimental
-frontier (remote fine-tuning); "to what extent" absorbs a partial/inconclusive result.
+- **RQ1 — Threat identification:** to what extent can local LLMs identify threats against
+  LLM-integrated systems during the threat modeling process?
+- **RQ2 — Effectiveness improvement:** how can the effectiveness of local LLMs in identifying threats
+  against LLM-integrated systems be improved? *(Mechanism = supervised fine-tuning / LoRA.)*
+- **RQ3 — Mitigation generation:** to what extent can local LLMs generate relevant mitigation
+  strategies for threats identified in LLM-integrated systems?
+- **RQ4 — Sustainability (experimental):** how can an LLM-assisted threat modeling tool for
+  LLM-integrated systems be kept up to date with emerging attack vectors and evolving threat patterns?
+  *(Update pipeline: trusted sources → normalized task-specific training data → periodic fine-tune of
+  the local model, preserving the same grounding/traceability/reproducibility constraints.)*
+
+RQ1 & RQ3 are load-bearing (implemented, automatically measurable now). RQ2 & RQ4 are the experimental
+frontier resting on remote fine-tuning (RQ2 = quality on a fixed knowledge set; RQ4 = fine-tuning as
+the delivery vehicle for *newly acquired* threat knowledge); "to what extent / how" absorbs a
+partial/inconclusive result.
 
 ## 4. Evaluation design (hard constraints)
 
@@ -79,9 +93,13 @@ frontier (remote fine-tuning); "to what extent" absorbs a partial/inconclusive r
   scoring — same input → identical scores). The LLM threat-identification stage is **stochastic**
   (the selected candidate cluster varies run-to-run); characterize its variance over N runs rather
   than claiming it reproducible.
-- **System-specificity / non-genericness** is measured automatically via a proxy: references to
-  concrete DFD node/component names and answer-derived entities vs a stoplist of generic security
-  phrases.
+- **System-specificity AND mitigation actionability are NOT expert-judged semantic quality** — they
+  are measured via **structural proxy metrics** (Chapter 1 §1.5): references to concrete DFD
+  nodes/components, answer-derived evidence/entities, target components, validation steps, and
+  evidence-linked mitigation fields (`maps_to_evidence`), optionally vs a stoplist of generic phrases.
+  ⚠️ **Proxy caveat (state in limitations):** these count *presence/linkage*, not quality; a model
+  that dumps many node refs could score high without being truly specific (gameable). Define the exact
+  computation (ratio? per-risk?) in the eval chapter.
 - Fine-tuning is assessed on **structural conformance only** (schema/grounding/actionability/
   specificity); semantic, expert-judged quality is out of scope (no human raters).
 
@@ -195,14 +213,20 @@ The same feature-flag path is taken when `LLM_THREAT_IDENTIFICATION_ENABLED` is 
   deterministic guardrails keep swaps safe). qwen3:8b base is a modest model — frame LLM weaknesses
   as **model-specific**, not design flaws.
 
-## 11. Fine-tuning (external / experimental — RQ4)
+## 11. Fine-tuning (external / experimental — RQ2 & RQ4)
 
 - **No training code or ML dependencies in this repo.** Fine-tuning runs remotely (VALAR HPC) on an
   external SFT dataset; treat it as experimental thesis work, not app functionality.
+- **Current dataset (2026-07-06) = task-split, chat-format**, under `training/`:
+  `threatid_{3000,5000}.jsonl` (threat-identification task) + `mitigation_{3000,5000}.jsonl`
+  (mitigation task) — both fine-tune-ready (dedup fixed, unique records, 29 codes). ⚠️ The old
+  `{input,output}` risk-report set (`train_dread_*.json`) is **obsolete**. Open notes:
+  `secondary_findings=0`, Critical-heavy distribution.
 - Dataset is grounded on deterministic output (good anti-hallucination design). **Circularity
   caveat:** because labels come from the same deterministic pipeline, fine-tuning is evaluated on
-  **structural conformance/grounding**, not "expert-quality improvement," and the test set must be
-  disjoint from training. See `RQ Ideas.txt` and [[project-sft-dataset]] notes.
+  **structural conformance/grounding + a held-out set disjoint from training**, not "expert-quality
+  improvement." Fine-tuning serves **RQ2** (effectiveness on a fixed knowledge set) and **RQ4**
+(delivery vehicle for the sustainability update pipeline). See `RQ.txt` and [[project-sft-dataset]] notes.
 
 ## 12. Feature flags & configuration
 

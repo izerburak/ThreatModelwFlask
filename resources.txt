@@ -1,0 +1,212 @@
+Working Resource Map for Thesis Background
+==========================================
+
+This file summarizes the working BibTeX sources prepared from the NotebookLM
+extracts. Some metadata is incomplete and should be verified before final
+submission. The purpose of this file is to keep track of what each source is
+useful for while drafting.
+
+
+Threat Modeling Foundations and Tool Support
+--------------------------------------------
+
+bygdas2021evaluating
+Title: Evaluating Threat Modeling Tools: Microsoft TMT versus OWASP Threat Dragon
+Use: Background source for traditional tool-supported threat modeling, Microsoft
+Threat Modeling Tool, OWASP Threat Dragon, DFD-based modeling, and secure design
+motivation.
+Notes: Metadata partly inferred; verify venue, DOI, URL, and pages later.
+
+hashim2025evaluating
+Title: Evaluating the Effectiveness and Usability of Microsoft Threat Modelling
+Tool in Undergraduate Cybersecurity Education
+Use: Optional/background source for usability challenges of Microsoft Threat
+Modeling Tool, especially for novice users.
+Notes: Lower priority because the study context is undergraduate education.
+
+hajric2020methods
+Title: Methods, Methodologies, and Tools for Threat Modeling with Case Study
+Use: Core background source for threat modeling definitions, process structure,
+DFDs, STRIDE/DREAD background, and general threat modeling methodology.
+Notes: Case study is not central; use mainly for definitions and method overview.
+
+naik2024comparative
+Title: A Comparative Analysis of Threat Modelling Methods: STRIDE, DREAD, VAST,
+PASTA, OCTAVE, and LINDDUN
+Use: Background source for comparing threat modeling/risk assessment methods and
+supporting the DREAD discussion.
+Notes: Metadata should be verified; useful as broad comparative background.
+
+thompson2024tmnt
+Title: The Threat Modeling Naturally Tool: An Interactive Tool Supporting More
+Natural, Flexible, and Ad-Hoc Threat Modeling
+Use: Source for limitations of existing threat modeling tools, cognitive load,
+boilerplate/context-agnostic threat lists, and need for more natural workflows.
+Notes: Useful for motivating automation and avoiding overwhelming tool output.
+
+shi2022taxonomy
+Title: Threat Modeling Tools: A Taxonomy
+Use: Background source for threat modeling tool taxonomy, diagram-based versus
+text-based modeling, automation gaps, and tool capabilities.
+Notes: Good support for why system modeling choices matter.
+
+cho2025defense
+Title: Threat Modeling for the Defense Industry: Past, Present, and Future
+Use: Optional source for broader threat modeling history and industry context.
+Notes: Not central unless a wider historical background paragraph is needed.
+
+aswec2018threatmodeling
+Title: Threat Modeling
+Use: Source for empirical limitations of manual threat modeling, including DFD
+abstraction difficulty, time cost, and expert dependency.
+Notes: Metadata is incomplete; verify title/authors/venue if used heavily.
+
+bernsmed_adopting_threat_modelling
+Title: Adopting Threat Modelling in Agile Software Development Projects
+Use: Source for manual threat modeling challenges in agile teams, time burden,
+false positives, and difficulty applying existing tool support.
+Notes: Preprint; may overlap with ASWEC source, so avoid double-counting.
+
+
+LLM-Integrated System Security and System-Level Threat Modeling
+---------------------------------------------------------------
+
+nagaraja2026where
+Title: Where Do LLM-based Systems Break? A System-Level Security Framework for
+Risk Assessment and Treatment
+Use: Key source for the research gap: LLM systems combine conventional platform
+threats, adversarial ML threats, and conversational/prompt-based threats; security
+analysis should be system-level rather than model-only.
+Notes: Strong source for Section 2.2 and research gap.
+
+nagaraja2025cyber
+Title: Cyber Threat Modeling of an LLM-Based Healthcare System
+Use: Source for mapping OWASP LLM risks to concrete DFD components and data flows;
+supports architecture-aware LLM threat modeling.
+Notes: Healthcare-specific and manual; useful contrast for generic automation.
+
+tete2024threatmodelling
+Title: Threat Modelling and Risk Analysis for Large Language Model
+(LLM)-Powered Applications
+Use: Source for LLM-powered applications inheriting Web/API risks and for DREAD
+or DREAD-style risk analysis in LLM application threat modeling.
+Notes: Manual/qualitative approach; useful as background and contrast.
+
+promptinjection2023formalizing
+Title: Formalizing and Benchmarking Prompt Injection Attacks and Defenses
+Use: Source for prompt injection as an emerging LLM-specific attack vector and
+for explaining why retrieved or user-supplied instructions can affect model
+behavior.
+Notes: Specific to prompt injection, not a full threat modeling framework.
+
+poisonedrag2024knowledge
+Title: PoisonedRAG: Knowledge Corruption Attacks to Retrieval-Augmented Generation
+Use: Source for RAG-specific attack surface and knowledge corruption / retrieval
+poisoning risks.
+Notes: Specific to RAG exploitation; useful in LLM-integrated systems section.
+
+
+LLM-Assisted and Automated Threat Modeling
+------------------------------------------
+
+mollaeefar2024pillar
+Title: PILLAR: An AI-Powered Privacy Threat Modeling Tool
+Use: Key related-work source for LLM-assisted DFD generation, privacy threat
+modeling, threat classification, and risk prioritization from natural language
+system descriptions.
+Notes: Privacy/LINDDUN-focused; contrasts with deterministic questionnaire-based
+security threat modeling.
+
+wu2024threatmodelingllm
+Title: ThreatModeling-LLM: Automating Threat Modeling using Large Language Models
+for Banking System
+Use: Key source for LLM-assisted threat modeling, prompt engineering, LoRA-based
+fine-tuning, threat identification, and mitigation mapping.
+Notes: Banking-specific and relies on prepared DFD input; strong RQ2/RQ3 support.
+
+pathe2025towards
+Title: Towards Threat Modeling with Large Language Models: Automating
+Domain-Specific Language Creation in Meta Attack Language (MAL)
+Use: Source for structured LLM generation, formal threat modeling artifacts,
+hallucination control, consistency challenges, and schema-like output concerns.
+Notes: MAL-specific; useful for grounding/validation motivation.
+
+atmllm2025framework
+Title: A Threat Modeling Framework for LLM System Integration Leveraging Automated
+Threat Modeling
+Use: Possible source for automated threat modeling and DREAD-style architecture in
+LLM system integration.
+Notes: Metadata incomplete; use only if the paper text is checked.
+
+automatedllmthreatmodelling2025survey
+Title: Automated Threat Modelling Applied to LLM System Integration using NLP and
+Machine Learning: A Survey
+Use: Possible survey source for research gap and traditional threat modeling
+limitations in probabilistic LLM settings.
+Notes: Metadata incomplete; use cautiously.
+
+
+DREAD and LLM Risk Assessment
+-----------------------------
+
+zahid2024securing
+Title: Securing Educational LLMs: A Generalised Taxonomy of Attacks on LLMs and
+DREAD Risk Assessment
+Use: Key source showing that DREAD can be applied to LLM-related threats and LLM
+attack taxonomies.
+Notes: Their scoring is manual/expert-driven; useful contrast for deterministic
+questionnaire-grounded DREAD.
+
+securingllms2024threats
+Title: Securing Large Language Models: Threats, Vulnerabilities and Responsible
+Practices
+Use: Background source for LLM vulnerabilities, mitigation strategies, red-teaming,
+and responsible practices.
+Notes: Broad overview; not central to the tool architecture.
+
+
+Fine-Tuning, Local Models, and Adaptation
+-----------------------------------------
+
+hu2022lora
+Title: LoRA: Low-Rank Adaptation of Large Language Models
+Use: Foundational source for LoRA as parameter-efficient fine-tuning.
+Notes: Important for explaining why task-specific adaptation can be done without
+full model retraining.
+
+dettmers2023qlora
+Title: QLoRA: Efficient Finetuning of Quantized LLMs
+Use: Background source for efficient fine-tuning through quantization plus LoRA.
+Notes: Only use as general background; the project uses LoRA, not necessarily
+QLoRA.
+
+uniquellmthreats2025survey
+Title: Unique Security and Privacy Threats of Large Language Models: A
+Comprehensive Survey
+Use: Possible source for lifecycle-specific LLM risks, fine-tuning risks, PEFT/LoRA
+poisoning, and emerging threat patterns.
+Notes: Metadata incomplete; useful if verified.
+
+
+Lower Priority / Mostly Not Central
+-----------------------------------
+
+riskcards2023assessing
+Title: Assessing Language Model Deployment with Risk Cards
+Use: Qualitative/human-centered risk documentation background.
+Notes: Not central because this thesis focuses on automated, deterministic, and
+structural evaluation.
+
+chimera2025insider
+Title: Chimera: Harnessing Multi-Agent LLMs for Automatic Insider Threat Simulation
+Use: Mostly unrelated; insider threat simulation and logs rather than application
+design threat modeling.
+Notes: Likely ignore.
+
+cybersentinel2025gpt4
+Title: Cyber Sentinel: Exploring Conversational Agents in Streamlining Security
+Tasks with GPT-4
+Use: Mostly unrelated; SOC/security-operations assistant rather than design-time
+threat modeling.
+Notes: Likely ignore.
+

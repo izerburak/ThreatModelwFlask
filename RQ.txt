@@ -1,0 +1,7 @@
+Main Research Question. To what extent can local Large Language Models improve the threat modeling process for LLM-integrated systems?
+
+Sub-Research Questions
+RQ1. To what extent can local Large Language Models identify threats against LLM-integrated systems during the threat modeling process?
+RQ2. How can the effectiveness of local Large Language Models in identifying threats against LLM-integrated systems be improved?
+RQ3. To what extent can local Large Language Models generate relevant mitigation strategies for threats identified in LLM-integrated systems?
+RQ4. How can an LLM-assisted threat modeling tool for LLM-integrated systems be kept up to date with emerging attack vectors and evolving threat patterns?

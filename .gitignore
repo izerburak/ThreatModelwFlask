@@ -14,3 +14,10 @@ responses/
 venv-win/
 .tmp-test
 .claude/
+
+# Local Codex-generated dependencies and working artifacts
+.codex
+.codex_assets/
+.codex_deps/
+.codex_pillow/
+.codex_thesis_text.txt
