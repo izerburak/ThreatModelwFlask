@@ -102,12 +102,28 @@ def identify_threats(app_root_path, answers_by_flow_id, deterministic_risks, ext
             "suggested_secondary_findings": [],
         }
 
+    identified = _dedup_identified(identified)
+    identified_codes = {
+        str(threat.get("code") or "").strip().upper()
+        for threat in identified
+        if isinstance(threat, dict)
+    }
+    missing_primary_codes = [code for code in primary_codes if code not in identified_codes]
+
     return {
-        "status": "completed" if succeeded == len(chunks) else "partial",
+        # A parseable response is not the same as complete candidate coverage. Mark
+        # the stage partial whenever the model omits an allowed deterministic code;
+        # the downstream deterministic backfill will keep those codes visible.
+        "status": (
+            "completed"
+            if succeeded == len(chunks) and not missing_primary_codes
+            else "partial"
+        ),
         "model": model,
         "chunks_total": len(chunks),
         "chunks_succeeded": succeeded,
         "identified_threats": identified,
+        "missing_primary_codes": missing_primary_codes,
         "suggested_secondary_findings": _dedup_secondary(secondary),
     }
 
@@ -169,6 +185,21 @@ def _dedup_secondary(findings):
             continue
         seen.add(key)
         result.append(finding)
+    return result
+
+
+def _dedup_identified(threats):
+    """Keep at most one primary threat per deterministic risk code."""
+    seen = set()
+    result = []
+    for threat in threats or []:
+        if not isinstance(threat, dict):
+            continue
+        code = str(threat.get("code") or "").strip().upper()
+        if not code or code in seen:
+            continue
+        seen.add(code)
+        result.append(threat)
     return result
 
 

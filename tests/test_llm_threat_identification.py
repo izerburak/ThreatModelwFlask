@@ -67,15 +67,39 @@ class ThreatIdentificationTests(unittest.TestCase):
                     {"code": "LLM01", "name": "Prompt Injection", "status": "confirmed",
                      "threat_pattern": "prompt_context_manipulation", "evidence": ["Q2: public"],
                      "affected_nodes": ["llm_gateway"], "affected_edges": [], "abuse_path": ["a"],
-                     "control_gap": "no isolation", "confidence": "high", "missing_information": []}
+                     "control_gap": "no isolation", "confidence": "high", "missing_information": []},
+                    {"code": "LLM06", "name": "Excessive Agency", "status": "not_applicable",
+                     "threat_pattern": "excessive_tool_or_workflow_agency", "evidence": ["Q15"],
+                     "affected_nodes": [], "affected_edges": [], "abuse_path": [],
+                     "control_gap": "", "confidence": "medium", "missing_information": []}
                 ],
                 "suggested_secondary_findings": [],
             }
         )
         result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD)
         self.assertEqual(result["status"], "completed")
-        self.assertEqual(len(result["identified_threats"]), 1)
+        self.assertEqual(len(result["identified_threats"]), 2)
         self.assertEqual(result["identified_threats"][0]["code"], "LLM01")
+        self.assertEqual(result["missing_primary_codes"], [])
+
+    @patch("app.services.llm_threat_identification.chat")
+    def test_parseable_but_incomplete_output_is_partial(self, chat_mock):
+        chat_mock.return_value = _chat_return(
+            {
+                "identified_threats": [
+                    {"code": "LLM01", "name": "Prompt Injection", "status": "plausible",
+                     "threat_pattern": "prompt_context_manipulation", "evidence": ["Q2"],
+                     "affected_nodes": [], "affected_edges": [], "abuse_path": ["a"],
+                     "control_gap": "gap", "confidence": "medium", "missing_information": []}
+                ],
+                "suggested_secondary_findings": [],
+            }
+        )
+
+        result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD)
+
+        self.assertEqual(result["status"], "partial")
+        self.assertEqual(result["missing_primary_codes"], ["LLM06"])
 
     @patch("app.services.llm_threat_identification.chat")
     def test_unavailable_when_ollama_down(self, chat_mock):

@@ -1,0 +1,1083 @@
+{
+  "schema_version": "sustainability.v1",
+  "custom_keywords": {
+    "security": [],
+    "llm": []
+  },
+  "last_scan": {
+    "schema_version": "sustainability.scan.v1",
+    "source_name": "ArXiv — cs.CR Recent",
+    "source_url": "https://arxiv.org/list/cs.CR/recent",
+    "requested_count": 50,
+    "scanned_at": "2026-08-28T20:08:29Z",
+    "keywords": {
+      "security": [
+        "attack",
+        "attacks",
+        "attack surface",
+        "vulnerability",
+        "vulnerabilities",
+        "risk",
+        "risks",
+        "threat",
+        "threats",
+        "exploit",
+        "exploits",
+        "exploitation",
+        "injection",
+        "jailbreak",
+        "poisoning",
+        "adversarial",
+        "leakage",
+        "exfiltration",
+        "bypass",
+        "hijack",
+        "compromise",
+        "abuse",
+        "security"
+      ],
+      "llm": [
+        "llm",
+        "large language model",
+        "language model",
+        "agent",
+        "agentic",
+        "prompt",
+        "rag",
+        "retrieval augmented generation",
+        "retrieval",
+        "memory",
+        "tool",
+        "tool-use",
+        "tool calling",
+        "model",
+        "ai agent"
+      ]
+    },
+    "summary": {
+      "papers_scanned": 50,
+      "security_matches": 16,
+      "llm_matches": 19,
+      "strong_candidates": 8,
+      "no_keyword_match": 23
+    },
+    "warnings": [],
+    "papers": [
+      {
+        "arxiv_id": "2608.27424",
+        "title": "Beyond F1: Evaluating Coverage and Failure Recovery in AI Model Security Scanners",
+        "paper_url": "https://arxiv.org/abs/2608.27424",
+        "html_url": "https://arxiv.org/html/2608.27424",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI)",
+        "categories": [
+          "cs.CR",
+          "cs.AI"
+        ],
+        "source_index": 1,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "security"
+        ],
+        "llm_matches": [
+          "model"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.27215",
+        "title": "From Security Events to Conflict States: A Three-layer Cyber Defense Scenario Model for Enhanced Cyber Situational Awareness",
+        "paper_url": "https://arxiv.org/abs/2608.27215",
+        "html_url": "https://arxiv.org/html/2608.27215",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 5,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "security"
+        ],
+        "llm_matches": [
+          "model"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.27092",
+        "title": "The Framing Gap: Indirect Prompt-Injection Exfiltration Defeats Surface-Level Defenses in Tool-Using Agents",
+        "paper_url": "https://arxiv.org/abs/2608.27092",
+        "html_url": "https://arxiv.org/html/2608.27092",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 11,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "injection",
+          "exfiltration"
+        ],
+        "llm_matches": [
+          "prompt",
+          "tool"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.26588",
+        "title": "Unsaid, Unsafe? Implicit Security Obligations in LLM-Based RTL Code Generation",
+        "paper_url": "https://arxiv.org/abs/2608.26588",
+        "html_url": "https://arxiv.org/html/2608.26588",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 27,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "security"
+        ],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.26237",
+        "title": "How Do LLM Agents Actually Get the Flag? Trace-Level Provenance for Agentic Offensive Security Evaluation",
+        "paper_url": "https://arxiv.org/abs/2608.26237",
+        "html_url": "https://arxiv.org/html/2608.26237",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI)",
+        "categories": [
+          "cs.CR",
+          "cs.AI"
+        ],
+        "source_index": 33,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "security"
+        ],
+        "llm_matches": [
+          "llm",
+          "agentic"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.26423",
+        "title": "The Latent Diagnostic Taxonomy: A Framework for Constructing Classifiers and Diagnosing Their Decisions, Applied to Prompt Injection Detection",
+        "paper_url": "https://arxiv.org/abs/2608.26423",
+        "html_url": "https://arxiv.org/html/2608.26423",
+        "html_available_on_listing": false,
+        "subjects": "Machine Learning (cs.LG) ; Artificial Intelligence (cs.AI); Computation and Language (cs.CL); Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.LG",
+          "cs.AI",
+          "cs.CL",
+          "cs.CR"
+        ],
+        "source_index": 40,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "injection"
+        ],
+        "llm_matches": [
+          "prompt"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.26008",
+        "title": "A Self-Evolving Multi-Agent Framework Defense against LLM Jailbreak Attacks",
+        "paper_url": "https://arxiv.org/abs/2608.26008",
+        "html_url": "https://arxiv.org/html/2608.26008",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Computation and Language (cs.CL)",
+        "categories": [
+          "cs.CR",
+          "cs.CL"
+        ],
+        "source_index": 45,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "attacks",
+          "jailbreak"
+        ],
+        "llm_matches": [
+          "llm",
+          "agent"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.25817",
+        "title": "SkillShield: Prompt-Space Security Skills for LLM Coding Agents",
+        "paper_url": "https://arxiv.org/abs/2608.25817",
+        "html_url": "https://arxiv.org/html/2608.25817",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 47,
+        "security_match": true,
+        "llm_match": true,
+        "security_matches": [
+          "security"
+        ],
+        "llm_matches": [
+          "llm",
+          "prompt"
+        ],
+        "candidate_status": "strong_candidate",
+        "candidate_status_label": "Strong Candidate"
+      },
+      {
+        "arxiv_id": "2608.27288",
+        "title": "Low-ASR Backdoors: Exploiting Attack Success Rate Reduction and Attacker-Defender Asymmetry",
+        "paper_url": "https://arxiv.org/abs/2608.27288",
+        "html_url": "https://arxiv.org/html/2608.27288",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 3,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "attack"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.27037",
+        "title": "Neighborhood Watch: Privacy Risks in Seeded Local Combination Synthetic Data",
+        "paper_url": "https://arxiv.org/abs/2608.27037",
+        "html_url": "https://arxiv.org/html/2608.27037",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 13,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "risks"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.26871",
+        "title": "SysComb: Fine-Grained Transparent System Call Filtering for Attack Surface Reduction",
+        "paper_url": "https://arxiv.org/abs/2608.26871",
+        "html_url": "https://arxiv.org/html/2608.26871",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 18,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "attack",
+          "attack surface"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.26416",
+        "title": "IoMT-SecAlarmBench: A Counterfactual Benchmark for Integrity Attacks in IoMT",
+        "paper_url": "https://arxiv.org/abs/2608.26416",
+        "html_url": "https://arxiv.org/html/2608.26416",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 28,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "attacks"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.26861",
+        "title": "FIDA: Feature Instability-Driven Attack on Self-Supervised Facial Representation",
+        "paper_url": "https://arxiv.org/abs/2608.26861",
+        "html_url": "https://arxiv.org/html/2608.26861",
+        "html_available_on_listing": false,
+        "subjects": "Computer Vision and Pattern Recognition (cs.CV) ; Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CV",
+          "cs.CR"
+        ],
+        "source_index": 37,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "attack"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.26072",
+        "title": "From Fleet to Lab: Revisiting the Security and Complexity of Industrial Rowhammer Mitigation",
+        "paper_url": "https://arxiv.org/abs/2608.26072",
+        "html_url": "https://arxiv.org/html/2608.26072",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Hardware Architecture (cs.AR)",
+        "categories": [
+          "cs.CR",
+          "cs.AR"
+        ],
+        "source_index": 43,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "security"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.25877",
+        "title": "A Hybrid Security Framework for Mini-Programs: Visual UI Compliance and Network Risk Assessment",
+        "paper_url": "https://arxiv.org/abs/2608.25877",
+        "html_url": "https://arxiv.org/html/2608.25877",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 46,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "risk",
+          "security"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.25776",
+        "title": "EVOMAL: Self-Poisoning in Self-Evolving Coding Agents",
+        "paper_url": "https://arxiv.org/abs/2608.25776",
+        "html_url": "https://arxiv.org/html/2608.25776",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI)",
+        "categories": [
+          "cs.CR",
+          "cs.AI"
+        ],
+        "source_index": 49,
+        "security_match": true,
+        "llm_match": false,
+        "security_matches": [
+          "poisoning"
+        ],
+        "llm_matches": [],
+        "candidate_status": "security_only",
+        "candidate_status_label": "Security Match Only"
+      },
+      {
+        "arxiv_id": "2608.27439",
+        "title": "RedEvoAgent: Automatic Red-Teaming Agent with Experience-Driven Skill Evolution",
+        "paper_url": "https://arxiv.org/abs/2608.27439",
+        "html_url": "https://arxiv.org/html/2608.27439",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI)",
+        "categories": [
+          "cs.CR",
+          "cs.AI"
+        ],
+        "source_index": 0,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "agent"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27299",
+        "title": "When Context Gets Root: Privilege Escalation in LLM Harnesses",
+        "paper_url": "https://arxiv.org/abs/2608.27299",
+        "html_url": "https://arxiv.org/html/2608.27299",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 2,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27234",
+        "title": "SPA: Securing Persistent LLM Agents Across Queries with Plan-First Information-Flow Control",
+        "paper_url": "https://arxiv.org/abs/2608.27234",
+        "html_url": "https://arxiv.org/html/2608.27234",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 4,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27141",
+        "title": "Safety Does Not Compose: Non-Decaying Loop State for Autonomous LLM Agents",
+        "paper_url": "https://arxiv.org/abs/2608.27141",
+        "html_url": "https://arxiv.org/html/2608.27141",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI)",
+        "categories": [
+          "cs.CR",
+          "cs.AI"
+        ],
+        "source_index": 8,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27009",
+        "title": "The Guard That Cried Wolf: How Scary Words Make Agent Guardrails Refuse Legitimate Actions",
+        "paper_url": "https://arxiv.org/abs/2608.27009",
+        "html_url": "https://arxiv.org/html/2608.27009",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 14,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "agent"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.26882",
+        "title": "PLCBench: Can Autonomous LLM Agents Turn PLC Access into Sustained Physical Impact?",
+        "paper_url": "https://arxiv.org/abs/2608.26882",
+        "html_url": "https://arxiv.org/html/2608.26882",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI)",
+        "categories": [
+          "cs.CR",
+          "cs.AI"
+        ],
+        "source_index": 17,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.26733",
+        "title": "Daydreaming: Stealing Hidden Agent Skills through Black-Box Task Interaction",
+        "paper_url": "https://arxiv.org/abs/2608.26733",
+        "html_url": "https://arxiv.org/html/2608.26733",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI); Machine Learning (cs.LG)",
+        "categories": [
+          "cs.CR",
+          "cs.AI",
+          "cs.LG"
+        ],
+        "source_index": 24,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "agent"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.26699",
+        "title": "KubeCap: A Framework for Capability Minimization in Kubernetes via Static Analysis and LLM-Assisted Rule Inference",
+        "paper_url": "https://arxiv.org/abs/2608.26699",
+        "html_url": "https://arxiv.org/html/2608.26699",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 25,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27443",
+        "title": "Do User-Authored Permission Policies Improve Protection Against AI Agent Overreach?",
+        "paper_url": "https://arxiv.org/abs/2608.27443",
+        "html_url": "https://arxiv.org/html/2608.27443",
+        "html_available_on_listing": false,
+        "subjects": "Human-Computer Interaction (cs.HC) ; Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.HC",
+          "cs.CR"
+        ],
+        "source_index": 35,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "agent",
+          "ai agent"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27102",
+        "title": "LAAF: A Layered Accountability Architecture Framework for LLM Applications",
+        "paper_url": "https://arxiv.org/abs/2608.27102",
+        "html_url": "https://arxiv.org/html/2608.27102",
+        "html_available_on_listing": false,
+        "subjects": "Artificial Intelligence (cs.AI) ; Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.AI",
+          "cs.CR"
+        ],
+        "source_index": 36,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.26222",
+        "title": "NeuronFuzz: Safety Neuron Guided Fuzzing for LLM Safety Evaluation",
+        "paper_url": "https://arxiv.org/abs/2608.26222",
+        "html_url": "https://arxiv.org/html/2608.26222",
+        "html_available_on_listing": false,
+        "subjects": "Machine Learning (cs.LG) ; Artificial Intelligence (cs.AI); Cryptography and Security (cs.CR); Software Engineering (cs.SE)",
+        "categories": [
+          "cs.LG",
+          "cs.AI",
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 41,
+        "security_match": false,
+        "llm_match": true,
+        "security_matches": [],
+        "llm_matches": [
+          "llm"
+        ],
+        "candidate_status": "llm_only",
+        "candidate_status_label": "LLM Match Only"
+      },
+      {
+        "arxiv_id": "2608.27172",
+        "title": "X-WAD: eXplainable Web Anomaly Detection",
+        "paper_url": "https://arxiv.org/abs/2608.27172",
+        "html_url": "https://arxiv.org/html/2608.27172",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 6,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.27164",
+        "title": "Physical-Layer Fingerprint-Space Capacity Analysis for 100BASE-TX Devices in IIoT",
+        "paper_url": "https://arxiv.org/abs/2608.27164",
+        "html_url": "https://arxiv.org/html/2608.27164",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Signal Processing (eess.SP)",
+        "categories": [
+          "cs.CR",
+          "eess.SP"
+        ],
+        "source_index": 7,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.27129",
+        "title": "SLIDE: Shuffle Shamir Secret Shares Uniformly with Linear Online Communication and Guaranteed Output Delivery",
+        "paper_url": "https://arxiv.org/abs/2608.27129",
+        "html_url": "https://arxiv.org/html/2608.27129",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 9,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.27108",
+        "title": "SecureDrive-FL: Joint Differential Privacy and Gradient-Aware Selective Homomorphic Encryption for Federated Driver Monitoring",
+        "paper_url": "https://arxiv.org/abs/2608.27108",
+        "html_url": "https://arxiv.org/html/2608.27108",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Machine Learning (cs.LG)",
+        "categories": [
+          "cs.CR",
+          "cs.LG"
+        ],
+        "source_index": 10,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.27043",
+        "title": "Cyber-Electromagnetic Anomaly Detection Through Time-Series Analysis",
+        "paper_url": "https://arxiv.org/abs/2608.27043",
+        "html_url": "https://arxiv.org/html/2608.27043",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 12,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.27007",
+        "title": "Metamorphism: A mathematical challenge for antivirus technology",
+        "paper_url": "https://arxiv.org/abs/2608.27007",
+        "html_url": "https://arxiv.org/html/2608.27007",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 15,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26955",
+        "title": "A Catalog of User Authentication Patterns",
+        "paper_url": "https://arxiv.org/abs/2608.26955",
+        "html_url": "https://arxiv.org/html/2608.26955",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 16,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26858",
+        "title": "Information Flow Control in Off-Chain Components",
+        "paper_url": "https://arxiv.org/abs/2608.26858",
+        "html_url": "https://arxiv.org/html/2608.26858",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Programming Languages (cs.PL)",
+        "categories": [
+          "cs.CR",
+          "cs.PL"
+        ],
+        "source_index": 19,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26844",
+        "title": "Are We Shooting Flies with Cannons? Trade-off Analysis for AI-based 5G Intrusion Detection",
+        "paper_url": "https://arxiv.org/abs/2608.26844",
+        "html_url": "https://arxiv.org/html/2608.26844",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 20,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26831",
+        "title": "When Relationships Break: Interpreting Network Traffic Anomalies via Dependency Violations",
+        "paper_url": "https://arxiv.org/abs/2608.26831",
+        "html_url": "https://arxiv.org/html/2608.26831",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 21,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26792",
+        "title": "Thresholding Post-Quantum Signatures",
+        "paper_url": "https://arxiv.org/abs/2608.26792",
+        "html_url": "https://arxiv.org/html/2608.26792",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 22,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26777",
+        "title": "A Hybrid Post-Quantum Encryption Architecture with Self-Hosted Key Management for SME Cloud Data Protection",
+        "paper_url": "https://arxiv.org/abs/2608.26777",
+        "html_url": "https://arxiv.org/html/2608.26777",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 23,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26651",
+        "title": "Beyond Vector Hiding: Breaking and Mitigating Shared-Direction Weight Obfuscation in TEE-Offloaded Large Language Models",
+        "paper_url": "https://arxiv.org/abs/2608.26651",
+        "html_url": "https://arxiv.org/html/2608.26651",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 26,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26402",
+        "title": "SILK: Closing the Time-of-Check-to-Time-of-Use Gap in RoT-Protected AI Systems",
+        "paper_url": "https://arxiv.org/abs/2608.26402",
+        "html_url": "https://arxiv.org/html/2608.26402",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Hardware Architecture (cs.AR)",
+        "categories": [
+          "cs.CR",
+          "cs.AR"
+        ],
+        "source_index": 29,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26380",
+        "title": "Improving the Robustness of the XRP Ledger Network via Edge Augmentation Strategies",
+        "paper_url": "https://arxiv.org/abs/2608.26380",
+        "html_url": "https://arxiv.org/html/2608.26380",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 30,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26367",
+        "title": "PRISM: Lightweight Enclave Isolation with Prismatic Capabilities",
+        "paper_url": "https://arxiv.org/abs/2608.26367",
+        "html_url": "https://arxiv.org/html/2608.26367",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 31,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26353",
+        "title": "FRESCO: Complete and Scalable Temporal Safety for CHERI Application Processors",
+        "paper_url": "https://arxiv.org/abs/2608.26353",
+        "html_url": "https://arxiv.org/html/2608.26353",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.CR"
+        ],
+        "source_index": 32,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26204",
+        "title": "ADeptS-Bench: Measuring the Trustworthiness of Computer Use Agents Across Devices",
+        "paper_url": "https://arxiv.org/abs/2608.26204",
+        "html_url": "https://arxiv.org/html/2608.26204",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Artificial Intelligence (cs.AI); Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.AI",
+          "cs.SE"
+        ],
+        "source_index": 34,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26696",
+        "title": "Five Primitives for Governing Autonomous AI Agents at Runtime",
+        "paper_url": "https://arxiv.org/abs/2608.26696",
+        "html_url": "https://arxiv.org/html/2608.26696",
+        "html_available_on_listing": false,
+        "subjects": "Artificial Intelligence (cs.AI) ; Cryptography and Security (cs.CR); Software Engineering (cs.SE)",
+        "categories": [
+          "cs.AI",
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 38,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26575",
+        "title": "Benchmarking Confidential Computing Performance on NVIDIA Blackwell GPUs",
+        "paper_url": "https://arxiv.org/abs/2608.26575",
+        "html_url": "https://arxiv.org/html/2608.26575",
+        "html_available_on_listing": false,
+        "subjects": "Distributed, Parallel, and Cluster Computing (cs.DC) ; Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.DC",
+          "cs.CR"
+        ],
+        "source_index": 39,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26183",
+        "title": "Four Ways to Forge a Bundle My Own Verifier Calls Clean: Refusal-Site Mutation Testing of an Evidence-Bundle Verifier",
+        "paper_url": "https://arxiv.org/abs/2608.26183",
+        "html_url": "https://arxiv.org/html/2608.26183",
+        "html_available_on_listing": false,
+        "subjects": "Software Engineering (cs.SE) ; Cryptography and Security (cs.CR)",
+        "categories": [
+          "cs.SE",
+          "cs.CR"
+        ],
+        "source_index": 42,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.26049",
+        "title": "RTLGuard: A Lightweight Teacher-Student Defense for Poisoned RTL Code Generation Models",
+        "paper_url": "https://arxiv.org/abs/2608.26049",
+        "html_url": "https://arxiv.org/html/2608.26049",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Hardware Architecture (cs.AR)",
+        "categories": [
+          "cs.CR",
+          "cs.AR"
+        ],
+        "source_index": 44,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      },
+      {
+        "arxiv_id": "2608.25793",
+        "title": "Closing the Gap: Automated Discovery of Secure Dockerfile Reference Standards via Semantic Clustering in Enterprise Inner Source",
+        "paper_url": "https://arxiv.org/abs/2608.25793",
+        "html_url": "https://arxiv.org/html/2608.25793",
+        "html_available_on_listing": false,
+        "subjects": "Cryptography and Security (cs.CR) ; Software Engineering (cs.SE)",
+        "categories": [
+          "cs.CR",
+          "cs.SE"
+        ],
+        "source_index": 48,
+        "security_match": false,
+        "llm_match": false,
+        "security_matches": [],
+        "llm_matches": [],
+        "candidate_status": "no_match",
+        "candidate_status_label": "No Match"
+      }
+    ]
+  }
+}

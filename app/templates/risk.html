@@ -4,252 +4,122 @@
     .risk-shell {
         display: grid;
         gap: 1rem;
+        --risk-panel: #111827;
+        --risk-panel-soft: #0f172a;
+        --risk-border: rgba(148, 163, 184, 0.18);
+        --risk-muted: #aebdd0;
     }
 
     .risk-hero,
+    .risk-selector,
+    .risk-overview,
     .risk-panel,
-    .risk-selector {
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 12px;
-        background: #111827;
+    .risk-workspace,
+    .risk-provenance {
+        border: 1px solid var(--risk-border);
+        border-radius: 14px;
+        background: var(--risk-panel);
     }
 
     .risk-hero {
         padding: 1.5rem;
+        background:
+            radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 34%),
+            #111827;
+    }
+
+    .risk-eyebrow {
+        margin-bottom: 0.45rem;
+        color: #60a5fa;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
     }
 
     .risk-hero h1 {
         margin: 0;
-        font-size: 1.8rem;
+        color: #f8fafc;
+        font-size: clamp(1.55rem, 3vw, 2.1rem);
     }
 
     .risk-hero p,
-    .risk-meta,
-    .risk-muted {
-        color: #cbd5e1;
+    .risk-muted,
+    .risk-meta {
+        color: var(--risk-muted);
+    }
+
+    .risk-hero p {
+        max-width: 52rem;
+        margin: 0.65rem 0 0;
     }
 
     .risk-selector {
-        padding: 1.25rem;
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 1rem;
         align-items: end;
+        padding: 1.1rem;
     }
 
-    .status-card {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
-        gap: 1rem;
-        align-items: center;
-        padding: 1.25rem;
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 12px;
-        background: #0f172a;
-    }
-
-    .status-pill {
-        min-width: 9rem;
-        padding: 0.65rem 1rem;
-        border-radius: 999px;
-        text-align: center;
-        font-weight: 700;
-    }
-
-    .status-pill.low {
-        background: rgba(34, 197, 94, 0.18);
-        color: #bbf7d0;
-    }
-
-    .status-pill.medium {
-        background: rgba(245, 158, 11, 0.18);
-        color: #fde68a;
-    }
-
-    .status-pill.high,
-    .status-pill.critical {
-        background: rgba(239, 68, 68, 0.2);
-        color: #fecaca;
-    }
-
-    .risk-summary-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-    }
-
-    .risk-stat {
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        border-radius: 8px;
-        padding: 1rem;
-        background: #0f172a;
-    }
-
-    .risk-stat strong {
-        display: block;
-        color: #f8fafc;
-        font-size: 1.4rem;
-        line-height: 1.1;
-    }
-
-    .risk-panel {
+    .risk-provenance {
         overflow: hidden;
     }
 
-    .risk-panel-header {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
-        background: #172033;
+    .risk-provenance summary {
+        padding: 0.85rem 1rem;
+        color: #dbeafe;
+        font-weight: 700;
+        cursor: pointer;
     }
 
-    .risk-panel-header h2 {
-        margin: 0;
-        font-size: 1.05rem;
-    }
-
-    .risk-list {
+    .risk-provenance-content {
         display: grid;
-        gap: 0.8rem;
-        padding: 1rem;
-    }
-
-    .risk-item {
-        padding: 0.95rem;
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        border-radius: 8px;
-        background: #0f172a;
-        min-width: 0;
-    }
-
-    .risk-item-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 1rem;
-        align-items: flex-start;
-        margin-bottom: 0.45rem;
-    }
-
-    .risk-code {
-        font-weight: 700;
-        color: #93c5fd;
-        overflow-wrap: anywhere;
-    }
-
-    .risk-level {
-        flex: 0 0 auto;
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-radius: 999px;
-        padding: 0.34rem 0.62rem;
-        font-size: 0.82rem;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .risk-level.low {
-        background: rgba(34, 197, 94, 0.16);
-        border-color: rgba(34, 197, 94, 0.36);
-        color: #bbf7d0;
-    }
-
-    .risk-level.medium {
-        background: rgba(245, 158, 11, 0.17);
-        border-color: rgba(245, 158, 11, 0.38);
-        color: #fde68a;
-    }
-
-    .risk-level.high {
-        background: rgba(249, 115, 22, 0.18);
-        border-color: rgba(249, 115, 22, 0.42);
-        color: #fed7aa;
-    }
-
-    .risk-level.critical {
-        background: rgba(239, 68, 68, 0.22);
-        border-color: rgba(239, 68, 68, 0.48);
-        color: #fecaca;
-    }
-
-    .risk-evidence,
-    .risk-mitigation {
-        margin-top: 0.7rem;
-        color: #cbd5e1;
-        font-size: 0.9rem;
-        overflow-wrap: anywhere;
-    }
-
-    .risk-mitigation {
-        border-left: 3px solid #22c55e;
-        padding-left: 0.75rem;
-        color: #dcfce7;
-    }
-
-    .risk-evidence ul {
-        margin-bottom: 0;
-        padding-left: 1.1rem;
-    }
-
-    .empty-panel {
-        padding: 1rem;
-        color: #94a3b8;
+        gap: 0.75rem;
+        padding: 0 1rem 1rem;
     }
 
     .pipe-status {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.75rem;
+        gap: 0.65rem;
+    }
+
+    .pipe-chip,
+    .pipe-note {
+        border: 1px solid var(--risk-border);
+        border-radius: 9px;
+        background: var(--risk-panel-soft);
     }
 
     .pipe-chip {
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        border-left-width: 4px;
-        border-radius: 10px;
-        background: #0f172a;
-        padding: 0.8rem 0.95rem;
         display: grid;
-        gap: 0.25rem;
+        gap: 0.2rem;
+        padding: 0.72rem 0.82rem;
+        border-left-width: 4px;
     }
 
     .pipe-chip .pipe-label {
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
         color: #94a3b8;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
     }
 
     .pipe-chip .pipe-value {
-        font-weight: 700;
         color: #e2e8f0;
-        font-size: 0.95rem;
+        font-size: 0.88rem;
+        font-weight: 700;
         overflow-wrap: anywhere;
     }
 
-    .pipe-chip.ok {
-        border-left-color: #22c55e;
-    }
-
-    .pipe-chip.ok .pipe-value {
-        color: #bbf7d0;
-    }
-
-    .pipe-chip.bad {
-        border-left-color: #ef4444;
-    }
-
-    .pipe-chip.bad .pipe-value {
-        color: #fecaca;
-    }
-
-    .pipe-chip.warn {
-        border-left-color: #f59e0b;
-    }
-
-    .pipe-chip.warn .pipe-value {
-        color: #fde68a;
-    }
-
-    .pipe-chip.neutral {
-        border-left-color: #38bdf8;
-    }
+    .pipe-chip.ok { border-left-color: #22c55e; }
+    .pipe-chip.bad { border-left-color: #ef4444; }
+    .pipe-chip.warn { border-left-color: #f59e0b; }
+    .pipe-chip.neutral { border-left-color: #38bdf8; }
+    .pipe-chip.ok .pipe-value { color: #bbf7d0; }
+    .pipe-chip.bad .pipe-value { color: #fecaca; }
+    .pipe-chip.warn .pipe-value { color: #fde68a; }
 
     .pipe-notes {
         display: grid;
@@ -257,42 +127,502 @@
     }
 
     .pipe-note {
-        border: 1px solid rgba(148, 163, 184, 0.16);
-        border-radius: 8px;
-        background: #0f172a;
-        padding: 0.6rem 0.8rem;
+        padding: 0.62rem 0.78rem;
         color: #cbd5e1;
-        font-size: 0.88rem;
-        overflow-wrap: anywhere;
+        font-size: 0.86rem;
     }
 
     .pipe-note.bad {
-        border-color: rgba(239, 68, 68, 0.4);
+        border-color: rgba(239, 68, 68, 0.42);
         color: #fecaca;
     }
 
+    .risk-overview {
+        display: grid;
+        gap: 1rem;
+        padding: 1.2rem;
+    }
+
+    .risk-overview-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .risk-overview-head h2 {
+        margin: 0 0 0.25rem;
+        color: #f8fafc;
+        font-size: 1.2rem;
+    }
+
+    .status-pill,
+    .risk-level,
+    .risk-state {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--risk-border);
+        border-radius: 999px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-pill {
+        padding: 0.55rem 0.9rem;
+    }
+
+    .risk-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .risk-stat {
+        padding: 0.9rem;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 10px;
+        background: var(--risk-panel-soft);
+    }
+
+    .risk-stat strong {
+        display: block;
+        color: #f8fafc;
+        font-size: 1.45rem;
+        line-height: 1.1;
+    }
+
+    .risk-stat span {
+        display: block;
+        margin-top: 0.28rem;
+        color: #9fb0c5;
+        font-size: 0.82rem;
+    }
+
+    .risk-panel {
+        overflow: hidden;
+    }
+
+    .risk-panel-header {
+        padding: 0.95rem 1.1rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: #172033;
+    }
+
+    .risk-panel-header h2 {
+        margin: 0;
+        color: #f1f5f9;
+        font-size: 1.02rem;
+    }
+
+    .priority-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        padding: 0.9rem;
+        counter-reset: priority-action;
+    }
+
+    .priority-action {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.65rem;
+        align-items: start;
+        padding: 0.78rem;
+        border: 1px solid rgba(34, 197, 94, 0.24);
+        border-radius: 9px;
+        background: rgba(34, 197, 94, 0.07);
+        color: #dcfce7;
+        counter-increment: priority-action;
+    }
+
+    .priority-action::before {
+        content: counter(priority-action);
+        width: 1.65rem;
+        height: 1.65rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.18);
+        color: #bbf7d0;
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .risk-category-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.8rem;
+    }
+
+    .risk-category-card {
+        min-width: 0;
+        padding: 1rem;
+        border: 1px solid var(--risk-border);
+        border-top: 4px solid #60a5fa;
+        border-radius: 12px;
+        background: var(--risk-panel);
+        color: inherit;
+        text-align: left;
+        transition: border-color 150ms ease, transform 150ms ease, background 150ms ease;
+    }
+
+    .risk-category-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(96, 165, 250, 0.7);
+    }
+
+    .risk-category-card[aria-selected="true"] {
+        border-color: #60a5fa;
+        background: #14213a;
+        box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.25);
+    }
+
+    .risk-category-card[data-category="web"] { border-top-color: #a78bfa; }
+    .risk-category-card[data-category="api"] { border-top-color: #2dd4bf; }
+
+    .risk-category-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: baseline;
+        color: #f8fafc;
+        font-weight: 800;
+    }
+
+    .risk-category-count {
+        color: #93c5fd;
+        font-size: 1.25rem;
+    }
+
+    .risk-category-description {
+        min-height: 2.6rem;
+        margin: 0.45rem 0 0.75rem;
+        color: #9fb0c5;
+        font-size: 0.8rem;
+    }
+
+    .risk-category-metrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.38rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .risk-mini-chip {
+        padding: 0.24rem 0.46rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.1);
+        color: #cbd5e1;
+        font-size: 0.72rem;
+    }
+
+    .risk-top-list {
+        display: grid;
+        gap: 0.28rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .risk-top-list li {
+        color: #cbd5e1;
+        font-size: 0.78rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .risk-workspace {
+        overflow: hidden;
+    }
+
+    .risk-toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) repeat(2, minmax(9rem, 0.28fr));
+        gap: 0.65rem;
+        padding: 0.9rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+        background: #172033;
+    }
+
+    .risk-category-panel[hidden],
+    .risk-detail[hidden],
+    .risk-row[hidden],
+    .risk-filter-empty[hidden] {
+        display: none !important;
+    }
+
+    .risk-category-panel {
+        padding: 1rem;
+    }
+
+    .risk-category-panel-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+        margin-bottom: 0.8rem;
+    }
+
+    .risk-category-panel-head h2 {
+        margin: 0;
+        color: #f8fafc;
+        font-size: 1.12rem;
+    }
+
+    .risk-list {
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .risk-row {
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 10px;
+        background: var(--risk-panel-soft);
+        overflow: hidden;
+    }
+
+    .risk-row-toggle {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 0.7rem;
+        align-items: center;
+        width: 100%;
+        padding: 0.82rem 0.9rem;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        text-align: left;
+    }
+
+    .risk-row-toggle:hover,
+    .risk-row-toggle[aria-expanded="true"] {
+        background: rgba(59, 130, 246, 0.07);
+    }
+
+    .risk-row-title {
+        min-width: 0;
+    }
+
+    .risk-code {
+        display: block;
+        color: #93c5fd;
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .risk-name {
+        display: block;
+        margin-top: 0.12rem;
+        color: #f1f5f9;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .risk-level,
+    .risk-state {
+        padding: 0.3rem 0.55rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+    }
+
+    .risk-state {
+        color: #cbd5e1;
+        text-transform: none;
+    }
+
+    .risk-level.low,
+    .status-pill.low {
+        border-color: rgba(34, 197, 94, 0.38);
+        background: rgba(34, 197, 94, 0.16);
+        color: #bbf7d0;
+    }
+
+    .risk-level.medium,
+    .status-pill.medium {
+        border-color: rgba(245, 158, 11, 0.4);
+        background: rgba(245, 158, 11, 0.16);
+        color: #fde68a;
+    }
+
+    .risk-level.high,
+    .status-pill.high {
+        border-color: rgba(249, 115, 22, 0.44);
+        background: rgba(249, 115, 22, 0.17);
+        color: #fed7aa;
+    }
+
+    .risk-level.critical,
+    .status-pill.critical {
+        border-color: rgba(239, 68, 68, 0.48);
+        background: rgba(239, 68, 68, 0.2);
+        color: #fecaca;
+    }
+
+    .risk-level.unscored {
+        border-color: rgba(56, 189, 248, 0.42);
+        background: rgba(56, 189, 248, 0.13);
+        color: #bae6fd;
+        text-transform: none;
+    }
+
+    .risk-detail {
+        padding: 0 0.9rem 0.9rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.13);
+    }
+
+    .risk-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        padding-top: 0.8rem;
+    }
+
+    .risk-detail-card {
+        min-width: 0;
+        padding: 0.78rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 9px;
+        background: #111827;
+        color: #cbd5e1;
+        font-size: 0.86rem;
+        overflow-wrap: anywhere;
+    }
+
+    .risk-detail-card.full {
+        grid-column: 1 / -1;
+    }
+
+    .risk-detail-card h3 {
+        margin: 0 0 0.55rem;
+        color: #e2e8f0;
+        font-size: 0.84rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .risk-detail-card ul {
+        margin: 0;
+        padding-left: 1.1rem;
+    }
+
+    .risk-detail-card li + li {
+        margin-top: 0.35rem;
+    }
+
+    .dread-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.35rem;
+        margin-top: 0.55rem;
+    }
+
+    .dread-cell {
+        padding: 0.4rem 0.2rem;
+        border-radius: 7px;
+        background: rgba(148, 163, 184, 0.08);
+        text-align: center;
+    }
+
+    .dread-cell strong,
+    .dread-cell span {
+        display: block;
+    }
+
+    .dread-cell strong { color: #f8fafc; }
+    .dread-cell span { color: #94a3b8; font-size: 0.64rem; }
+
+    .risk-mitigation {
+        padding: 0.58rem 0.7rem;
+        border-left: 3px solid #22c55e;
+        background: rgba(34, 197, 94, 0.06);
+        color: #dcfce7;
+    }
+
+    .risk-mitigation + .risk-mitigation {
+        margin-top: 0.45rem;
+    }
+
+    .risk-filter-empty,
+    .empty-panel {
+        padding: 1rem;
+        color: #94a3b8;
+        text-align: center;
+    }
+
+    .support-list {
+        display: grid;
+        gap: 0.55rem;
+        padding: 0.9rem;
+    }
+
+    .support-item {
+        padding: 0.72rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 8px;
+        background: var(--risk-panel-soft);
+        color: #cbd5e1;
+        font-size: 0.86rem;
+    }
+
     @media (max-width: 991px) {
-        .risk-selector,
-        .status-card,
+        .pipe-status,
         .risk-summary-grid,
-        .pipe-status {
+        .risk-category-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .risk-category-card:last-child {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .risk-selector,
+        .pipe-status,
+        .risk-summary-grid,
+        .risk-category-grid,
+        .priority-actions,
+        .risk-toolbar,
+        .risk-detail-grid {
             grid-template-columns: 1fr;
+        }
+
+        .risk-category-card:last-child,
+        .risk-detail-card.full {
+            grid-column: auto;
+        }
+
+        .risk-overview-head,
+        .risk-category-panel-head {
+            display: grid;
+        }
+
+        .risk-row-toggle {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .risk-state {
+            grid-column: 1 / -1;
+            justify-self: start;
         }
     }
 </style>
 {% endblock %}
+
 {% block content %}
 <div class="risk-shell">
-    <div class="risk-hero">
+    <header class="risk-hero">
+        <div class="risk-eyebrow">Security posture</div>
         <h1>Risk Analysis &amp; Mitigation</h1>
-        <p>
-            Review pipeline-generated OWASP LLM risks, quick wins, and mitigation guidance.
-        </p>
-    </div>
+        <p>Scan the LLM, Web Application, and API risk surfaces first; expand only the evidence and controls you need.</p>
+    </header>
 
     <form method="get" action="{{ url_for('main.risk') }}" class="risk-selector">
         <div>
-            <label for="pipelineSelect" class="form-label">Risk Analysis</label>
+            <label for="pipelineSelect" class="form-label">Risk analysis</label>
             <select class="form-select" id="pipelineSelect" name="pipeline" required>
                 <option value="" disabled {% if not selected_pipeline %}selected{% endif %}>Select a pipeline risk analysis</option>
                 {% for run in risk_runs %}
@@ -302,14 +632,14 @@
                 {% endfor %}
             </select>
         </div>
-        <button class="btn btn-primary" type="submit">Show Analysis</button>
+        <button class="btn btn-primary" type="submit">Show analysis</button>
     </form>
 
     {% if analysis_error %}
     <div class="alert alert-danger">{{ analysis_error }}</div>
     {% endif %}
 
-    {% if analysis %}
+    {% if analysis and risk_view %}
     {% set ti = analysis.threat_identification or {} %}
     {% set mm = analysis.mitigation_meta or {} %}
     {% set ti_llm = ti.mode == 'template_guided_llm' and ti.status == 'completed' %}
@@ -317,236 +647,352 @@
     {% set mm_llm = mm.status == 'completed' %}
     {% set mm_fallback = mm.status == 'unavailable' %}
     {% set mm_off = mm.status in ['disabled', 'skipped'] %}
-    <section class="pipe-status">
-        <div class="pipe-chip neutral">
-            <span class="pipe-label">Pipeline</span>
-            <span class="pipe-value">{{ analysis.pipeline_mode or 'deterministic' }}</span>
-        </div>
-        <div class="pipe-chip {{ 'ok' if ti_llm else ('bad' if ti_fallback else 'neutral') }}">
-            <span class="pipe-label">Threat identification</span>
-            <span class="pipe-value">
-                {% if ti_llm %}LLM &#10003;{% if ti.model %} &middot; {{ ti.model }}{% endif %}
-                {% elif ti_fallback %}Fallback &#10007;
-                {% else %}Deterministic{% endif %}
-            </span>
-        </div>
-        <div class="pipe-chip neutral">
-            <span class="pipe-label">DREAD scoring</span>
-            <span class="pipe-value">Deterministic &#10003;</span>
-        </div>
-        <div class="pipe-chip {{ 'ok' if mm_llm else ('warn' if mm_off else ('bad' if mm_fallback else 'neutral')) }}">
-            <span class="pipe-label">Mitigations</span>
-            <span class="pipe-value">
-                {% if mm_llm %}LLM &#10003;{% if mm.model %} &middot; {{ mm.model }}{% endif %}
-                {% elif mm_fallback %}Fallback &#10007;
-                {% elif mm_off %}{{ mm.status|capitalize }}
-                {% else %}Deterministic{% endif %}
-            </span>
-        </div>
-    </section>
-    {% if analysis.pipeline_warning or ti.message or mm.error %}
-    <div class="pipe-notes">
-        {% if analysis.pipeline_warning %}<div class="pipe-note bad">&#9888; {{ analysis.pipeline_warning }}</div>{% endif %}
-        {% if ti.message %}<div class="pipe-note">Threat identification: {{ ti.message }}</div>{% endif %}
-        {% if mm.error %}<div class="pipe-note bad">Mitigation fallback reason: {{ mm.error }}</div>{% endif %}
+
+    {% if analysis.display_backfilled_count %}
+    <div class="pipe-note">
+        {{ analysis.display_backfilled_count }} candidate risk(s) from this older artifact were restored for display.
+        Rerun the analysis to calculate their DREAD scores.
     </div>
     {% endif %}
 
-    {% set status_class = analysis.overall_status|lower %}
-    <div class="status-card">
-        <div class="status-pill {{ status_class }}">{{ analysis.overall_status }}</div>
-        <div>
-            <h2 class="h5 mb-1">
-                {{ selected_manifest.project_name if selected_manifest else "Selected pipeline" }}
-            </h2>
-            <div class="risk-meta">
-                {% if selected_manifest %}
-                Analysis: {{ selected_manifest.dfd_name or selected_manifest.pipeline_id }}<br>
-                {% if selected_manifest.auditor_name %}Auditor: {{ selected_manifest.auditor_name }}<br>{% endif %}
-                Pipeline: <code>{{ selected_manifest.pipeline_id }}</code><br>
-                {% endif %}
-                Status source: {{ analysis.status_source }}.
-                {{ analysis.answers_analyzed }} questionnaire answers analyzed.
+    <details class="risk-provenance">
+        <summary>Analysis provenance and pipeline status</summary>
+        <div class="risk-provenance-content">
+            <section class="pipe-status" aria-label="Pipeline status">
+                <div class="pipe-chip neutral">
+                    <span class="pipe-label">Pipeline</span>
+                    <span class="pipe-value">{{ analysis.pipeline_mode or 'deterministic' }}</span>
+                </div>
+                <div class="pipe-chip {{ 'ok' if ti_llm else ('bad' if ti_fallback else 'neutral') }}">
+                    <span class="pipe-label">Threat identification</span>
+                    <span class="pipe-value">
+                        {% if ti_llm %}LLM &#10003;{% if ti.model %} &middot; {{ ti.model }}{% endif %}
+                        {% elif ti_fallback %}Fallback &#10007;
+                        {% elif ti.status == 'partial' %}Partial LLM result
+                        {% else %}Deterministic{% endif %}
+                    </span>
+                </div>
+                <div class="pipe-chip neutral">
+                    <span class="pipe-label">DREAD scoring</span>
+                    <span class="pipe-value">Deterministic &#10003;</span>
+                </div>
+                <div class="pipe-chip {{ 'ok' if mm_llm else ('warn' if mm_off else ('bad' if mm_fallback else 'neutral')) }}">
+                    <span class="pipe-label">Mitigations</span>
+                    <span class="pipe-value">
+                        {% if mm_llm %}LLM &#10003;{% if mm.model %} &middot; {{ mm.model }}{% endif %}
+                        {% elif mm_fallback %}Fallback &#10007;
+                        {% elif mm_off %}{{ mm.status|capitalize }}
+                        {% else %}Deterministic{% endif %}
+                    </span>
+                </div>
+            </section>
+            {% if analysis.pipeline_warning or ti.message or mm.error %}
+            <div class="pipe-notes">
+                {% if analysis.pipeline_warning %}<div class="pipe-note bad">&#9888; {{ analysis.pipeline_warning }}</div>{% endif %}
+                {% if ti.message %}<div class="pipe-note">Threat identification: {{ ti.message }}</div>{% endif %}
+                {% if mm.error %}<div class="pipe-note bad">Mitigation fallback reason: {{ mm.error }}</div>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </details>
+
+    <section class="risk-overview" aria-labelledby="riskOverviewTitle">
+        <div class="risk-overview-head">
+            <div>
+                <h2 id="riskOverviewTitle">{{ selected_manifest.project_name if selected_manifest else "Selected pipeline" }}</h2>
+                <div class="risk-meta">
+                    {% if selected_manifest %}
+                    {{ selected_manifest.dfd_name or selected_manifest.pipeline_id }}
+                    {% if selected_manifest.auditor_name %} &middot; Auditor: {{ selected_manifest.auditor_name }}{% endif %}
+                    {% endif %}
+                    {% if analysis.answers_analyzed %} &middot; {{ analysis.answers_analyzed }} answers analyzed{% endif %}
+                </div>
+            </div>
+            <span class="status-pill {{ analysis.overall_status|lower }}">{{ analysis.overall_status }}</span>
+        </div>
+        <div class="risk-summary-grid">
+            <div class="risk-stat">
+                <strong>{{ risk_view.total }}</strong>
+                <span>Total detected risks</span>
+            </div>
+            <div class="risk-stat">
+                <strong>{{ risk_view.critical_high }}</strong>
+                <span>Critical or high</span>
+            </div>
+            <div class="risk-stat">
+                <strong>{{ risk_view.needs_review }}</strong>
+                <span>Need review or rerun</span>
+            </div>
+            <div class="risk-stat">
+                <strong>{{ risk_view.mitigated }}</strong>
+                <span>Risks with guidance</span>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="risk-summary-grid">
-        <div class="risk-stat">
-            <strong>{{ analysis.unified_risks|length }}</strong>
-            <span class="risk-muted">Consolidated risks</span>
-        </div>
-        <div class="risk-stat">
-            <strong>{{ analysis.quick_wins|length }}</strong>
-            <span class="risk-muted">Quick wins</span>
-        </div>
-    </div>
-
-    {% if analysis.missing_information %}
-    <section class="risk-panel">
+    {% if risk_view.priority_actions %}
+    <section class="risk-panel" aria-labelledby="priorityActionsTitle">
         <div class="risk-panel-header">
-            <h2>Missing Information &amp; Assumptions</h2>
+            <h2 id="priorityActionsTitle">Priority actions</h2>
         </div>
-        <div class="risk-list">
-            {% for item in analysis.missing_information %}
-            <div class="risk-item risk-muted">{{ item }}</div>
-            {% endfor %}
-            {% for item in analysis.assumptions %}
-            <div class="risk-item risk-muted">Assumption: {{ item }}</div>
+        <div class="priority-actions">
+            {% for action in risk_view.priority_actions %}
+            <div class="priority-action">{{ action }}</div>
             {% endfor %}
         </div>
     </section>
     {% endif %}
 
-    {% if analysis.quick_wins %}
-    <section class="risk-panel">
-        <div class="risk-panel-header">
-            <h2>Quick Wins</h2>
-        </div>
-        <div class="risk-list">
-            {% for quick_win in analysis.quick_wins %}
-            <div class="risk-item">{{ quick_win }}</div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
+    <div class="risk-category-grid" role="tablist" aria-label="Risk categories">
+        {% for category in risk_view.categories %}
+        <button
+            type="button"
+            class="risk-category-card"
+            role="tab"
+            data-risk-category="{{ category.short_key }}"
+            data-category="{{ category.short_key }}"
+            aria-controls="riskCategory-{{ category.short_key }}"
+            aria-selected="{{ 'true' if category.short_key == risk_view.default_category else 'false' }}"
+            tabindex="{{ '0' if category.short_key == risk_view.default_category else '-1' }}"
+        >
+            <span class="risk-category-title">
+                <span>{{ category.label }}</span>
+                <span class="risk-category-count">{{ category.total }}</span>
+            </span>
+            <span class="risk-category-description">{{ category.description }}</span>
+            <span class="risk-category-metrics">
+                <span class="risk-mini-chip">{{ category.critical_high }} critical/high</span>
+                <span class="risk-mini-chip">{{ category.needs_review }} need review</span>
+                {% if category.unscored %}<span class="risk-mini-chip">{{ category.unscored }} unscored</span>{% endif %}
+            </span>
+            <span class="risk-top-list" aria-label="Top risks">
+                {% for risk in category.top_risks %}
+                <span>{{ risk.code }} &middot; {{ risk.name }}</span>
+                {% else %}
+                <span>No detected risks</span>
+                {% endfor %}
+            </span>
+        </button>
+        {% endfor %}
+    </div>
 
-    <section class="risk-panel">
-        <div class="risk-panel-header">
-            <h2>Mitigations</h2>
+    <section class="risk-workspace" aria-label="Category risk explorer">
+        <div class="risk-toolbar">
+            <label>
+                <span class="visually-hidden">Search risks or components</span>
+                <input id="riskSearch" class="form-control" type="search" placeholder="Search code, risk, or affected component">
+            </label>
+            <label>
+                <span class="visually-hidden">Filter by severity</span>
+                <select id="riskLevelFilter" class="form-select">
+                    <option value="all">All severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                    <option value="unscored">Reanalysis required</option>
+                </select>
+            </label>
+            <label>
+                <span class="visually-hidden">Filter by detection status</span>
+                <select id="riskStatusFilter" class="form-select">
+                    <option value="all">All detection states</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="plausible">Plausible</option>
+                    <option value="needs_more_info">Needs review</option>
+                </select>
+            </label>
         </div>
-        {% set mitigations = analysis.unified_risks|selectattr("mitigations")|list %}
-        {% if mitigations %}
-        <div class="risk-list">
-            {% for risk in analysis.unified_risks %}
-            {% if risk.mitigation_actions %}
-            <article class="risk-item">
-                <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(LLM, context-specific)</span></div>
-                {% for m in risk.mitigation_actions %}
-                <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} - {{ m.action }}{% endif %}{% if m.validation_step %} <span class="risk-muted">(validate: {{ m.validation_step }})</span>{% endif %}</div>
-                {% endfor %}
-            </article>
-            {% elif risk.llm_assessment and risk.llm_assessment.mitigations %}
-            <article class="risk-item">
-                <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(LLM, context-specific)</span></div>
-                {% for m in risk.llm_assessment.mitigations %}
-                <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} - {{ m.action }}{% endif %}</div>
-                {% endfor %}
-            </article>
-            {% elif risk.mitigations %}
-            <article class="risk-item">
-                <div class="risk-code">{{ risk.code }} - {{ risk.name }} <span class="risk-muted">(OWASP fallback)</span></div>
-                {% for mitigation in risk.mitigations %}
-                <div class="risk-mitigation">{{ mitigation }}</div>
-                {% endfor %}
-            </article>
-            {% endif %}
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-panel">No mitigation guidance is available in this risk artifact.</div>
-        {% endif %}
-    </section>
 
-    <section class="risk-panel">
-        <div class="risk-panel-header">
-            <h2>Risks</h2>
-        </div>
-        {% if analysis.unified_risks %}
-        <div class="risk-list">
-            {% for risk in analysis.unified_risks %}
-            <article class="risk-item">
-                <div class="risk-item-top">
-                    <div>
-                        <div class="risk-code">{{ risk.code }} - {{ risk.name }}</div>
-                        <div class="risk-muted">
-                            Sources: {{ risk.sources|join(", ") }}
+        {% for category in risk_view.categories %}
+        <section
+            id="riskCategory-{{ category.short_key }}"
+            class="risk-category-panel"
+            role="tabpanel"
+            data-risk-panel="{{ category.short_key }}"
+            {% if category.short_key != risk_view.default_category %}hidden{% endif %}
+        >
+            <div class="risk-category-panel-head">
+                <div>
+                    <h2>{{ category.label }}</h2>
+                    <div class="risk-muted">{{ category.description }}</div>
+                </div>
+                <span class="risk-muted" data-visible-count>{{ category.total }} shown</span>
+            </div>
+
+            {% if category.risks %}
+            <div class="risk-list">
+                {% for risk in category.risks %}
+                {% set risk_index = loop.index0 %}
+                {% set risk_level = (risk.risk_level or 'unscored')|lower %}
+                {% set risk_status = risk.status or 'unspecified' %}
+                {% set detail_id = 'riskDetail-' ~ category.short_key ~ '-' ~ risk_index %}
+                <article
+                    class="risk-row"
+                    data-risk-item
+                    data-level="{{ risk_level }}"
+                    data-status="{{ risk_status }}"
+                    data-search="{{ risk.code }} {{ risk.name }} {{ risk.affected_assets|default([])|join(' ') }} {{ risk.threat_pattern or '' }} {{ risk.control_gap or '' }}"
+                >
+                    <button
+                        type="button"
+                        class="risk-row-toggle"
+                        aria-expanded="false"
+                        aria-controls="{{ detail_id }}"
+                    >
+                        <span class="risk-row-title">
+                            <span class="risk-code">{{ risk.code }}</span>
+                            <span class="risk-name">{{ risk.name }}</span>
+                        </span>
+                        <span class="risk-level {{ risk_level }}">
+                            {% if risk_level == 'unscored' %}Reanalysis required{% else %}{{ risk.risk_level }}{% endif %}
+                        </span>
+                        <span class="risk-state">{{ risk_status|replace('_', ' ') }}</span>
+                    </button>
+
+                    <div id="{{ detail_id }}" class="risk-detail" hidden>
+                        <div class="risk-detail-grid">
+                            <section class="risk-detail-card">
+                                <h3>Assessment</h3>
+                                {% if risk.dread %}
+                                <div>DREAD {{ risk.dread.total }}/15 &middot; Average {{ risk.dread.average }}</div>
+                                <div class="dread-grid" aria-label="DREAD dimensions">
+                                    <span class="dread-cell"><strong>{{ risk.dread.damage }}</strong><span>Damage</span></span>
+                                    <span class="dread-cell"><strong>{{ risk.dread.reproducibility }}</strong><span>Repeat</span></span>
+                                    <span class="dread-cell"><strong>{{ risk.dread.exploitability }}</strong><span>Exploit</span></span>
+                                    <span class="dread-cell"><strong>{{ risk.dread.affected_users }}</strong><span>Users</span></span>
+                                    <span class="dread-cell"><strong>{{ risk.dread.discoverability }}</strong><span>Discover</span></span>
+                                </div>
+                                {% else %}
+                                <div>This legacy candidate is visible but has not been scored. Rerun the analysis for DREAD.</div>
+                                {% endif %}
+                                {% if risk.sources %}<div class="risk-muted mt-2">Sources: {{ risk.sources|join(', ') }}</div>{% endif %}
+                            </section>
+
+                            <section class="risk-detail-card">
+                                <h3>Affected system</h3>
+                                {% if risk.affected_assets %}
+                                <div>{{ risk.affected_assets|join(', ') }}</div>
+                                {% elif risk.affected_nodes %}
+                                <div>{{ risk.affected_nodes|join(', ') }}</div>
+                                {% else %}
+                                <div class="risk-muted">No affected component was recorded.</div>
+                                {% endif %}
+                                {% if risk.identified_name %}<div class="mt-2"><strong>Model finding:</strong> {{ risk.identified_name }}</div>{% endif %}
+                                {% if risk.threat_pattern %}<div class="mt-2"><strong>Pattern:</strong> {{ risk.threat_pattern|replace('_', ' ') }}</div>{% endif %}
+                            </section>
+
+                            {% if risk.control_gap or risk.abuse_path %}
+                            <section class="risk-detail-card full">
+                                <h3>Control gap and abuse path</h3>
+                                {% if risk.control_gap %}<div>{{ risk.control_gap }}</div>{% endif %}
+                                {% if risk.abuse_path %}
+                                <ol class="mt-2 mb-0">
+                                    {% for step in risk.abuse_path %}<li>{{ step }}</li>{% endfor %}
+                                </ol>
+                                {% endif %}
+                            </section>
+                            {% endif %}
+
+                            {% if risk.why or risk.extract_evidence or risk.question_evidence or risk.llm_evidence %}
+                            <section class="risk-detail-card full">
+                                <h3>Evidence</h3>
+                                {% if risk.why %}<div>{{ risk.why|join(' ') }}</div>{% endif %}
+                                {% if risk.extract_evidence %}<div class="mt-2">{{ risk.extract_evidence|join(', ') }}</div>{% endif %}
+                                {% if risk.question_evidence %}
+                                <ul class="mt-2">
+                                    {% for evidence in risk.question_evidence[:5] %}
+                                    <li><strong>{{ evidence.question }}</strong>: {{ evidence.answer }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                                {% if risk.llm_evidence %}
+                                <ul class="mt-2">
+                                    {% for evidence in risk.llm_evidence[:5] %}<li>{{ evidence }}</li>{% endfor %}
+                                </ul>
+                                {% endif %}
+                            </section>
+                            {% endif %}
+
+                            <section class="risk-detail-card full">
+                                <h3>Mitigation and validation</h3>
+                                {% if risk.mitigation_actions %}
+                                    {% for mitigation in risk.mitigation_actions %}
+                                    <div class="risk-mitigation">
+                                        <strong>{{ mitigation.title or 'Recommended control' }}</strong>
+                                        {% if mitigation.priority %} &middot; {{ mitigation.priority }}{% endif %}
+                                        {% if mitigation.action %}<div>{{ mitigation.action }}</div>{% endif %}
+                                        {% if mitigation.target_component %}<div class="risk-muted">Target: {{ mitigation.target_component }}</div>{% endif %}
+                                        {% if mitigation.validation_step %}<div class="risk-muted">Validate: {{ mitigation.validation_step }}</div>{% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% elif risk.llm_assessment and risk.llm_assessment.mitigations %}
+                                    {% for mitigation in risk.llm_assessment.mitigations %}
+                                    <div class="risk-mitigation">
+                                        <strong>{{ mitigation.title or 'Recommended control' }}</strong>
+                                        {% if mitigation.priority %} &middot; {{ mitigation.priority }}{% endif %}
+                                        {% if mitigation.action %}<div>{{ mitigation.action }}</div>{% endif %}
+                                    </div>
+                                    {% endfor %}
+                                {% elif risk.mitigations %}
+                                    {% for mitigation in risk.mitigations %}
+                                    <div class="risk-mitigation">{{ mitigation }}</div>
+                                    {% endfor %}
+                                {% else %}
+                                <div class="risk-muted">No mitigation guidance is available for this risk.</div>
+                                {% endif %}
+                            </section>
                         </div>
                     </div>
-                    <div class="risk-level {{ risk.risk_level|lower }}">{{ risk.risk_level }}</div>
-                </div>
-                {% if risk.dread %}
-                <div class="risk-muted">DREAD {{ risk.dread.total }}/15 (avg {{ risk.dread.average }}) - D{{ risk.dread.damage }} R{{ risk.dread.reproducibility }} E{{ risk.dread.exploitability }} A{{ risk.dread.affected_users }} Dc{{ risk.dread.discoverability }}{% if risk.dread.strongest_dimensions %} - driven by {{ risk.dread.strongest_dimensions|join(", ") }}{% endif %}</div>
-                {% endif %}
-                {% if risk.affected_assets %}
-                <div class="risk-muted">Affected assets: {{ risk.affected_assets|join(", ") }}</div>
-                {% endif %}
-                {% if risk.llm_assessment %}
-                <div class="risk-evidence" style="border-left:3px solid #8b5cf6; padding-left:8px;">
-                    <strong>LLM review:</strong>
-                    {{ risk.llm_assessment.assessed_level or "-" }}
-                    {% if risk.llm_assessment.priority %} | {{ risk.llm_assessment.priority }}{% endif %}
-                    {% if not risk.llm_assessment.applies %} | marked not applicable{% endif %}
-                    <span class="risk-muted">(deterministic baseline: {{ risk.risk_level }})</span>
-                    {% if risk.llm_assessment.rationale %}
-                    <div class="risk-muted">{{ risk.llm_assessment.rationale }}</div>
-                    {% endif %}
-                    {% if risk.llm_assessment.mitigations %}
-                    <div class="risk-muted"><strong>LLM mitigations (context-specific):</strong></div>
-                    {% for m in risk.llm_assessment.mitigations %}
-                    <div class="risk-mitigation">{{ m.title }}{% if m.priority %} [{{ m.priority }}]{% endif %}{% if m.action %} - {{ m.action }}{% endif %}</div>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                {% endif %}
-                {% if risk.why %}
-                <div class="risk-evidence">{{ risk.why|join(" ") }}</div>
-                {% endif %}
-                {% if risk.extract_evidence %}
-                <div class="risk-evidence">Extract evidence: {{ risk.extract_evidence|join(", ") }}</div>
-                {% endif %}
-                {% if risk.question_evidence %}
-                <div class="risk-evidence">
-                    <ul>
-                        {% for evidence in risk.question_evidence[:5] %}
-                        <li><strong>{{ evidence.question }}</strong>: {{ evidence.answer }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-                {% if not (risk.llm_assessment and risk.llm_assessment.mitigations) %}
-                {% for mitigation in risk.mitigations %}
-                <div class="risk-mitigation">{{ mitigation }}</div>
+                </article>
                 {% endfor %}
-                {% endif %}
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-panel">No risks were found for this pipeline.</div>
-        {% endif %}
+            </div>
+            <div class="risk-filter-empty" hidden>No risks match the current filters.</div>
+            {% else %}
+            <div class="empty-panel">No risks were detected in this category.</div>
+            {% endif %}
+        </section>
+        {% endfor %}
     </section>
 
-    {% if analysis.suggested_secondary_findings %}
-    <section class="risk-panel">
-        <div class="risk-panel-header">
-            <h2>Suggested Secondary Findings <span class="risk-muted">(advisory - outside the deterministic candidate set, not scored)</span></h2>
+    {% if analysis.missing_information or analysis.assumptions %}
+    <details class="risk-provenance">
+        <summary>Missing information and assumptions</summary>
+        <div class="support-list">
+            {% for item in analysis.missing_information %}
+            <div class="support-item">{{ item }}</div>
+            {% endfor %}
+            {% for item in analysis.assumptions %}
+            <div class="support-item">Assumption: {{ item }}</div>
+            {% endfor %}
         </div>
-        <div class="risk-list">
+    </details>
+    {% endif %}
+
+    {% if analysis.suggested_secondary_findings %}
+    <details class="risk-provenance">
+        <summary>Suggested secondary findings ({{ analysis.suggested_secondary_findings|length }})</summary>
+        <div class="support-list">
             {% for finding in analysis.suggested_secondary_findings %}
-            <article class="risk-item">
-                <div class="risk-code">{{ finding.code or "No code" }}{% if finding.name %} - {{ finding.name }}{% endif %} <span class="risk-muted">({{ finding.status or "needs_more_info" }})</span></div>
-                {% if finding.threat_pattern %}<div class="risk-muted">Pattern: {{ finding.threat_pattern }}</div>{% endif %}
-                {% if finding.rationale %}<div class="risk-evidence">{{ finding.rationale }}</div>{% endif %}
-                {% if finding.evidence %}
-                <div class="risk-evidence">
-                    <ul>
-                        {% for item in finding.evidence[:4] %}
-                        <li>{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
+            <article class="support-item">
+                <div class="risk-code">{{ finding.code or "No code" }}</div>
+                <strong>{{ finding.name or "Suggested finding" }}</strong>
+                <span class="risk-muted"> &middot; {{ finding.status or "needs_more_info" }}</span>
+                {% if finding.rationale %}<div class="mt-2">{{ finding.rationale }}</div>{% endif %}
             </article>
             {% endfor %}
         </div>
-    </section>
+    </details>
     {% endif %}
+
     {% elif not analysis_error %}
     <div class="risk-panel">
-        <div class="empty-panel">Select a completed pipeline risk analysis to review mitigations.</div>
+        <div class="empty-panel">Select a completed pipeline risk analysis to review risks and mitigations.</div>
     </div>
     {% endif %}
 </div>
 {% endblock %}
 
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/risk.js') }}"></script>
+{% endblock %}

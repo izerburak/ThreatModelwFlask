@@ -198,6 +198,27 @@ OWASP_QUICK_WINS = {
 
 RISK_RANK = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
 
+RISK_CATEGORY_META = (
+    {
+        "key": "owasp_llm",
+        "short_key": "llm",
+        "label": "LLM Security",
+        "description": "Model inputs, outputs, data exposure, agency, RAG, and resource-abuse risks.",
+    },
+    {
+        "key": "owasp_web",
+        "short_key": "web",
+        "label": "Web Application",
+        "description": "Access control, configuration, injection, authentication, integrity, and resilience risks.",
+    },
+    {
+        "key": "owasp_api",
+        "short_key": "api",
+        "label": "API Security",
+        "description": "Authorization, authentication, consumption, inventory, SSRF, and business-flow risks.",
+    },
+)
+
 # Multi-select options that are mutually exclusive with concrete choices. When a
 # concrete option is selected alongside one of these, the exclusive marker is the
 # inconsistency and gets dropped (and recorded as a normalization note).
@@ -817,14 +838,14 @@ def _risk_name(framework_key, code):
 
 
 def score_validated_threats(validated_primary, answers, deterministic_by_code):
-    """Static DREAD scoring for validated primary threats (stage 6).
+    """Static DREAD scoring for validated or display-backfilled threats (stage 6).
 
     DREAD is computed deterministically via ``score_code`` (the LLM never scores).
-    Each validated threat is turned into a unified-risk-compatible dict: it keeps the
-    grounded questionnaire evidence and deterministic mitigations of its candidate,
-    and gains the threat-identification fields (status, threat_pattern, affected
-    nodes/edges, abuse_path, control_gap, confidence). risk_level always comes from
-    the DREAD band - never from the LLM.
+    Each record is turned into a unified-risk-compatible dict with grounded
+    questionnaire evidence and deterministic mitigations. Model-omitted candidates
+    may pass through this function as ``unaddressed_candidate`` records so they stay
+    visible without being misrepresented as LLM-validated. risk_level always comes
+    from the DREAD band - never from the LLM.
     """
     idx = index_answers(answers)
     deterministic_by_code = deterministic_by_code or {}
@@ -840,10 +861,22 @@ def score_validated_threats(validated_primary, answers, deterministic_by_code):
         framework = candidate.get("framework") or _framework(code)
         affected_assets = candidate.get("affected_assets") or []
         evidence = candidate.get("evidence") if isinstance(candidate.get("evidence"), list) else []
+        classification = str(threat.get("classification") or "primary").strip()
+        is_unaddressed = classification == "unaddressed_candidate"
+        canonical_name = candidate.get("name") or _risk_name(framework, code)
+        identified_name = None if is_unaddressed else str(threat.get("name") or "").strip()
+        sources = ["Questionnaire"]
+        if is_unaddressed:
+            sources.append("Deterministic candidate discovery")
+        else:
+            sources.append("LLM threat identification")
         scored.append(
             {
                 "code": code,
-                "name": threat.get("name") or candidate.get("name") or _risk_name(framework, code),
+                # OWASP code/name pairs are canonical. Preserve a model-authored
+                # finding title separately so it cannot relabel an OWASP code.
+                "name": canonical_name,
+                "identified_name": identified_name if identified_name and identified_name != canonical_name else None,
                 "framework": framework,
                 "risk_level": dread["band"],
                 "score": dread["total"],
@@ -857,25 +890,201 @@ def score_validated_threats(validated_primary, answers, deterministic_by_code):
                 ),
                 "evidence": evidence,
                 "question_evidence": evidence,
-                "sources": ["Questionnaire", "LLM threat identification"],
+                "sources": sources,
                 "mitigations": _unique_strings(
                     _dread_aware_mitigations(code, dread, idx, affected_assets) + OWASP_MITIGATIONS.get(code, [])
                 ),
                 # threat-identification fields (the LLM's semantic contribution)
                 "status": threat.get("status"),
+                "classification": classification,
                 "threat_pattern": threat.get("threat_pattern"),
                 "affected_nodes": threat.get("affected_nodes") or [],
                 "affected_edges": threat.get("affected_edges") or [],
                 "abuse_path": threat.get("abuse_path") or [],
                 "control_gap": threat.get("control_gap") or "",
                 "confidence": threat.get("confidence"),
-                "llm_evidence": threat.get("evidence") or [],
+                "llm_evidence": [] if is_unaddressed else (threat.get("evidence") or []),
             }
         )
     return sorted(
         scored,
         key=lambda item: (-RISK_RANK.get(item.get("risk_level"), 0), -(item.get("score") or 0), item.get("code", "")),
     )
+
+
+def backfill_legacy_risk_display(analysis):
+    """Repair older risk artifacts whose model omitted deterministic candidates.
+
+    New analyses backfill before DREAD scoring in ``build_threat_analysis``. Older
+    saved artifacts do not contain the questionnaire answers needed to recompute
+    DREAD safely, so this read-time compatibility path adds missing candidates as
+    explicitly unscored/needs-more-info entries with canonical names and baseline
+    mitigations. Candidates explicitly returned as not_applicable remain excluded.
+    """
+    if not isinstance(analysis, dict):
+        return analysis
+
+    enriched = dict(analysis)
+    deterministic = [
+        risk for risk in enriched.get("deterministic_risks", [])
+        if isinstance(risk, dict) and risk.get("code")
+    ]
+    unified = [
+        dict(risk) for risk in enriched.get("unified_risks", [])
+        if isinstance(risk, dict)
+    ]
+    if not deterministic or not isinstance(enriched.get("unified_risks"), list):
+        return enriched
+
+    candidates = {
+        str(risk.get("code") or "").strip().upper(): risk
+        for risk in deterministic
+    }
+    existing_codes = {
+        str(risk.get("code") or "").strip().upper()
+        for risk in unified
+    }
+    addressed_codes = {
+        str(risk.get("code") or "").strip().upper()
+        for risk in enriched.get("identified_threats", [])
+        if isinstance(risk, dict) and risk.get("code")
+    }
+
+    # Also repair model-authored labels that overwrote canonical OWASP names.
+    for risk in unified:
+        code = str(risk.get("code") or "").strip().upper()
+        candidate = candidates.get(code)
+        if candidate:
+            risk["name"] = candidate.get("name") or _risk_name(
+                candidate.get("framework") or _framework(code), code
+            )
+
+    added = 0
+    for code, candidate in candidates.items():
+        if code in existing_codes or code in addressed_codes:
+            continue
+        framework = candidate.get("framework") or _framework(code)
+        evidence = candidate.get("evidence") if isinstance(candidate.get("evidence"), list) else []
+        unified.append(
+            {
+                "code": code,
+                "name": candidate.get("name") or _risk_name(framework, code),
+                "framework": framework,
+                "risk_level": "Unscored",
+                "score": None,
+                "average": None,
+                "dread": None,
+                "strongest_dimensions": [],
+                "related_codes": [code],
+                "affected_assets": candidate.get("affected_assets") or [],
+                "missing_information": candidate.get("missing_information") or [],
+                "evidence": evidence,
+                "question_evidence": evidence,
+                "sources": ["Questionnaire", "Deterministic candidate discovery"],
+                "mitigations": list(OWASP_MITIGATIONS.get(code, [])),
+                "status": "needs_more_info",
+                "classification": "unaddressed_candidate",
+                "identified_name": None,
+                "threat_pattern": None,
+                "affected_nodes": [],
+                "affected_edges": [],
+                "abuse_path": [],
+                "control_gap": "",
+                "confidence": None,
+                "llm_evidence": [],
+            }
+        )
+        added += 1
+
+    if added:
+        enriched["display_backfilled_count"] = added
+    enriched["unified_risks"] = sorted(
+        unified,
+        key=lambda item: (
+            -RISK_RANK.get(item.get("risk_level"), 0),
+            -(item.get("score") or 0),
+            item.get("code", ""),
+        ),
+    )
+    return enriched
+
+
+def build_risk_view_model(analysis):
+    """Build the compact, category-oriented view model used by ``risk.html``."""
+    analysis = analysis if isinstance(analysis, dict) else {}
+    risks = [
+        risk for risk in analysis.get("unified_risks", [])
+        if isinstance(risk, dict)
+    ]
+    categories = []
+    for meta in RISK_CATEGORY_META:
+        category_risks = [
+            risk for risk in risks
+            if (risk.get("framework") or _framework(str(risk.get("code") or ""))) == meta["key"]
+        ]
+        levels = {
+            level: len([
+                risk for risk in category_risks
+                if str(risk.get("risk_level") or "").strip().title() == level
+            ])
+            for level in ("Critical", "High", "Medium", "Low")
+        }
+        unscored = len([
+            risk for risk in category_risks
+            if str(risk.get("risk_level") or "").strip().lower() == "unscored"
+        ])
+        needs_review = len([
+            risk for risk in category_risks
+            if (
+                str(risk.get("status") or "").strip().lower() == "needs_more_info"
+                or str(risk.get("risk_level") or "").strip().lower() == "unscored"
+            )
+        ])
+        categories.append(
+            {
+                **meta,
+                "risks": category_risks,
+                "top_risks": category_risks[:3],
+                "total": len(category_risks),
+                "levels": levels,
+                "critical_high": levels["Critical"] + levels["High"],
+                "needs_review": needs_review,
+                "unscored": unscored,
+            }
+        )
+
+    mitigated = len([
+        risk for risk in risks
+        if risk.get("mitigation_actions")
+        or risk.get("mitigations")
+        or (
+            isinstance(risk.get("llm_assessment"), dict)
+            and risk["llm_assessment"].get("mitigations")
+        )
+    ])
+    needs_review = len([
+        risk for risk in risks
+        if (
+            str(risk.get("status") or "").strip().lower() == "needs_more_info"
+            or str(risk.get("risk_level") or "").strip().lower() == "unscored"
+        )
+    ])
+    first_populated = next(
+        (category["short_key"] for category in categories if category["total"]),
+        categories[0]["short_key"],
+    )
+    return {
+        "categories": categories,
+        "default_category": first_populated,
+        "total": len(risks),
+        "critical_high": len([
+            risk for risk in risks
+            if str(risk.get("risk_level") or "").strip().title() in ("Critical", "High")
+        ]),
+        "needs_review": needs_review,
+        "mitigated": mitigated,
+        "priority_actions": _string_list(analysis.get("quick_wins"))[:4],
+    }
 
 
 def build_threat_analysis(app_root_path, response_payload, dfd_graph, app_config=None):
@@ -907,14 +1116,30 @@ def build_threat_analysis(app_root_path, response_payload, dfd_graph, app_config
 
     validation = validate_threats(identification, dfd_graph, deterministic_risks)
     deterministic_by_code = {risk["code"]: risk for risk in deterministic_risks}
-    unified_risks = score_validated_threats(validation["primary_threats"], answers, deterministic_by_code)
+    validated_risks = score_validated_threats(validation["primary_threats"], answers, deterministic_by_code)
+    # A model omission must not erase a questionnaire-grounded deterministic
+    # candidate from Risks & Mitigations. Keep it visibly marked needs_more_info,
+    # but still attach deterministic DREAD and baseline OWASP mitigations.
+    unaddressed_risks = score_validated_threats(
+        validation.get("unaddressed_candidates", []), answers, deterministic_by_code
+    )
+    unified_risks = sorted(
+        validated_risks + unaddressed_risks,
+        key=lambda item: (
+            -RISK_RANK.get(item.get("risk_level"), 0),
+            -(item.get("score") or 0),
+            item.get("code", ""),
+        ),
+    )
 
     # Mitigation generation runs only on validated, scored threats; best-effort.
-    if flag_enabled(app_config, "LLM_MITIGATION_GENERATION_ENABLED", True) and unified_risks:
-        mitigation_result = generate_mitigations(app_root_path, unified_risks, raw_answers, dfd_graph, app_config, timeout=llm_timeout)
+    if flag_enabled(app_config, "LLM_MITIGATION_GENERATION_ENABLED", True) and validated_risks:
+        mitigation_result = generate_mitigations(
+            app_root_path, validated_risks, raw_answers, dfd_graph, app_config, timeout=llm_timeout
+        )
     else:
         mitigation_result = {
-            "status": "disabled" if unified_risks else "skipped",
+            "status": "disabled" if validated_risks else "skipped",
             "mitigations": [],
             "quick_wins": [],
             "assumptions": [],
@@ -966,6 +1191,7 @@ def build_threat_analysis(app_root_path, response_payload, dfd_graph, app_config
             "model": identification.get("model"),
             "chunks_total": identification.get("chunks_total"),
             "chunks_succeeded": identification.get("chunks_succeeded"),
+            "missing_primary_codes": identification.get("missing_primary_codes") or [],
             "message": (
                 f"{len(validation['primary_threats'])} validated primary, "
                 f"{len(validation['downgraded_threats'])} downgraded, "

@@ -35,8 +35,17 @@ from app.services.ollama_client import OllamaError, chat as ollama_chat, get_oll
 from app.services.extract_to_reactflow import extract_to_reactflow
 from app.services.llm_extract_service import generate_llm_extract
 from app.services.pipeline_orchestrator import PIPELINE_STEPS, PipelineOrchestrator
-from app.services.risk_analysis_service import RISK_RANK, build_risk_analysis, suggested_extract_filename, unify_risks
+from app.services.risk_analysis_service import (
+    RISK_RANK,
+    backfill_legacy_risk_display,
+    build_risk_analysis,
+    build_risk_view_model,
+    suggested_extract_filename,
+    unify_risks,
+)
 from app.services.static_dfd_mapper import build_static_dfd_from_answers
+from app.services.sustainability.arxiv_source import ArxivSourceError
+from app.services.sustainability.sustainability_service import SustainabilityService
 from app.utils.save_utils import save_adaptive_llm_sec_answers
 
 
@@ -131,6 +140,58 @@ def pipeline_index():
         active_tab="pipeline",
         response_files=list_response_files(current_app.root_path),
         pipelines=orchestrator.list_pipelines(),
+    )
+
+
+@main.route("/sustainability", methods=["GET", "POST"])
+def sustainability():
+    service = _sustainability_service()
+
+    if request.method == "POST":
+        action = request.form.get("action") or ""
+        try:
+            if action == "add_keyword":
+                added = service.add_keyword(
+                    request.form.get("keyword_group"),
+                    request.form.get("keyword"),
+                )
+                if added:
+                    flash("Custom keyword added to the active scan configuration.", "success")
+                else:
+                    flash("That keyword is already active.", "info")
+            elif action == "remove_keyword":
+                removed = service.remove_keyword(
+                    request.form.get("keyword_group"),
+                    request.form.get("keyword"),
+                )
+                flash(
+                    "Custom keyword removed." if removed else "Custom keyword was not found.",
+                    "success" if removed else "info",
+                )
+            elif action == "start_pipeline":
+                scan = service.run_scan(request.form.get("papers_to_scan"))
+                flash(
+                    f"Sustainability scan completed: {scan['summary']['papers_scanned']} papers analyzed.",
+                    "success",
+                )
+            else:
+                flash("The requested Sustainability action was not recognized.", "warning")
+        except (ArxivSourceError, ValueError) as exc:
+            flash(str(exc), "danger")
+        except OSError:
+            current_app.logger.exception("Sustainability storage operation failed")
+            flash("The Sustainability configuration could not be saved locally.", "danger")
+        return redirect(url_for("main.sustainability"))
+
+    state = service.view_state()
+    selected_paper_count = 50
+    if state["last_scan"]:
+        selected_paper_count = state["last_scan"].get("requested_count") or selected_paper_count
+    return render_template(
+        "sustainability.html",
+        active_tab="sustainability",
+        selected_paper_count=selected_paper_count,
+        **state,
     )
 
 
@@ -532,6 +593,7 @@ def risk():
     selected_file = None
     selected_extract = None
     analysis = None
+    risk_view = None
     analysis_error = None
 
     if selected_pipeline:
@@ -539,6 +601,7 @@ def risk():
             selected_manifest = orchestrator.get_manifest(selected_pipeline)
             analysis = orchestrator.load_artifact(selected_pipeline, "risks.json")
             analysis = _with_unified_risks(analysis)
+            risk_view = build_risk_view_model(analysis)
         except (FileNotFoundError, ValueError, json.JSONDecodeError):
             analysis_error = "Selected pipeline risk analysis was not found."
     elif request.method == "POST":
@@ -550,6 +613,7 @@ def risk():
             extract_payload = _load_extract_payload(selected_extract) if selected_extract else None
             analysis = build_risk_analysis(current_app.root_path, response_payload, extract_payload)
             analysis = _with_unified_risks(analysis)
+            risk_view = build_risk_view_model(analysis)
         except FileNotFoundError:
             analysis_error = "Selected response or extract file was not found."
         except ValueError as exc:
@@ -567,6 +631,7 @@ def risk():
         selected_extract=selected_extract,
         suggested_extract=suggested_extract,
         analysis=analysis,
+        risk_view=risk_view,
         analysis_error=analysis_error,
     )
 
@@ -807,6 +872,13 @@ def _pipeline_orchestrator():
     return PipelineOrchestrator(current_app.root_path, current_app.config)
 
 
+def _sustainability_service():
+    return SustainabilityService(
+        current_app.root_path,
+        storage_path=current_app.config.get("SUSTAINABILITY_STORAGE_PATH"),
+    )
+
+
 def _start_pipeline_background(pipeline_id, app_root_path, app_config):
     worker = Thread(
         target=_run_pipeline_background,
@@ -963,6 +1035,7 @@ def _with_unified_risks(analysis):
             enriched.get("extract_risks") if isinstance(enriched.get("extract_risks"), list) else [],
             enriched.get("mapped_risks") if isinstance(enriched.get("mapped_risks"), list) else [],
         )
+    enriched = backfill_legacy_risk_display(enriched)
     unified_levels = [
         risk.get("risk_level")
         for risk in enriched.get("unified_risks", [])

@@ -72,11 +72,34 @@ class ThreatPipelineIntegrationTests(unittest.TestCase):
         self.assertEqual(scored[code]["risk_level"], expected_band)
         self.assertIsInstance(scored[code]["dread"], dict)
         self.assertEqual(scored[code]["status"], "confirmed")
+        self.assertNotEqual(scored[code]["name"], "X")
+        self.assertEqual(scored[code]["identified_name"], "X")
         # Hallucinated node id was stripped before scoring.
         self.assertNotIn("entry_FAKE", scored[code]["affected_nodes"])
         self.assertEqual(result["pipeline_mode"], "llm_threat_identification_v1")
 
-    def test_only_validated_threats_are_scored(self):
+    def test_unaddressed_candidates_remain_visible_with_fallback_mitigations(self):
+        dfd = _dfd()
+        codes = _deterministic_codes(dfd)
+        identified = [{
+            "code": codes[0], "name": "Model title", "status": "confirmed",
+            "threat_pattern": "prompt_context_manipulation",
+            "evidence": ["Q2"], "affected_nodes": [], "affected_edges": [],
+            "abuse_path": ["x"], "control_gap": "gap", "confidence": "high",
+            "missing_information": [],
+        }]
+
+        result, _, _ = self._run(identified, {"mitigations": []})
+        risks = {risk["code"]: risk for risk in result["unified_risks"]}
+
+        self.assertEqual(set(risks), set(codes))
+        omitted = risks[codes[1]]
+        self.assertEqual(omitted["status"], "needs_more_info")
+        self.assertEqual(omitted["classification"], "unaddressed_candidate")
+        self.assertIn("Deterministic candidate discovery", omitted["sources"])
+        self.assertTrue(omitted["mitigations"])
+
+    def test_explicitly_not_applicable_threats_remain_excluded(self):
         dfd = _dfd()
         codes = _deterministic_codes(dfd)
         # One confirmed (validated) + one not_applicable (must NOT be scored).
@@ -92,6 +115,38 @@ class ThreatPipelineIntegrationTests(unittest.TestCase):
         scored_codes = {r["code"] for r in result["unified_risks"]}
         self.assertIn(codes[0], scored_codes)
         self.assertNotIn(codes[1], scored_codes)
+
+    def test_legacy_artifact_backfills_omitted_candidates_for_display(self):
+        legacy = {
+            "unified_risks": [{
+                "code": "A01:2025",
+                "name": "Incorrect model-authored name",
+                "risk_level": "High",
+                "score": 12,
+                "mitigations": [],
+            }],
+            "identified_threats": [{"code": "A01:2025", "status": "plausible"}],
+            "deterministic_risks": [
+                {
+                    "code": "A01:2025", "name": "Broken Access Control",
+                    "framework": "owasp_web", "evidence": [],
+                },
+                {
+                    "code": "LLM01", "name": "Prompt Injection",
+                    "framework": "owasp_llm",
+                    "evidence": [{"question": "Q2", "answer": "Public"}],
+                },
+            ],
+        }
+
+        repaired = ras.backfill_legacy_risk_display(legacy)
+        risks = {risk["code"]: risk for risk in repaired["unified_risks"]}
+
+        self.assertEqual(repaired["display_backfilled_count"], 1)
+        self.assertEqual(risks["A01:2025"]["name"], "Broken Access Control")
+        self.assertEqual(risks["LLM01"]["risk_level"], "Unscored")
+        self.assertEqual(risks["LLM01"]["status"], "needs_more_info")
+        self.assertTrue(risks["LLM01"]["mitigations"])
 
     def test_mitigation_cannot_add_new_risks(self):
         dfd = _dfd()

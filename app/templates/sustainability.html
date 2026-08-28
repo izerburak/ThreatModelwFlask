@@ -1,0 +1,306 @@
+{% extends "layout.html" %}
+
+{% block extra_head %}
+<style>
+    .sustainability-shell { display: grid; gap: 1rem; }
+    .sustainability-hero,
+    .sustainability-panel,
+    .scan-summary {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        background: #111827;
+    }
+    .sustainability-hero {
+        padding: 1.6rem;
+        background: radial-gradient(circle at 92% 20%, rgba(16, 185, 129, 0.16), transparent 28%),
+            linear-gradient(135deg, #111827, #0f1d2e);
+    }
+    .sustainability-kicker {
+        color: #6ee7b7;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+    .sustainability-hero h1 { margin: 0.35rem 0 0; font-size: clamp(1.65rem, 3vw, 2.1rem); }
+    .sustainability-hero p { max-width: 880px; margin: 0.6rem 0 0; color: #cbd5e1; }
+    .sustainability-panel-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        background: #172033;
+    }
+    .sustainability-panel-header h2 { margin: 0; font-size: 1.08rem; }
+    .sustainability-panel-body { padding: 1.25rem; }
+    .configuration-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+        gap: 1rem;
+        align-items: stretch;
+    }
+    .source-card,
+    .pipeline-action-card,
+    .keyword-group,
+    .paper-card {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 10px;
+        background: #0f172a;
+    }
+    .source-card, .pipeline-action-card { padding: 1.1rem; }
+    .config-label {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: #94a3b8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .source-name { color: #f8fafc; font-weight: 700; }
+    .source-url { display: inline-block; margin-top: 0.35rem; color: #7dd3fc; overflow-wrap: anywhere; }
+    .pipeline-action-card form { display: grid; gap: 0.9rem; }
+    .start-pipeline-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+    .keyword-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .keyword-group { padding: 1rem; }
+    .keyword-group h3 { margin: 0 0 0.2rem; font-size: 1rem; }
+    .keyword-group-description { margin: 0 0 0.85rem; color: #94a3b8; font-size: 0.86rem; }
+    .keyword-list { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .keyword-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.32rem 0.58rem;
+        border: 1px solid rgba(96, 165, 250, 0.28);
+        border-radius: 999px;
+        color: #dbeafe;
+        background: rgba(37, 99, 235, 0.12);
+        font-size: 0.78rem;
+        line-height: 1.2;
+    }
+    .keyword-chip.custom { border-color: rgba(52, 211, 153, 0.4); color: #d1fae5; background: rgba(16, 185, 129, 0.12); }
+    .keyword-chip form { display: inline; margin: 0; }
+    .keyword-remove { border: 0; padding: 0 0.1rem; color: #a7f3d0; background: transparent; font-size: 1rem; line-height: 1; }
+    .keyword-add-form {
+        display: grid;
+        grid-template-columns: minmax(180px, 0.65fr) minmax(220px, 1fr) auto;
+        gap: 0.75rem;
+        align-items: end;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+    .scan-summary {
+        padding: 1.15rem 1.25rem;
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.45), rgba(15, 23, 42, 0.98));
+    }
+    .scan-summary-top { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.9rem; }
+    .scan-summary-top h2 { margin: 0; font-size: 1.08rem; }
+    .scan-timestamp { color: #a7f3d0; font-size: 0.86rem; }
+    .summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.65rem; }
+    .summary-stat { padding: 0.8rem; border: 1px solid rgba(167, 243, 208, 0.17); border-radius: 8px; background: rgba(15, 23, 42, 0.62); }
+    .summary-stat strong { display: block; color: #f8fafc; font-size: 1.35rem; }
+    .summary-stat span { color: #cbd5e1; font-size: 0.78rem; }
+    .scan-warning { margin-top: 0.75rem; color: #fde68a; font-size: 0.86rem; }
+    .results-list { display: grid; gap: 0.75rem; }
+    .paper-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; padding: 1rem; }
+    .paper-card.strong-candidate { border-color: rgba(52, 211, 153, 0.5); box-shadow: inset 3px 0 #10b981; }
+    .paper-title { margin: 0.35rem 0 0.45rem; font-size: 1rem; line-height: 1.4; }
+    .paper-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem; color: #94a3b8; font-size: 0.8rem; }
+    .paper-id { color: #f0abfc; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .match-explanation { margin: 0.75rem 0 0; color: #cbd5e1; font-size: 0.86rem; }
+    .match-explanation strong { color: #f8fafc; }
+    .match-chip { display: inline-block; margin: 0.25rem 0.2rem 0 0; padding: 0.18rem 0.45rem; border-radius: 999px; font-size: 0.72rem; background: rgba(239, 68, 68, 0.14); color: #fecaca; }
+    .match-chip.llm { background: rgba(59, 130, 246, 0.15); color: #bfdbfe; }
+    .paper-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.65rem; min-width: 150px; }
+    .status-badge { display: inline-flex; padding: 0.32rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+    .status-strong-candidate { color: #a7f3d0; background: rgba(16, 185, 129, 0.18); }
+    .status-security-only { color: #fecaca; background: rgba(239, 68, 68, 0.16); }
+    .status-llm-only { color: #bfdbfe; background: rgba(59, 130, 246, 0.16); }
+    .status-no-match { color: #cbd5e1; background: rgba(100, 116, 139, 0.2); }
+    .paper-links { display: flex; gap: 0.45rem; }
+    .empty-results { padding: 2.2rem 1rem; color: #94a3b8; text-align: center; }
+    @media (max-width: 991px) { .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 767px) {
+        .configuration-grid, .keyword-grid, .keyword-add-form, .paper-card { grid-template-columns: 1fr; }
+        .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .paper-actions { align-items: flex-start; min-width: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="sustainability-shell">
+    <section class="sustainability-hero">
+        <div class="sustainability-kicker">Advisory research monitor</div>
+        <h1>Sustainability — Emerging LLM Security Research</h1>
+        <p>
+            Scan recent ArXiv Cryptography and Security papers and identify research potentially relevant
+            to emerging LLM attack surfaces and vulnerabilities. This research scan is separate from the
+            threat-modeling pipeline and does not change any project risks or scores.
+        </p>
+    </section>
+
+    {% if last_scan %}
+    <section class="scan-summary" aria-labelledby="scanSummaryTitle">
+        <div class="scan-summary-top">
+            <h2 id="scanSummaryTitle">Latest Pipeline Summary</h2>
+            <div class="scan-timestamp">Last scan: {{ last_scan.scanned_at }}</div>
+        </div>
+        <div class="summary-grid">
+            <div class="summary-stat"><strong>{{ last_scan.summary.papers_scanned }}</strong><span>Papers scanned</span></div>
+            <div class="summary-stat"><strong>{{ last_scan.summary.security_matches }}</strong><span>Security keyword matches</span></div>
+            <div class="summary-stat"><strong>{{ last_scan.summary.llm_matches }}</strong><span>LLM keyword matches</span></div>
+            <div class="summary-stat"><strong>{{ last_scan.summary.strong_candidates }}</strong><span>Strong candidates</span></div>
+            <div class="summary-stat"><strong>{{ last_scan.summary.no_keyword_match }}</strong><span>No keyword match</span></div>
+        </div>
+        {% for warning in last_scan.warnings %}<div class="scan-warning">{{ warning }}</div>{% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="sustainability-panel" aria-labelledby="configurationTitle">
+        <div class="sustainability-panel-header">
+            <h2 id="configurationTitle">Pipeline Configuration</h2>
+            <span class="badge text-bg-secondary">Keyword pre-filter</span>
+        </div>
+        <div class="sustainability-panel-body">
+            <div class="configuration-grid">
+                <div class="source-card">
+                    <span class="config-label">Source</span>
+                    <div class="source-name">{{ source_name }}</div>
+                    <a class="source-url" href="{{ source_url }}" target="_blank" rel="noopener noreferrer">{{ source_url }}</a>
+                    <p class="form-text mb-0 mt-3">Actual recent cs.CR entries are used. PDFs and paper HTML are not downloaded during this stage.</p>
+                </div>
+                <div class="pipeline-action-card">
+                    <form method="post" action="{{ url_for('main.sustainability') }}">
+                        <input type="hidden" name="action" value="start_pipeline">
+                        <div>
+                            <label class="form-label" for="papersToScan">Papers to Scan</label>
+                            <select class="form-select" id="papersToScan" name="papers_to_scan">
+                                {% for option in paper_count_options %}
+                                <option value="{{ option }}" {% if option == selected_paper_count %}selected{% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-lg start-pipeline-button" type="submit">Start Pipeline</button>
+                        <div class="form-text">The scan runs only when this button is pressed.</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sustainability-panel" aria-labelledby="keywordsTitle">
+        <div class="sustainability-panel-header">
+            <h2 id="keywordsTitle">Active Title Keywords</h2>
+            <span class="badge text-bg-secondary">Deterministic matching</span>
+        </div>
+        <div class="sustainability-panel-body">
+            <div class="keyword-grid">
+                {% for group, title, description in [
+                    ('security', 'Security Keywords', 'At least one match is required for the security side of a strong candidate.'),
+                    ('llm', 'LLM / AI System Keywords', 'At least one match is required for the LLM / AI side of a strong candidate.')
+                ] %}
+                <div class="keyword-group">
+                    <h3>{{ title }}</h3>
+                    <p class="keyword-group-description">{{ description }}</p>
+                    <div class="keyword-list">
+                        {% for keyword in keywords[group] %}
+                        {% set is_custom = keyword in custom_keywords[group] %}
+                        <span class="keyword-chip{% if is_custom %} custom{% endif %}">
+                            {{ keyword }}
+                            {% if is_custom %}
+                            <form method="post" action="{{ url_for('main.sustainability') }}">
+                                <input type="hidden" name="action" value="remove_keyword">
+                                <input type="hidden" name="keyword_group" value="{{ group }}">
+                                <input type="hidden" name="keyword" value="{{ keyword }}">
+                                <button class="keyword-remove" type="submit" aria-label="Remove custom keyword {{ keyword }}" title="Remove custom keyword">×</button>
+                            </form>
+                            {% endif %}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <form class="keyword-add-form" method="post" action="{{ url_for('main.sustainability') }}">
+                <input type="hidden" name="action" value="add_keyword">
+                <div>
+                    <label class="form-label" for="keywordGroup">Keyword Group</label>
+                    <select class="form-select" id="keywordGroup" name="keyword_group">
+                        <option value="security">Security</option>
+                        <option value="llm">LLM / AI System</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="keyword">Add Keyword</label>
+                    <input class="form-control" id="keyword" name="keyword" type="text" maxlength="80" placeholder="Example: indirect prompt injection" required>
+                </div>
+                <button class="btn btn-outline-primary" type="submit">Add</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="sustainability-panel" aria-labelledby="resultsTitle">
+        <div class="sustainability-panel-header">
+            <h2 id="resultsTitle">Research Findings</h2>
+            {% if last_scan %}<span class="badge text-bg-secondary">Strong candidates first</span>{% endif %}
+        </div>
+        <div class="sustainability-panel-body">
+            {% if last_scan and last_scan.papers %}
+            <div class="results-list">
+                {% for paper in last_scan.papers %}
+                <article class="paper-card{% if paper.candidate_status == 'strong_candidate' %} strong-candidate{% endif %}">
+                    <div>
+                        <div class="paper-meta">
+                            <span class="paper-id">arXiv:{{ paper.arxiv_id }}</span>
+                            {% if paper.subjects %}<span>{{ paper.subjects }}</span>{% endif %}
+                        </div>
+                        <h3 class="paper-title">{{ paper.title }}</h3>
+                        {% if paper.security_matches %}
+                        <div aria-label="Matched security keywords">
+                            {% for keyword in paper.security_matches %}<span class="match-chip">{{ keyword }}</span>{% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if paper.llm_matches %}
+                        <div aria-label="Matched LLM keywords">
+                            {% for keyword in paper.llm_matches %}<span class="match-chip llm">{{ keyword }}</span>{% endfor %}
+                        </div>
+                        {% endif %}
+                        <p class="match-explanation">
+                            {% if paper.candidate_status == 'strong_candidate' %}
+                            <strong>Why selected:</strong> the title matched security keyword(s) {{ paper.security_matches|join(', ') }} and LLM / AI keyword(s) {{ paper.llm_matches|join(', ') }}.
+                            {% elif paper.candidate_status == 'security_only' %}
+                            <strong>Why classified this way:</strong> security keyword(s) {{ paper.security_matches|join(', ') }} matched, but no LLM / AI keyword matched.
+                            {% elif paper.candidate_status == 'llm_only' %}
+                            <strong>Why classified this way:</strong> LLM / AI keyword(s) {{ paper.llm_matches|join(', ') }} matched, but no security keyword matched.
+                            {% else %}
+                            <strong>Why classified this way:</strong> no active title keyword matched.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="paper-actions">
+                        <span class="status-badge status-{{ paper.candidate_status|replace('_', '-') }}">{{ paper.candidate_status_label }}</span>
+                        <div class="paper-links">
+                            <a class="btn btn-outline-primary btn-sm" href="{{ paper.paper_url }}" target="_blank" rel="noopener noreferrer">Abstract</a>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ paper.html_url }}" target="_blank" rel="noopener noreferrer">HTML</a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-results">No scan results yet. Review the source and active keywords, choose a paper count, then press <strong>Start Pipeline</strong>.</div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}
