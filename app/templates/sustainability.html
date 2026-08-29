@@ -105,7 +105,7 @@
     .scan-summary-top { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; flex-wrap: wrap; margin-bottom: 0.9rem; }
     .scan-summary-top h2 { margin: 0; font-size: 1.08rem; }
     .scan-timestamp { color: #a7f3d0; font-size: 0.86rem; }
-    .summary-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.65rem; }
+    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
     .summary-stat { padding: 0.8rem; border: 1px solid rgba(167, 243, 208, 0.17); border-radius: 8px; background: rgba(15, 23, 42, 0.62); }
     .summary-stat strong { display: block; color: #f8fafc; font-size: 1.35rem; }
     .summary-stat span { color: #cbd5e1; font-size: 0.78rem; }
@@ -128,11 +128,61 @@
     .status-no-match { color: #cbd5e1; background: rgba(100, 116, 139, 0.2); }
     .paper-links { display: flex; gap: 0.45rem; }
     .empty-results { padding: 2.2rem 1rem; color: #94a3b8; text-align: center; }
-    @media (max-width: 991px) { .summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .excluded-papers {
+        margin-top: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 8px;
+        background: #0b1220;
+    }
+    .excluded-papers summary {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.85rem 1rem;
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        list-style: none;
+    }
+    .excluded-papers summary::-webkit-details-marker { display: none; }
+    .excluded-papers summary::before { content: ">"; color: #94a3b8; }
+    .excluded-papers[open] summary::before { content: "v"; }
+    .excluded-count {
+        margin-left: auto;
+        padding: 0.15rem 0.45rem;
+        border-radius: 999px;
+        color: #cbd5e1;
+        background: rgba(100, 116, 139, 0.2);
+        font-size: 0.72rem;
+    }
+    .excluded-list { display: grid; border-top: 1px solid rgba(148, 163, 184, 0.14); }
+    .excluded-paper {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.8rem;
+        align-items: center;
+        padding: 0.7rem 0.85rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .excluded-paper:last-child { border-bottom: 0; }
+    .excluded-paper-main { min-width: 0; }
+    .excluded-paper-title {
+        margin: 0.2rem 0 0;
+        color: #dbe4f0;
+        font-size: 0.86rem;
+        font-weight: 600;
+        line-height: 1.35;
+    }
+    .excluded-paper-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .excluded-paper .paper-id { font-size: 0.72rem; }
+    .excluded-reason { color: #94a3b8; font-size: 0.72rem; }
+    .excluded-html-link { min-width: 58px; }
     @media (max-width: 767px) {
         .configuration-grid, .keyword-grid, .keyword-add-form, .paper-card { grid-template-columns: 1fr; }
         .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .paper-actions { align-items: flex-start; min-width: 0; }
+        .excluded-paper { grid-template-columns: minmax(0, 1fr) auto; }
     }
 </style>
 {% endblock %}
@@ -157,10 +207,7 @@
         </div>
         <div class="summary-grid">
             <div class="summary-stat"><strong>{{ last_scan.summary.papers_scanned }}</strong><span>Papers scanned</span></div>
-            <div class="summary-stat"><strong>{{ last_scan.summary.security_matches }}</strong><span>Security keyword matches</span></div>
-            <div class="summary-stat"><strong>{{ last_scan.summary.llm_matches }}</strong><span>LLM keyword matches</span></div>
             <div class="summary-stat"><strong>{{ last_scan.summary.strong_candidates }}</strong><span>Strong candidates</span></div>
-            <div class="summary-stat"><strong>{{ last_scan.summary.no_keyword_match }}</strong><span>No keyword match</span></div>
         </div>
         {% for warning in last_scan.warnings %}<div class="scan-warning">{{ warning }}</div>{% endfor %}
     </section>
@@ -251,14 +298,14 @@
 
     <section class="sustainability-panel" aria-labelledby="resultsTitle">
         <div class="sustainability-panel-header">
-            <h2 id="resultsTitle">Research Findings</h2>
-            {% if last_scan %}<span class="badge text-bg-secondary">Strong candidates first</span>{% endif %}
+            <h2 id="resultsTitle">Strong Candidates</h2>
+            {% if last_scan %}<span class="badge text-bg-secondary">Security + LLM match</span>{% endif %}
         </div>
         <div class="sustainability-panel-body">
-            {% if last_scan and last_scan.papers %}
+            {% if last_scan and strong_candidates %}
             <div class="results-list">
-                {% for paper in last_scan.papers %}
-                <article class="paper-card{% if paper.candidate_status == 'strong_candidate' %} strong-candidate{% endif %}">
+                {% for paper in strong_candidates %}
+                <article class="paper-card strong-candidate">
                     <div>
                         <div class="paper-meta">
                             <span class="paper-id">arXiv:{{ paper.arxiv_id }}</span>
@@ -276,15 +323,7 @@
                         </div>
                         {% endif %}
                         <p class="match-explanation">
-                            {% if paper.candidate_status == 'strong_candidate' %}
                             <strong>Why selected:</strong> the title matched security keyword(s) {{ paper.security_matches|join(', ') }} and LLM / AI keyword(s) {{ paper.llm_matches|join(', ') }}.
-                            {% elif paper.candidate_status == 'security_only' %}
-                            <strong>Why classified this way:</strong> security keyword(s) {{ paper.security_matches|join(', ') }} matched, but no LLM / AI keyword matched.
-                            {% elif paper.candidate_status == 'llm_only' %}
-                            <strong>Why classified this way:</strong> LLM / AI keyword(s) {{ paper.llm_matches|join(', ') }} matched, but no security keyword matched.
-                            {% else %}
-                            <strong>Why classified this way:</strong> no active title keyword matched.
-                            {% endif %}
                         </p>
                     </div>
                     <div class="paper-actions">
@@ -297,8 +336,41 @@
                 </article>
                 {% endfor %}
             </div>
+            {% elif last_scan %}
+            <div class="empty-results">No papers matched both the active Security and LLM / AI keyword groups in this scan.</div>
             {% else %}
             <div class="empty-results">No scan results yet. Review the source and active keywords, choose a paper count, then press <strong>Start Pipeline</strong>.</div>
+            {% endif %}
+
+            {% if last_scan and excluded_papers %}
+            <details class="excluded-papers" id="excludedPapers">
+                <summary>
+                    <span>Excluded Papers</span>
+                    <span class="excluded-count">{{ excluded_papers|length }}</span>
+                </summary>
+                <div class="excluded-list">
+                    {% for paper in excluded_papers %}
+                    <article class="excluded-paper">
+                        <div class="excluded-paper-main">
+                            <div class="excluded-paper-meta">
+                                <span class="paper-id">arXiv:{{ paper.arxiv_id }}</span>
+                                <span class="excluded-reason">
+                                    {% if paper.candidate_status == 'security_only' %}
+                                    Missing LLM / AI title match
+                                    {% elif paper.candidate_status == 'llm_only' %}
+                                    Missing Security title match
+                                    {% else %}
+                                    No active title keyword match
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <h3 class="excluded-paper-title">{{ paper.title }}</h3>
+                        </div>
+                        <a class="btn btn-outline-secondary btn-sm excluded-html-link" href="{{ paper.html_url }}" target="_blank" rel="noopener noreferrer">HTML</a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </details>
             {% endif %}
         </div>
     </section>

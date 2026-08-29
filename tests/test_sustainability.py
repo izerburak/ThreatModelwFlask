@@ -178,6 +178,14 @@ class SustainabilityPersistenceTests(unittest.TestCase):
         self.assertEqual(scan["summary"]["strong_candidates"], 1)
         self.assertEqual(scan["papers"][0]["candidate_status"], "strong_candidate")
         self.assertEqual(service.view_state()["last_scan"]["summary"], scan["summary"])
+        self.assertEqual(
+            [paper["arxiv_id"] for paper in service.view_state()["strong_candidates"]],
+            ["2608.00001"],
+        )
+        self.assertEqual(
+            [paper["arxiv_id"] for paper in service.view_state()["excluded_papers"]],
+            ["2608.00002"],
+        )
 
 
 class SustainabilityRouteTests(unittest.TestCase):
@@ -208,7 +216,11 @@ class SustainabilityRouteTests(unittest.TestCase):
         fetch_papers.assert_not_called()
 
         fetch_papers.return_value = {
-            "papers": [_paper("2608.00003", "Agent Memory Injection Attack on LLM Systems")],
+            "papers": [
+                _paper("2608.00003", "Agent Memory Injection Attack on LLM Systems"),
+                _paper("2608.00004", "Language Model Evaluation Methods"),
+                _paper("2608.00005", "Post-Quantum Signatures"),
+            ],
             "warnings": [],
         }
         response = self.client.post(
@@ -221,6 +233,12 @@ class SustainabilityRouteTests(unittest.TestCase):
         self.assertIn(b"Strong Candidate", response.data)
         self.assertIn(b"2608.00003", response.data)
         self.assertIn(b"Why selected", response.data)
+        self.assertIn(b'<details class="excluded-papers" id="excludedPapers">', response.data)
+        excluded_markup = response.data.split(b'id="excludedPapers">', 1)[1]
+        self.assertIn(b"2608.00004", excluded_markup)
+        self.assertIn(b"2608.00005", excluded_markup)
+        self.assertNotIn(b">Abstract<", excluded_markup)
+        self.assertEqual(excluded_markup.count(b">HTML<"), 2)
         fetch_papers.assert_called_once_with(25)
 
 

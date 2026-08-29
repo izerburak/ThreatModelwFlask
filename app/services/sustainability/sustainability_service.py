@@ -17,13 +17,30 @@ class SustainabilityService:
 
     def view_state(self):
         stored = self.store.load()
+        last_scan = stored["last_scan"]
+        strong_candidates = []
+        if last_scan:
+            strong_candidates = [
+                paper
+                for paper in last_scan.get("papers", [])
+                if paper.get("candidate_status") == "strong_candidate"
+            ]
+        excluded_papers = []
+        if last_scan:
+            excluded_papers = [
+                paper
+                for paper in last_scan.get("papers", [])
+                if paper.get("candidate_status") != "strong_candidate"
+            ]
         return {
             "source_name": "ArXiv — cs.CR Recent",
             "source_url": ARXIV_RECENT_URL,
             "paper_count_options": PAPER_COUNT_OPTIONS,
             "custom_keywords": stored["custom_keywords"],
             "keywords": active_keywords(stored["custom_keywords"]),
-            "last_scan": stored["last_scan"],
+            "last_scan": last_scan,
+            "strong_candidates": strong_candidates,
+            "excluded_papers": excluded_papers,
         }
 
     def add_keyword(self, group, keyword):
