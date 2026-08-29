@@ -40,9 +40,6 @@ LLM_KEYWORDS = (
     "retrieval augmented generation",
     "retrieval",
     "memory",
-    "tool",
-    "tool-use",
-    "tool calling",
     "model",
     "ai agent",
 )

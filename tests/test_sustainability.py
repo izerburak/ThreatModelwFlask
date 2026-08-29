@@ -79,6 +79,13 @@ class SustainabilityKeywordTests(unittest.TestCase):
         self.assertIn("retrieval augmented generation", result["llm_matches"])
         self.assertEqual(result["candidate_status"], "strong_candidate")
 
+    def test_tool_terms_alone_do_not_create_an_llm_match(self):
+        result = match_title("Security Analysis of Tool-Using and Tool Calling Systems")
+
+        self.assertFalse(result["llm_match"])
+        self.assertEqual(result["llm_matches"], [])
+        self.assertEqual(result["candidate_status"], "security_only")
+
     def test_matching_retains_weak_results_and_sorts_strong_first(self):
         papers = [
             _paper("1", "A Study of Quantum Networks"),
