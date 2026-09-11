@@ -1,0 +1,4 @@
+model,calls,successful_calls,success_rate,shape_valid_rate,status_match_rate,pattern_match_rate,mean_grounding_precision,mean_evidence_coverage,mean_node_linkage,mean_actionability,median_latency_seconds,p95_latency_seconds,mean_output_tokens_per_second
+qwen2.5:3b-instruct-q4_K_M,45,30,0.6667,1.0,0.6,0.3333,1.0,0.3667,1.0,0.5667,4.568,7.897,49.942
+ministral-3:3b-instruct-2512-q4_K_M,45,45,1.0,1.0,0.3556,0.1333,1.0,0.7444,1.0,0.1556,5.133,6.297,46.588
+llama3.2:3b-instruct-q4_K_M,45,45,1.0,1.0,0.3333,0.2,1.0,0.6889,1.0,1.0,3.78,4.407,47.783

@@ -1,0 +1,308 @@
+PILOT BASE-MODEL SELECTION EXPERIMENT
+
+1. Objective
+
+This pilot experiment compared three instruction-tuned models in the approximately
+three-billion-parameter deployment class for the constrained threat-identification
+task used by the proposed system. The purpose was not to compare general language
+model capability. Instead, the experiment examined whether each model could assess
+a deterministic OWASP candidate against questionnaire evidence and a supplied data-
+flow diagram while obeying a fixed structured-output contract.
+
+The evaluated models were:
+
+- qwen2.5:3b-instruct-q4_K_M
+- llama3.2:3b-instruct-q4_K_M
+- ministral-3:3b-instruct-2512-q4_K_M
+
+
+2. Experimental Setup
+
+The experiment was executed on an NVIDIA Tesla T4 GPU through Google Colab. Ollama
+0.34.0 was used as the inference runtime. All models used Q4_K_M quantization, an
+8,192-token context window, temperature 0, and the same prompt and JSON schema.
+
+The pilot set contained 15 controlled cases covering five OWASP risk families:
+
+- LLM01: Prompt Injection
+- LLM02: Sensitive Information Disclosure
+- LLM05: Improper Output Handling
+- LLM06: Excessive Agency
+- API7:2023: Server-Side Request Forgery
+
+Each risk family was represented by three counterfactual variants: a positive case
+with explicit evidence of a control gap, a control case containing protective
+controls, and an unknown case in which decisive security information was missing.
+Every case was executed three times, resulting in 45 attempted calls per model and
+135 attempted calls in total.
+
+
+3. Aggregate Results
+
+Model                                  Completion   Status*   Status**  Evidence  Actionability  Median   P95     Tokens/s
+qwen2.5:3b-instruct-q4_K_M                66.67%      60.00%     40.00%    36.67%       56.67%      4.568s   7.897s   49.942
+ministral-3:3b-instruct-2512-q4_K_M      100.00%      35.56%     35.56%    74.44%       15.56%      5.133s   6.297s   46.588
+llama3.2:3b-instruct-q4_K_M              100.00%      33.33%     33.33%    68.89%      100.00%      3.780s   4.407s   47.783
+
+* Status agreement calculated only over calls that returned a usable response.
+** Operational status agreement calculated over all 45 attempted calls, treating a
+   timeout as an unsuccessful decision.
+
+All usable responses conformed to the expected JSON shape, and all referenced DFD
+identifiers were valid. However, Qwen completed only 30 of its 45 calls. Its other
+15 calls reached the configured 300-second request timeout. The conditional status
+score of 60.00% shown by the original benchmark summary therefore overstates Qwen's
+operational performance. When the failed calls are retained in the denominator,
+Qwen's effective status agreement is 40.00%, or 18 correct decisions from 45
+attempts.
+
+The 15 Qwen timeouts occurred in the following cases:
+
+- TC-API7-POS-01: three timeouts
+- TC-LLM01-CTRL-01: one timeout
+- TC-LLM02-CTRL-01: three timeouts
+- TC-LLM02-POS-01: three timeouts
+- TC-LLM05-POS-01: three timeouts
+- TC-LLM06-CTRL-01: one timeout
+- TC-LLM06-POS-01: one timeout
+
+At a 300-second timeout per failed request, these failures added approximately 75
+minutes of waiting time. If each timeout is counted as a 300-second operational
+latency, Qwen's mean latency per attempted call becomes approximately 103.35 seconds,
+compared with 3.77 seconds for Llama and 4.99 seconds for Ministral. Consequently,
+Qwen's 4.568-second median for successful calls must not be interpreted as its full
+end-to-end reliability or latency.
+
+
+4. Behaviour by Scenario Type
+
+Llama and Ministral both completed all 15 positive, 15 control, and 15 unknown
+attempts. Each achieved 60.00% agreement on positive cases, but both performed poorly
+on control and unknown cases. Llama achieved 20.00% agreement on both control and
+unknown cases. Ministral achieved 26.67% agreement on control cases and 20.00% on
+unknown cases.
+
+Qwen completed only five of the 15 positive attempts and ten of the 15 control
+attempts. It achieved three correct positive decisions and no correct control
+decisions when failures were retained in the denominator. In contrast, Qwen
+correctly classified all 15 unknown attempts as needs_more_info. This indicates a
+strong conservative bias: among its 30 successful responses, Qwen produced 27
+needs_more_info decisions and three confirmed decisions, but no plausible or
+not_applicable decisions.
+
+Llama exhibited the opposite bias. Across all 45 calls, it produced only confirmed
+or plausible decisions: 12 confirmed and 33 plausible. It never emitted
+needs_more_info or not_applicable, even for explicitly unknown or strongly controlled
+cases. Ministral produced 11 confirmed, 24 plausible, and 10 not_applicable decisions,
+but never used needs_more_info. Therefore, none of the three models demonstrated
+balanced use of all four status categories in this pilot.
+
+
+5. Grounding, Pattern Selection, and Actionability
+
+Ministral achieved the highest mean evidence coverage at 74.44%, followed by Llama
+at 68.89%. Qwen's evidence coverage was considerably lower at 36.67% among its
+successful responses. Qwen therefore made more expected status decisions than the
+other models when it completed a request, but it cited substantially fewer expected
+questionnaire evidence items.
+
+Pattern selection was weak for all models. Llama selected
+excessive_tool_or_workflow_agency in all 45 cases, irrespective of the target risk.
+Qwen selected the same pattern in 27 of its 30 successful responses. Ministral used a
+more varied set of patterns, but its exact pattern agreement was still only 13.33%.
+This systematic behaviour suggests that pattern-selection accuracy should be
+investigated separately and that the current prompt may not elicit reliable pattern
+discrimination from models of this size.
+
+Llama achieved 100.00% actionability conformance: it consistently populated an abuse
+path and control gap for positive statuses and left them empty for non-positive
+statuses. Qwen achieved 56.67% actionability conformance among successful calls.
+Ministral achieved only 15.56%, despite its relatively high evidence coverage. Thus,
+Ministral frequently cited relevant inputs without satisfying the required output
+semantics.
+
+
+6. Comparative Interpretation
+
+Qwen produced the highest conditional status agreement and the highest output-token
+rate. It also handled unknown cases consistently. Nevertheless, a 66.67% completion
+rate is below a reasonable reliability threshold for a pipeline component. Its
+timeouts, low evidence coverage, absence of not_applicable decisions, and narrow
+pattern selection prevent it from being declared the winner of the current run.
+
+Ministral was fully reliable at the transport and parsing level and achieved the
+highest evidence coverage. Its status agreement was slightly higher than Llama's,
+but it was the slowest model and had very low actionability conformance. It also
+failed to represent uncertainty through needs_more_info.
+
+Llama was the fastest model, completed all calls, maintained valid grounding, and
+achieved perfect actionability conformance. Its principal weakness was semantic
+discrimination: it overused plausible and collapsed every threat-pattern decision to
+the same pattern. Its status agreement was 2.23 percentage points lower than
+Ministral's, but this small difference was accompanied by a much stronger operational
+profile.
+
+
+7. Provisional Selection Decision
+
+Applying the precondition that a candidate model must first complete requests
+reliably, Qwen does not pass the reliability gate in this run. Between the two models
+with 100% completion, Llama 3.2 3B provides the strongest operational baseline because
+it has the lowest median and P95 latency and the highest actionability conformance.
+Accordingly, if a model had to be selected solely from this run, Llama 3.2 3B would be
+the provisional operational choice.
+
+This is not yet a final scientific base-model selection. The result is based on only
+15 unique cases from five risk families, and the three repeated executions are not
+45 independent scenarios. In addition, all three models showed systematic status or
+pattern biases. The experiment should therefore be described as a pilot study used
+to refine the benchmark rather than conclusive evidence of general threat-
+identification quality.
+
+
+8. Required Benchmark Revision
+
+Before the final comparison, the benchmark should be revised as follows:
+
+1. Add a fixed output-token limit for every model. A limit such as 512 generated
+   tokens is sufficient for a single-candidate case and prevents unbounded generation
+   from consuming the entire 300-second timeout.
+2. Count timeouts and invalid outputs as failures in every primary metric rather than
+   excluding them from the denominator.
+3. Report a status confusion matrix and macro-averaged F1 in addition to simple
+   status agreement.
+4. Preserve completion rate, evidence coverage, DFD grounding, actionability, median
+   latency, P95 latency, and token throughput as separate metrics.
+5. Examine whether threat_pattern should remain a predicted field or be supplied as
+   a deterministic investigation lens, because two models collapsed heavily toward
+   a single pattern.
+6. Repeat the corrected 15-case pilot before extending the benchmark to all 29 OWASP
+   risk families.
+
+The corrected pilot will determine whether Qwen's timeout behaviour is caused by
+uncapped generation or represents a persistent model-runtime compatibility problem.
+Only after that rerun should the selected model be used as the base checkpoint for
+the LoRA fine-tuning comparison.
+
+
+9. TODO FOR THE NEXT SESSION
+
+This section is a simple handoff for continuing the experiment on another computer.
+Do not treat the first pilot result as the final model-selection result.
+
+Files to keep together:
+
+- colab_3b_owasp_benchmark.py: standalone benchmark program and 15 test cases
+- owasp_3b_benchmark_20260911T181957Z.jsonl: raw result of every attempted call
+- owasp_3b_benchmark_summary_20260911T181957Z.csv: original aggregate metrics
+- owasp_3b_benchmark_metadata_20260911T181957Z.json: runtime configuration
+- benchmark.txt: original Colab console output
+- model_selection_analysis_en.txt: interpretation and handoff document
+
+
+TODO 1 - Correct the standalone benchmark before running it again
+
+Edit colab_3b_owasp_benchmark.py and make these changes:
+
+1. Add a fixed generation limit for every request. Use num_predict=512 for the
+   current single-candidate cases. Apply the same value to every model.
+2. Keep the request timeout identical for every model. A 120-second timeout is
+   sufficient after adding the generation limit. Record a timeout as a failed call.
+3. Add the definitions of all ten threat patterns to SYSTEM_PROMPT. The first pilot
+   supplied the pattern names through the schema but did not explain their meanings.
+   Use the pattern descriptions from the production Threat-Identification prompt.
+4. Build affected_nodes and affected_edges in the JSON schema as enums containing
+   only the node and edge identifiers from the current case's DFD.
+5. Use the same three fixed seeds for all models, for example 17, 42, and 73. Pass
+   one seed for each repeat. Keep temperature=0.
+6. Preserve the existing Q4_K_M quantization, 8,192-token context, prompt, hardware,
+   case order, and three repeats for all models.
+
+
+TODO 2 - Correct the metric calculations
+
+The original summary excluded failed calls from several quality metrics. Correct the
+calculation as follows:
+
+1. Completion rate = usable responses / all attempted calls.
+2. Overall schema success = schema-valid responses / all attempted calls.
+3. Overall status agreement = correct status decisions / all attempted calls.
+4. A timeout, invalid JSON response, or schema failure must contribute zero to the
+   primary quality metrics. Do not silently remove it from the denominator.
+5. Produce a status confusion matrix for confirmed, plausible, needs_more_info, and
+   not_applicable.
+6. Calculate macro-averaged precision, recall, and F1 for status classification.
+7. Continue reporting evidence coverage, valid DFD-reference precision, node
+   linkage, actionability conformance, median latency, P95 latency, and output
+   tokens per second separately.
+8. Report results by scenario type: positive, control, and unknown.
+9. Report repeat stability for every case and model.
+
+
+TODO 3 - Rerun the corrected 15-case pilot
+
+Use an NVIDIA T4 GPU if possible. Install and start Ollama, upload only the standalone
+benchmark file, and run the quick test first. If the quick test succeeds, run the
+full corrected pilot with these models:
+
+- qwen2.5:3b-instruct-q4_K_M
+- llama3.2:3b-instruct-q4_K_M
+- ministral-3:3b-instruct-2512-q4_K_M
+
+Expected run size:
+
+15 unique cases x 3 repeats x 3 models = 135 attempted calls.
+
+Save the new raw JSONL, summary CSV, metadata JSON, and console output. Do not
+overwrite or delete the original 20260911T181957Z result files. Use a new run ID so
+the corrected experiment can be compared with the first pilot.
+
+
+TODO 4 - Apply the selection rule
+
+Use the following decision order instead of an arbitrary weighted score:
+
+1. Reliability gate: completion rate and overall schema success must both be at
+   least 95%.
+2. Primary ranking metric: status macro-F1 over all attempted calls.
+3. Secondary metrics: evidence coverage, DFD grounding, and actionability.
+4. Tie-breakers: lower P95 latency, lower median latency, and higher token throughput.
+
+If Qwen still fails the reliability gate after num_predict is capped, exclude it
+from final selection and document the timeout behaviour. If its reliability reaches
+the threshold, compare its corrected macro-F1 with Llama and Ministral before making
+a selection. Do not select a model using only the old conditional status score.
+
+
+TODO 5 - Expand only after the pilot is valid
+
+After the corrected pilot behaves as expected:
+
+1. Extend the benchmark from five risk families to all 29 risk families used by the
+   project.
+2. Keep one positive, one controlled, and one unknown case for every risk family.
+   This will produce 87 unique cases.
+3. Check that each case has an explicit expected status, expected evidence questions,
+   relevant DFD nodes, and an expected threat pattern.
+4. Keep the final evaluation cases separate from all fine-tuning records.
+5. Freeze the test cases before fine-tuning. Do not edit expected labels after seeing
+   the fine-tuned model's output.
+6. Run the same final benchmark on the selected base model and its LoRA fine-tuned
+   version. This comparison will support the fine-tuning research question.
+
+
+10. COPY-PASTE HANDOFF PROMPT FOR ANOTHER AI ASSISTANT
+
+Continue the 3B local-LLM base-model selection experiment in the LLM-Selection
+folder. First read model_selection_analysis_en.txt, the original summary CSV,
+metadata JSON, and raw JSONL. The first pilot is not a final result: Qwen timed out
+on 15 of 45 calls, the original short summary excluded those failures from its
+conditional status score, generation was not capped, and the standalone prompt did
+not define the ten threat patterns. Modify colab_3b_owasp_benchmark.py according to
+Section 9 of the analysis: add num_predict=512, use the same fixed seeds across
+models, add the production threat-pattern definitions, enum-constrain DFD ids, count
+all failed calls as zero in overall metrics, and add a status confusion matrix plus
+macro-F1. Verify the modified script locally without overwriting any original result
+files. Then provide simple Google Colab T4 instructions for a quick run followed by
+the corrected 135-call pilot. Do not declare a final base model until the corrected
+pilot has been evaluated.

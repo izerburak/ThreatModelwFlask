@@ -1,0 +1,156 @@
+
+Pulling qwen2.5:3b-instruct-q4_K_M ...
+
+Warming up qwen2.5:3b-instruct-q4_K_M ...
+[1/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM01-POS-01
+[2/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM01-CTRL-01
+[3/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM01-UNK-01
+[4/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM02-POS-01
+[5/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM02-CTRL-01
+[6/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM02-UNK-01
+[7/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM05-POS-01
+[8/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM05-CTRL-01
+[9/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM05-UNK-01
+[10/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM06-POS-01
+[11/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM06-CTRL-01
+[12/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-LLM06-UNK-01
+[13/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-API7-POS-01
+[14/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-API7-CTRL-01
+[15/135] qwen2.5:3b-instruct-q4_K_M | repeat=1 | TC-API7-UNK-01
+[16/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM01-POS-01
+[17/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM01-CTRL-01
+[18/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM01-UNK-01
+[19/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM02-POS-01
+[20/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM02-CTRL-01
+[21/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM02-UNK-01
+[22/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM05-POS-01
+[23/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM05-CTRL-01
+[24/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM05-UNK-01
+[25/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM06-POS-01
+[26/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM06-CTRL-01
+[27/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-LLM06-UNK-01
+[28/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-API7-POS-01
+[29/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-API7-CTRL-01
+[30/135] qwen2.5:3b-instruct-q4_K_M | repeat=2 | TC-API7-UNK-01
+[31/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM01-POS-01
+[32/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM01-CTRL-01
+[33/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM01-UNK-01
+[34/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM02-POS-01
+[35/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM02-CTRL-01
+[36/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM02-UNK-01
+[37/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM05-POS-01
+[38/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM05-CTRL-01
+[39/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM05-UNK-01
+[40/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM06-POS-01
+[41/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM06-CTRL-01
+[42/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-LLM06-UNK-01
+[43/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-API7-POS-01
+[44/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-API7-CTRL-01
+[45/135] qwen2.5:3b-instruct-q4_K_M | repeat=3 | TC-API7-UNK-01
+
+Pulling llama3.2:3b-instruct-q4_K_M ...
+
+Warming up llama3.2:3b-instruct-q4_K_M ...
+[46/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM01-POS-01
+[47/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM01-CTRL-01
+[48/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM01-UNK-01
+[49/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM02-POS-01
+[50/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM02-CTRL-01
+[51/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM02-UNK-01
+[52/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM05-POS-01
+[53/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM05-CTRL-01
+[54/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM05-UNK-01
+[55/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM06-POS-01
+[56/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM06-CTRL-01
+[57/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-LLM06-UNK-01
+[58/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-API7-POS-01
+[59/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-API7-CTRL-01
+[60/135] llama3.2:3b-instruct-q4_K_M | repeat=1 | TC-API7-UNK-01
+[61/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM01-POS-01
+[62/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM01-CTRL-01
+[63/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM01-UNK-01
+[64/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM02-POS-01
+[65/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM02-CTRL-01
+[66/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM02-UNK-01
+[67/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM05-POS-01
+[68/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM05-CTRL-01
+[69/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM05-UNK-01
+[70/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM06-POS-01
+[71/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM06-CTRL-01
+[72/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-LLM06-UNK-01
+[73/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-API7-POS-01
+[74/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-API7-CTRL-01
+[75/135] llama3.2:3b-instruct-q4_K_M | repeat=2 | TC-API7-UNK-01
+[76/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM01-POS-01
+[77/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM01-CTRL-01
+[78/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM01-UNK-01
+[79/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM02-POS-01
+[80/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM02-CTRL-01
+[81/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM02-UNK-01
+[82/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM05-POS-01
+[83/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM05-CTRL-01
+[84/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM05-UNK-01
+[85/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM06-POS-01
+[86/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM06-CTRL-01
+[87/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-LLM06-UNK-01
+[88/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-API7-POS-01
+[89/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-API7-CTRL-01
+[90/135] llama3.2:3b-instruct-q4_K_M | repeat=3 | TC-API7-UNK-01
+
+Pulling ministral-3:3b-instruct-2512-q4_K_M ...
+
+Warming up ministral-3:3b-instruct-2512-q4_K_M ...
+[91/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM01-POS-01
+[92/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM01-CTRL-01
+[93/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM01-UNK-01
+[94/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM02-POS-01
+[95/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM02-CTRL-01
+[96/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM02-UNK-01
+[97/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM05-POS-01
+[98/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM05-CTRL-01
+[99/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM05-UNK-01
+[100/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM06-POS-01
+[101/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM06-CTRL-01
+[102/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-LLM06-UNK-01
+[103/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-API7-POS-01
+[104/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-API7-CTRL-01
+[105/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=1 | TC-API7-UNK-01
+[106/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM01-POS-01
+[107/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM01-CTRL-01
+[108/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM01-UNK-01
+[109/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM02-POS-01
+[110/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM02-CTRL-01
+[111/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM02-UNK-01
+[112/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM05-POS-01
+[113/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM05-CTRL-01
+[114/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM05-UNK-01
+[115/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM06-POS-01
+[116/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM06-CTRL-01
+[117/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-LLM06-UNK-01
+[118/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-API7-POS-01
+[119/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-API7-CTRL-01
+[120/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=2 | TC-API7-UNK-01
+[121/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM01-POS-01
+[122/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM01-CTRL-01
+[123/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM01-UNK-01
+[124/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM02-POS-01
+[125/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM02-CTRL-01
+[126/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM02-UNK-01
+[127/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM05-POS-01
+[128/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM05-CTRL-01
+[129/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM05-UNK-01
+[130/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM06-POS-01
+[131/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM06-CTRL-01
+[132/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-LLM06-UNK-01
+[133/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-API7-POS-01
+[134/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-API7-CTRL-01
+[135/135] ministral-3:3b-instruct-2512-q4_K_M | repeat=3 | TC-API7-UNK-01
+
+=== SUMMARY ===
+1. qwen2.5:3b-instruct-q4_K_M | status=0.600 | schema=1.000 | evidence=0.367 | median=4.57s | tok/s=49.94
+2. ministral-3:3b-instruct-2512-q4_K_M | status=0.356 | schema=1.000 | evidence=0.744 | median=5.13s | tok/s=46.59
+3. llama3.2:3b-instruct-q4_K_M | status=0.333 | schema=1.000 | evidence=0.689 | median=3.78s | tok/s=47.78
+
+Raw results: /content/owasp_3b_benchmark_20260911T181957Z.jsonl
+Summary CSV: /content/owasp_3b_benchmark_summary_20260911T181957Z.csv
+Metadata: /content/owasp_3b_benchmark_metadata_20260911T181957Z.json
