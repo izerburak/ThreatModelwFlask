@@ -26,5 +26,7 @@ def create_app():
 
     from .routes import main
     app.register_blueprint(main)
+    from .paper_routes import papers
+    app.register_blueprint(papers)
 
     return app

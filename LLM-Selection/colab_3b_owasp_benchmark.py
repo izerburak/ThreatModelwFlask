@@ -32,8 +32,10 @@ MODELS = [
     "ministral-3:3b-instruct-2512-q4_K_M",
 ]
 RUNS_PER_CASE = 3
-REQUEST_TIMEOUT_SECONDS = 300
+REQUEST_TIMEOUT_SECONDS = 120
 NUM_CTX = 8192
+NUM_PREDICT = 512
+SEEDS = [17, 42, 73]
 
 STATUSES = ["confirmed", "plausible", "needs_more_info", "not_applicable"]
 PATTERNS = [
@@ -61,6 +63,29 @@ Status rules:
 - needs_more_info: decisive evidence or control information is unknown/missing.
 - not_applicable: the candidate does not manifest because the required capability
   is absent or strong controls make the described path inapplicable.
+
+Threat patterns (use the single pattern that best describes how this candidate
+manifests in the supplied system):
+- prompt_context_manipulation: untrusted text reaches the model context and can
+  override, leak, or subvert system instructions.
+- untrusted_input_crossing_trust_boundary: lower-trust input crosses into a
+  higher-trust process with weak validation or parsing.
+- rag_or_memory_contamination: retrieved, indexed, or memory content can be
+  poisoned and affect other requests or users.
+- sensitive_data_exposure: sensitive data is reachable, returned, retained, or
+  logged without adequate control.
+- excessive_tool_or_workflow_agency: the model can trigger tools, actions, or
+  workflows with insufficient scoping, approval, or least privilege.
+- weak_authentication_authorization: authentication or per-object/per-function
+  authorization is insufficient.
+- unsafe_output_handling: model output is consumed downstream without validation,
+  encoding, or allowlisting.
+- vector_store_or_embedding_isolation: vector stores or embeddings lack tenant or
+  user isolation and access control.
+- secrets_logging_transport_exposure: secrets are reachable, logs capture sensitive
+  data, or transport protection across trust boundaries is unclear.
+- missing_monitoring_limits_incident_response: effective limits, monitoring,
+  alerting, or incident-response processes are missing.
 
 Evidence strings must start with the relevant question id, for example
 "Q30: No safeguards". affected_nodes and affected_edges must use only ids from
@@ -297,22 +322,39 @@ def request_json(path: str, payload: dict[str, Any] | None = None, timeout: int 
         return json.loads(response.read().decode("utf-8"))
 
 
-def schema_for(target_code: str) -> dict[str, Any]:
+def schema_for(test_case: dict[str, Any]) -> dict[str, Any]:
+    node_ids = [item["id"] for item in test_case["dfd"]["nodes"]]
+    edge_ids = [item["id"] for item in test_case["dfd"]["edges"]]
     return {
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "code": {"type": "string", "enum": [target_code]},
-            "name": {"type": "string"},
+            "code": {"type": "string", "enum": [test_case["target_code"]]},
+            "name": {"type": "string", "maxLength": 200},
             "status": {"type": "string", "enum": STATUSES},
             "threat_pattern": {"type": "string", "enum": PATTERNS},
-            "evidence": {"type": "array", "items": {"type": "string"}},
-            "affected_nodes": {"type": "array", "items": {"type": "string"}},
-            "affected_edges": {"type": "array", "items": {"type": "string"}},
-            "abuse_path": {"type": "array", "items": {"type": "string"}},
-            "control_gap": {"type": "string"},
+            "evidence": {
+                "type": "array", "items": {"type": "string", "maxLength": 300},
+                "maxItems": 8,
+            },
+            "affected_nodes": {
+                "type": "array", "items": {"type": "string", "enum": node_ids},
+                "uniqueItems": True, "maxItems": len(node_ids),
+            },
+            "affected_edges": {
+                "type": "array", "items": {"type": "string", "enum": edge_ids},
+                "uniqueItems": True, "maxItems": len(edge_ids),
+            },
+            "abuse_path": {
+                "type": "array", "items": {"type": "string", "maxLength": 300},
+                "maxItems": 8,
+            },
+            "control_gap": {"type": "string", "maxLength": 500},
             "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
-            "missing_information": {"type": "array", "items": {"type": "string"}},
+            "missing_information": {
+                "type": "array", "items": {"type": "string", "maxLength": 300},
+                "maxItems": 8,
+            },
         },
         "required": [
             "code", "name", "status", "threat_pattern", "evidence",
@@ -322,7 +364,9 @@ def schema_for(target_code: str) -> dict[str, Any]:
     }
 
 
-def run_case(model: str, test_case: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def run_case(
+    model: str, test_case: dict[str, Any], seed: int,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     user_payload = {
         "candidate": {"code": test_case["target_code"], "name": test_case["risk_name"]},
         "questionnaire_answers": test_case["answers"],
@@ -336,8 +380,13 @@ def run_case(model: str, test_case: dict[str, Any]) -> tuple[dict[str, Any], dic
         ],
         "stream": False,
         "think": False,
-        "format": schema_for(test_case["target_code"]),
-        "options": {"temperature": 0, "num_ctx": NUM_CTX},
+        "format": schema_for(test_case),
+        "options": {
+            "temperature": 0,
+            "num_ctx": NUM_CTX,
+            "num_predict": NUM_PREDICT,
+            "seed": seed,
+        },
         "keep_alive": "5m",
     }
     started = time.perf_counter()
@@ -347,6 +396,7 @@ def run_case(model: str, test_case: dict[str, Any]) -> tuple[dict[str, Any], dic
     parsed = json.loads(content)
     usage = {
         "wall_seconds": round(wall_seconds, 6),
+        "done_reason": response.get("done_reason"),
         "total_duration_ns": response.get("total_duration"),
         "load_duration_ns": response.get("load_duration"),
         "prompt_eval_count": response.get("prompt_eval_count"),
@@ -425,9 +475,93 @@ def percentile(values: list[float], p: float) -> float:
     return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
 
 
-def mean(rows: list[dict[str, Any]], key: str) -> float:
+def successful_mean(rows: list[dict[str, Any]], key: str) -> float:
     values = [float(row["scores"][key]) for row in rows if not row.get("error")]
     return statistics.fmean(values) if values else 0.0
+
+
+def overall_mean(rows: list[dict[str, Any]], key: str) -> float:
+    """Failed calls contribute zero instead of disappearing from the denominator."""
+    if not rows:
+        return 0.0
+    return statistics.fmean(
+        float(row.get("scores", {}).get(key, 0.0)) if not row.get("error") else 0.0
+        for row in rows
+    )
+
+
+def status_classification_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Use the first expected status as the canonical label for macro metrics."""
+    confusion = {
+        expected: {predicted: 0 for predicted in [*STATUSES, "failed"]}
+        for expected in STATUSES
+    }
+    for row in rows:
+        expected = row["expected_statuses"][0]
+        predicted = "failed" if row.get("error") else row["output"].get("status", "failed")
+        if predicted not in confusion[expected]:
+            predicted = "failed"
+        confusion[expected][predicted] += 1
+
+    precisions: list[float] = []
+    recalls: list[float] = []
+    f1_scores: list[float] = []
+    for status in STATUSES:
+        tp = confusion[status][status]
+        fp = sum(confusion[other][status] for other in STATUSES if other != status)
+        fn = sum(confusion[status][other] for other in [*STATUSES, "failed"] if other != status)
+        precision = tp / (tp + fp) if tp + fp else 0.0
+        recall = tp / (tp + fn) if tp + fn else 0.0
+        f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+        precisions.append(precision)
+        recalls.append(recall)
+        f1_scores.append(f1)
+
+    return {
+        "confusion_matrix": confusion,
+        "macro_precision": round(statistics.fmean(precisions), 6),
+        "macro_recall": round(statistics.fmean(recalls), 6),
+        "macro_f1": round(statistics.fmean(f1_scores), 6),
+    }
+
+
+def build_diagnostics(rows: list[dict[str, Any]], models: list[str]) -> dict[str, Any]:
+    diagnostics: dict[str, Any] = {}
+    for model in models:
+        model_rows = [row for row in rows if row["model"] == model]
+        by_scenario: dict[str, Any] = {}
+        for variant in ("positive", "control", "unknown"):
+            subset = [row for row in model_rows if row["variant"] == variant]
+            successful = [row for row in subset if not row.get("error")]
+            by_scenario[variant] = {
+                "calls": len(subset),
+                "completed": len(successful),
+                "completion_rate": round(len(successful) / len(subset), 6) if subset else 0.0,
+                "overall_status_match_rate": round(overall_mean(subset, "status_match"), 6),
+                "conditional_status_match_rate": round(successful_mean(subset, "status_match"), 6),
+            }
+
+        stability: dict[str, Any] = {}
+        for case_id in sorted({row["case_id"] for row in model_rows}):
+            subset = [row for row in model_rows if row["case_id"] == case_id]
+            successful = [row for row in subset if not row.get("error")]
+            statuses = [row["output"]["status"] for row in successful]
+            patterns = [row["output"]["threat_pattern"] for row in successful]
+            stability[case_id] = {
+                "completed_repeats": len(successful),
+                "expected_repeats": len(subset),
+                "status_stable": len(successful) == len(subset) and len(set(statuses)) == 1,
+                "pattern_stable": len(successful) == len(subset) and len(set(patterns)) == 1,
+                "statuses": statuses,
+                "patterns": patterns,
+            }
+
+        diagnostics[model] = {
+            **status_classification_metrics(model_rows),
+            "by_scenario": by_scenario,
+            "repeat_stability": stability,
+        }
+    return diagnostics
 
 
 def summarize(rows: list[dict[str, Any]], models: list[str]) -> list[dict[str, Any]]:
@@ -442,27 +576,37 @@ def summarize(rows: list[dict[str, Any]], models: list[str]) -> list[dict[str, A
             duration = row["usage"].get("eval_duration_ns")
             if count and duration:
                 token_rates.append(float(count) / (float(duration) / 1_000_000_000))
+        classification = status_classification_metrics(model_rows)
+        completion_rate = len(successful) / len(model_rows) if model_rows else 0.0
+        schema_success = overall_mean(model_rows, "shape_valid")
         summary.append({
             "model": model,
             "calls": len(model_rows),
             "successful_calls": len(successful),
-            "success_rate": round(len(successful) / len(model_rows), 4) if model_rows else 0.0,
-            "shape_valid_rate": round(mean(model_rows, "shape_valid"), 4),
-            "status_match_rate": round(mean(model_rows, "status_match"), 4),
-            "pattern_match_rate": round(mean(model_rows, "pattern_match"), 4),
-            "mean_grounding_precision": round(mean(model_rows, "grounding_precision"), 4),
-            "mean_evidence_coverage": round(mean(model_rows, "evidence_coverage"), 4),
-            "mean_node_linkage": round(mean(model_rows, "node_linkage"), 4),
-            "mean_actionability": round(mean(model_rows, "actionability"), 4),
+            "completion_rate": round(completion_rate, 4),
+            "overall_schema_success_rate": round(schema_success, 4),
+            "overall_status_match_rate": round(overall_mean(model_rows, "status_match"), 4),
+            "conditional_status_match_rate": round(successful_mean(model_rows, "status_match"), 4),
+            "status_macro_precision": round(classification["macro_precision"], 4),
+            "status_macro_recall": round(classification["macro_recall"], 4),
+            "status_macro_f1": round(classification["macro_f1"], 4),
+            "overall_pattern_match_rate": round(overall_mean(model_rows, "pattern_match"), 4),
+            "conditional_pattern_match_rate": round(successful_mean(model_rows, "pattern_match"), 4),
+            "mean_grounding_precision": round(successful_mean(model_rows, "grounding_precision"), 4),
+            "mean_evidence_coverage": round(successful_mean(model_rows, "evidence_coverage"), 4),
+            "mean_node_linkage": round(successful_mean(model_rows, "node_linkage"), 4),
+            "mean_actionability": round(successful_mean(model_rows, "actionability"), 4),
             "median_latency_seconds": round(statistics.median(latencies), 3) if latencies else 0.0,
             "p95_latency_seconds": round(percentile(latencies, 0.95), 3),
             "mean_output_tokens_per_second": round(statistics.fmean(token_rates), 3) if token_rates else 0.0,
+            "passes_reliability_gate": completion_rate >= 0.95 and schema_success >= 0.95,
         })
     return sorted(
         summary,
         key=lambda row: (
-            -row["status_match_rate"], -row["shape_valid_rate"],
-            -row["mean_evidence_coverage"], row["median_latency_seconds"],
+            -int(row["passes_reliability_gate"]), -row["status_macro_f1"],
+            -row["mean_evidence_coverage"], -row["mean_actionability"],
+            row["p95_latency_seconds"],
         ),
     )
 
@@ -479,7 +623,9 @@ def warm_up(model: str) -> None:
         "stream": False,
         "think": False,
         "format": "json",
-        "options": {"temperature": 0, "num_ctx": NUM_CTX},
+        "options": {
+            "temperature": 0, "num_ctx": NUM_CTX, "num_predict": 32, "seed": SEEDS[0],
+        },
         "keep_alive": "5m",
     }
     request_json("/api/chat", payload, REQUEST_TIMEOUT_SECONDS)
@@ -496,13 +642,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the standalone 3B OWASP threat-identification benchmark.")
     parser.add_argument(
         "--quick", action="store_true",
-        help="Run only the three LLM01 cases once with Qwen, to verify the setup.",
+        help="Run the three LLM01 cases once with every model to verify the setup.",
     )
     args = parser.parse_args()
 
-    models = MODELS[:1] if args.quick else MODELS
+    models = MODELS
     cases = CASES[:3] if args.quick else CASES
     runs_per_case = 1 if args.quick else RUNS_PER_CASE
+    seeds = SEEDS[:runs_per_case]
 
     try:
         request_json("/api/tags", timeout=5)
@@ -517,13 +664,17 @@ def main() -> None:
     raw_path = output_dir / f"owasp_3b_benchmark_{run_id}.jsonl"
     summary_path = output_dir / f"owasp_3b_benchmark_summary_{run_id}.csv"
     metadata_path = output_dir / f"owasp_3b_benchmark_metadata_{run_id}.json"
+    diagnostics_path = output_dir / f"owasp_3b_benchmark_diagnostics_{run_id}.json"
 
     metadata_path.write_text(json.dumps({
         "run_id": run_id,
         "models": models,
         "runs_per_case": runs_per_case,
         "num_ctx": NUM_CTX,
+        "num_predict": NUM_PREDICT,
+        "request_timeout_seconds": REQUEST_TIMEOUT_SECONDS,
         "temperature": 0,
+        "seeds": seeds,
         "case_count": len(cases),
         "ollama_version": subprocess.run(
             ["ollama", "--version"], capture_output=True, text=True, check=False
@@ -539,7 +690,7 @@ def main() -> None:
         print(f"Warming up {model} ...", flush=True)
         warm_up(model)
 
-        for repeat in range(1, runs_per_case + 1):
+        for repeat, seed in enumerate(seeds, start=1):
             for test_case in cases:
                 completed += 1
                 print(
@@ -551,13 +702,14 @@ def main() -> None:
                     "timestamp_utc": datetime.now(timezone.utc).isoformat(),
                     "model": model,
                     "repeat": repeat,
+                    "seed": seed,
                     "case_id": test_case["id"],
                     "target_code": test_case["target_code"],
                     "variant": test_case["variant"],
                     "expected_statuses": test_case["expected_statuses"],
                 }
                 try:
-                    output, usage = run_case(model, test_case)
+                    output, usage = run_case(model, test_case, seed)
                     row["output"] = output
                     row["usage"] = usage
                     row["scores"] = score_output(test_case, output)
@@ -580,6 +732,10 @@ def main() -> None:
         unload(model)
 
     summary = summarize(rows, models)
+    diagnostics_path.write_text(
+        json.dumps(build_diagnostics(rows, models), indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
     with summary_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(summary[0]))
         writer.writeheader()
@@ -588,13 +744,17 @@ def main() -> None:
     print("\n=== SUMMARY ===")
     for rank, item in enumerate(summary, start=1):
         print(
-            f"{rank}. {item['model']} | status={item['status_match_rate']:.3f} | "
-            f"schema={item['shape_valid_rate']:.3f} | evidence={item['mean_evidence_coverage']:.3f} | "
+            f"{rank}. {item['model']} | complete={item['completion_rate']:.3f} | "
+            f"macro_f1={item['status_macro_f1']:.3f} | "
+            f"status_overall={item['overall_status_match_rate']:.3f} | "
+            f"schema_overall={item['overall_schema_success_rate']:.3f} | "
+            f"evidence={item['mean_evidence_coverage']:.3f} | "
             f"median={item['median_latency_seconds']:.2f}s | tok/s={item['mean_output_tokens_per_second']:.2f}"
         )
     print(f"\nRaw results: {raw_path}")
     print(f"Summary CSV: {summary_path}")
     print(f"Metadata: {metadata_path}")
+    print(f"Diagnostics: {diagnostics_path}")
 
 
 if __name__ == "__main__":

@@ -184,6 +184,10 @@
         .paper-actions { align-items: flex-start; min-width: 0; }
         .excluded-paper { grid-template-columns: minmax(0, 1fr) auto; }
     }
+    .paper-select { display: flex; align-items: baseline; gap: .7rem; cursor: pointer; }
+    .paper-select input { flex-shrink: 0; width: 1.1rem; height: 1.1rem; accent-color: #60a5fa; }
+    .paper-card:has(input:checked), .excluded-paper:has(input:checked) { border-color: #60a5fa; background: rgba(59,130,246,.09); }
+    .extraction-toolbar { max-width: 850px; }
 </style>
 {% endblock %}
 
@@ -299,6 +303,7 @@
     <section class="sustainability-panel" aria-labelledby="resultsTitle">
         <div class="sustainability-panel-header">
             <h2 id="resultsTitle">Strong Candidates</h2>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('papers.extraction') }}">View extraction results</a>
             {% if last_scan %}<span class="badge text-bg-secondary">Security + LLM match</span>{% endif %}
         </div>
         <div class="sustainability-panel-body">
@@ -311,7 +316,7 @@
                             <span class="paper-id">arXiv:{{ paper.arxiv_id }}</span>
                             {% if paper.subjects %}<span>{{ paper.subjects }}</span>{% endif %}
                         </div>
-                        <h3 class="paper-title">{{ paper.title }}</h3>
+                        <h3 class="paper-title"><label class="paper-select"><input type="checkbox" name="paper_id" form="extraction-form" value="{{ paper.arxiv_id }}" {% if paper.arxiv_id in request.form.getlist('paper_id') %}checked{% endif %}> <span>{{ paper.title }}</span></label></h3>
                         {% if paper.security_matches %}
                         <div aria-label="Matched security keywords">
                             {% for keyword in paper.security_matches %}<span class="match-chip">{{ keyword }}</span>{% endfor %}
@@ -364,7 +369,7 @@
                                     {% endif %}
                                 </span>
                             </div>
-                            <h3 class="excluded-paper-title">{{ paper.title }}</h3>
+                            <h3 class="excluded-paper-title"><label class="paper-select"><input type="checkbox" name="paper_id" form="extraction-form" value="{{ paper.arxiv_id }}" {% if paper.arxiv_id in request.form.getlist('paper_id') %}checked{% endif %}> <span>{{ paper.title }}</span></label></h3>
                         </div>
                         <a class="btn btn-outline-secondary btn-sm excluded-html-link" href="{{ paper.html_url }}" target="_blank" rel="noopener noreferrer">HTML</a>
                     </article>
@@ -374,5 +379,31 @@
             {% endif %}
         </div>
     </section>
+    <section class="sustainability-panel">
+        <div class="sustainability-panel-header"><h2>Extract selected papers</h2></div>
+        <div class="sustainability-panel-body">{% include "_paper_extraction_form.html" %}</div>
+    </section>
 </main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const extractionForm = document.getElementById('extraction-form');
+const paperBoxes = [...document.querySelectorAll('input[name="paper_id"]')];
+const extractButton = document.getElementById('extract-button');
+function updateSelection() {
+    const count = paperBoxes.filter(box => box.checked).length;
+    const extra = Boolean(extractionForm.elements.url.value.trim() || extractionForm.elements.source_text.value.trim());
+    document.getElementById('selection-count').textContent = `${count} papers selected`;
+    extractButton.disabled = count + Number(extra) === 0 || count + Number(extra) > 10;
+    paperBoxes.forEach(box => { box.disabled = !box.checked && count + Number(extra) >= 10; });
+}
+paperBoxes.forEach(box => box.addEventListener('change', updateSelection));
+extractionForm.addEventListener('input', updateSelection);
+extractionForm.addEventListener('submit', () => {
+    extractButton.disabled = true;
+    document.getElementById('progress').textContent = 'Extracting selected papers… Results will open when ready.';
+});
+updateSelection();
+</script>
 {% endblock %}

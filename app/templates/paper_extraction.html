@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<main class="container py-4">
+    <h1>Paper extraction results</h1>
+    <a href="{{ url_for('main.sustainability') }}">Back to Sustainability</a>
+    <p>Downloads are unreviewed extraction training candidates. Exact quote checks verify text occurrence, not scientific correctness. These records do not match the existing DFD threat/mitigation training task automatically.</p>
+    {% for run in results %}
+    <section class="border rounded p-3 mb-3">
+        <h2>{{ run.source.title or run.source.url }}</h2>
+        <p>{{ run.source.mode }} · {{ run.model }} · {{ run.latency_seconds }} s · {{ run.review_status }}</p>
+        <pre style="white-space:pre-wrap">{{ run.extraction | tojson(indent=2) }}</pre>
+    </section>
+    {% endfor %}
+    <h2>Saved runs</h2>
+    <p>Compare runs by source hash, source scope, prompt version, model, token usage and latency in the JSON download. Quality scoring against a reference dataset is a separate benchmark step.</p>
+    {% for run in history %}
+    <div class="border rounded p-3 mb-2">
+        <strong>{{ run.source.title or run.source.url }}</strong> — {{ run.model }} · {{ run.created_at }}
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('papers.download', run_id=run.id, kind='json') }}">Source + extraction JSON</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('papers.download', run_id=run.id, kind='jsonl') }}">Training candidate JSONL</a>
+    </div>
+    {% else %}<p>No saved runs.</p>{% endfor %}
+</main>
+{% endblock %}
