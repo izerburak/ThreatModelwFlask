@@ -1,11 +1,18 @@
-"""Standalone Colab benchmark for small local LLM threat identification.
+"""Timeout-resistant v2 benchmark for small local LLM threat identification.
 
 No project repository is required.  The script talks to an Ollama server already
 running on http://127.0.0.1:11434, pulls three Q4_K_M instruction models, runs
 15 controlled OWASP cases three times, and writes raw JSONL plus a CSV summary.
 
+V2 adds a strict per-attempt deadline, bounded generation, retry/recovery after a
+stalled Ollama call, per-case checkpointing, and resume support.  The same policy
+is applied to every model so Qwen receives recovery protection without making the
+comparison unfair.  A timeout can never be mathematically ruled out, but it can no
+longer stall the full run indefinitely or discard already completed cases.
+
 Run in Colab with:
-    !python /content/colab_3b_owasp_benchmark.py
+    !python /content/benchmark_v2.py --quick
+    !python /content/benchmark_v2.py
 """
 
 from __future__ import annotations
@@ -32,10 +39,13 @@ MODELS = [
     "ministral-3:3b-instruct-2512-q4_K_M",
 ]
 RUNS_PER_CASE = 3
-# A generous, identical ceiling for every model. NUM_PREDICT still bounds each
-# single-candidate response, so this gives slower models time without allowing
-# unbounded generation.
-REQUEST_TIMEOUT_SECONDS = 600
+# The first pilot's Qwen failures consumed 300 seconds each.  Healthy calls took
+# only a few seconds, so v2 cuts a stalled attempt off at three minutes, unloads the
+# model, warms it again, and retries.  NUM_PREDICT is the primary guard against
+# runaway generation.  CLI flags can override these defaults.
+REQUEST_TIMEOUT_SECONDS = 180
+MAX_ATTEMPTS = 3
+RETRY_BACKOFF_SECONDS = 3
 NUM_CTX = 8192
 NUM_PREDICT = 512
 SEEDS = [17, 42, 73]
@@ -368,7 +378,11 @@ def schema_for(test_case: dict[str, Any]) -> dict[str, Any]:
 
 
 def run_case(
-    model: str, test_case: dict[str, Any], seed: int,
+    model: str,
+    test_case: dict[str, Any],
+    seed: int,
+    request_timeout: int,
+    num_predict: int,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     user_payload = {
         "candidate": {"code": test_case["target_code"], "name": test_case["risk_name"]},
@@ -387,13 +401,13 @@ def run_case(
         "options": {
             "temperature": 0,
             "num_ctx": NUM_CTX,
-            "num_predict": NUM_PREDICT,
+            "num_predict": num_predict,
             "seed": seed,
         },
         "keep_alive": "5m",
     }
     started = time.perf_counter()
-    response = request_json("/api/chat", payload, REQUEST_TIMEOUT_SECONDS)
+    response = request_json("/api/chat", payload, request_timeout)
     wall_seconds = time.perf_counter() - started
     content = (response.get("message") or {}).get("content", "")
     parsed = json.loads(content)
@@ -561,6 +575,21 @@ def build_diagnostics(rows: list[dict[str, Any]], models: list[str]) -> dict[str
 
         diagnostics[model] = {
             **status_classification_metrics(model_rows),
+            "retry_statistics": {
+                "first_attempt_successes": sum(
+                    not row.get("error") and row.get("usage", {}).get("attempts_used") == 1
+                    for row in model_rows
+                ),
+                "recovered_calls": sum(
+                    bool(row.get("usage", {}).get("recovered_after_failure"))
+                    for row in model_rows
+                ),
+                "exhausted_calls": sum(bool(row.get("error")) for row in model_rows),
+                "total_physical_attempts": sum(
+                    int(row.get("usage", {}).get("attempts_used", 1))
+                    for row in model_rows
+                ),
+            },
             "by_scenario": by_scenario,
             "repeat_stability": stability,
         }
@@ -582,11 +611,27 @@ def summarize(rows: list[dict[str, Any]], models: list[str]) -> list[dict[str, A
         classification = status_classification_metrics(model_rows)
         completion_rate = len(successful) / len(model_rows) if model_rows else 0.0
         schema_success = overall_mean(model_rows, "shape_valid")
+        first_attempt_successes = sum(
+            not row.get("error") and row.get("usage", {}).get("attempts_used") == 1
+            for row in model_rows
+        )
+        recovered_calls = sum(
+            bool(row.get("usage", {}).get("recovered_after_failure"))
+            for row in model_rows
+        )
         summary.append({
             "model": model,
             "calls": len(model_rows),
             "successful_calls": len(successful),
             "completion_rate": round(completion_rate, 4),
+            "first_attempt_completion_rate": round(
+                first_attempt_successes / len(model_rows), 4
+            ) if model_rows else 0.0,
+            "recovered_calls": recovered_calls,
+            "total_physical_attempts": sum(
+                int(row.get("usage", {}).get("attempts_used", 1))
+                for row in model_rows
+            ),
             "overall_schema_success_rate": round(schema_success, 4),
             "overall_status_match_rate": round(overall_mean(model_rows, "status_match"), 4),
             "conditional_status_match_rate": round(successful_mean(model_rows, "status_match"), 4),
@@ -619,7 +664,7 @@ def pull_model(model: str) -> None:
     subprocess.run(["ollama", "pull", model], check=True)
 
 
-def warm_up(model: str) -> None:
+def warm_up(model: str, request_timeout: int) -> None:
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": 'Return JSON only: {"ready":true}'}],
@@ -631,25 +676,178 @@ def warm_up(model: str) -> None:
         },
         "keep_alive": "5m",
     }
-    request_json("/api/chat", payload, REQUEST_TIMEOUT_SECONDS)
+    request_json("/api/chat", payload, request_timeout)
 
 
 def unload(model: str) -> None:
     try:
-        request_json("/api/generate", {"model": model, "keep_alive": 0}, 30)
+        request_json("/api/generate", {"model": model, "keep_alive": 0}, 15)
     except Exception:
         pass
 
 
+def warm_up_with_retries(
+    model: str, request_timeout: int, max_attempts: int, retry_backoff: float,
+) -> None:
+    for attempt in range(1, max_attempts + 1):
+        try:
+            warm_up(model, request_timeout)
+            return
+        except Exception as exc:
+            if attempt >= max_attempts:
+                raise RuntimeError(
+                    f"Warm-up failed {max_attempts} times for {model}: "
+                    f"{type(exc).__name__}: {exc}"
+                ) from exc
+            print(
+                f"  warm-up attempt {attempt}/{max_attempts} failed; reloading model...",
+                flush=True,
+            )
+            unload(model)
+            time.sleep(retry_backoff * attempt)
+
+
+def run_case_with_retries(
+    model: str,
+    test_case: dict[str, Any],
+    seed: int,
+    request_timeout: int,
+    num_predict: int,
+    max_attempts: int,
+    retry_backoff: float,
+) -> tuple[dict[str, Any] | None, dict[str, Any], str | None]:
+    """Run one logical benchmark call with bounded recovery attempts.
+
+    The logical call remains one row in the benchmark.  Attempt history is kept
+    so a recovered timeout is visible instead of being silently hidden.
+    """
+    attempt_errors: list[str] = []
+    attempt_wall_seconds: list[float] = []
+    total_started = time.perf_counter()
+
+    for attempt in range(1, max_attempts + 1):
+        attempt_started = time.perf_counter()
+        try:
+            output, usage = run_case(
+                model, test_case, seed,
+                request_timeout=request_timeout,
+                num_predict=num_predict,
+            )
+            if not validate_shape(output, test_case["target_code"]):
+                raise ValueError("Response JSON did not satisfy the required output shape")
+
+            attempt_wall_seconds.append(round(time.perf_counter() - attempt_started, 6))
+            usage["attempts_used"] = attempt
+            usage["recovered_after_failure"] = attempt > 1
+            usage["attempt_errors"] = attempt_errors
+            usage["attempt_wall_seconds"] = attempt_wall_seconds
+            usage["logical_wall_seconds"] = round(time.perf_counter() - total_started, 6)
+            # End-to-end latency includes failed attempts, recovery, and backoff.
+            usage["successful_attempt_wall_seconds"] = usage["wall_seconds"]
+            usage["wall_seconds"] = usage["logical_wall_seconds"]
+            return output, usage, None
+        except Exception as exc:
+            elapsed = round(time.perf_counter() - attempt_started, 6)
+            attempt_wall_seconds.append(elapsed)
+            attempt_errors.append(f"attempt {attempt}: {type(exc).__name__}: {exc}")
+
+            if attempt >= max_attempts:
+                break
+
+            print(
+                f"  attempt {attempt}/{max_attempts} failed after {elapsed:.1f}s; "
+                f"reloading {model} before retry...",
+                flush=True,
+            )
+            unload(model)
+            time.sleep(retry_backoff * attempt)
+            try:
+                warm_up(model, request_timeout)
+            except Exception as warmup_exc:
+                attempt_errors.append(
+                    f"recovery warm-up after attempt {attempt}: "
+                    f"{type(warmup_exc).__name__}: {warmup_exc}"
+                )
+
+    usage = {
+        "attempts_used": max_attempts,
+        "recovered_after_failure": False,
+        "attempt_errors": attempt_errors,
+        "attempt_wall_seconds": attempt_wall_seconds,
+        "logical_wall_seconds": round(time.perf_counter() - total_started, 6),
+        "wall_seconds": round(time.perf_counter() - total_started, 6),
+    }
+    return None, usage, "RetryExhausted: " + " | ".join(attempt_errors)
+
+
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError as exc:
+            raise SystemExit(f"Invalid JSONL at {path}:{line_number}: {exc}") from exc
+    return rows
+
+
+def logical_key(row: dict[str, Any]) -> tuple[str, int, str]:
+    return str(row["model"]), int(row["repeat"]), str(row["case_id"])
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the standalone 3B OWASP threat-identification benchmark.")
+    parser = argparse.ArgumentParser(
+        description="Run the timeout-resistant v2 3B OWASP benchmark."
+    )
     parser.add_argument(
         "--quick", action="store_true",
-        help="Run the three LLM01 cases once with every model to verify the setup.",
+        help="Run the three LLM01 cases once with every selected model.",
+    )
+    parser.add_argument(
+        "--models", nargs="+", choices=MODELS,
+        help="Optional subset of model tags; defaults to all three models.",
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=REQUEST_TIMEOUT_SECONDS,
+        help=f"Per-attempt deadline in seconds (default: {REQUEST_TIMEOUT_SECONDS}).",
+    )
+    parser.add_argument(
+        "--max-attempts", type=int, default=MAX_ATTEMPTS,
+        help=f"Maximum attempts per logical call (default: {MAX_ATTEMPTS}).",
+    )
+    parser.add_argument(
+        "--retry-backoff", type=float, default=RETRY_BACKOFF_SECONDS,
+        help=f"Base retry backoff in seconds (default: {RETRY_BACKOFF_SECONDS}).",
+    )
+    parser.add_argument(
+        "--num-predict", type=int, default=NUM_PREDICT,
+        help=f"Maximum generated tokens per attempt (default: {NUM_PREDICT}).",
+    )
+    parser.add_argument(
+        "--output-dir", type=Path,
+        help="Result directory; defaults to /content in Colab, otherwise cwd.",
+    )
+    parser.add_argument(
+        "--resume", type=Path,
+        help="Resume an interrupted v2 run from its raw JSONL checkpoint.",
+    )
+    parser.add_argument(
+        "--skip-pull", action="store_true",
+        help="Do not run `ollama pull` when all model tags already exist locally.",
     )
     args = parser.parse_args()
 
-    models = MODELS
+    if args.timeout < 10:
+        parser.error("--timeout must be at least 10 seconds")
+    if args.max_attempts < 1:
+        parser.error("--max-attempts must be at least 1")
+    if args.num_predict < 64:
+        parser.error("--num-predict must be at least 64")
+    if args.resume and args.quick:
+        parser.error("--resume and --quick cannot be used together")
+
+    models = args.models or MODELS
     cases = CASES[:3] if args.quick else CASES
     runs_per_case = 1 if args.quick else RUNS_PER_CASE
     seeds = SEEDS[:runs_per_case]
@@ -662,39 +860,84 @@ def main() -> None:
             "in the background before running this file."
         ) from exc
 
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    output_dir = Path("/content") if Path("/content").exists() else Path.cwd()
-    raw_path = output_dir / f"owasp_3b_benchmark_{run_id}.jsonl"
-    summary_path = output_dir / f"owasp_3b_benchmark_summary_{run_id}.csv"
-    metadata_path = output_dir / f"owasp_3b_benchmark_metadata_{run_id}.json"
-    diagnostics_path = output_dir / f"owasp_3b_benchmark_diagnostics_{run_id}.json"
+    default_output_dir = Path("/content") if Path("/content").exists() else Path.cwd()
+    output_dir = (args.output_dir or default_output_dir).expanduser().resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.resume:
+        raw_path = args.resume.expanduser().resolve()
+        if not raw_path.is_file():
+            raise SystemExit(f"Resume checkpoint not found: {raw_path}")
+        rows = load_jsonl(raw_path)
+        if not rows:
+            raise SystemExit(f"Resume checkpoint is empty: {raw_path}")
+        run_id = str(rows[0]["run_id"])
+        output_dir = raw_path.parent
+        print(f"Resuming {run_id} from {raw_path} ({len(rows)} saved rows).", flush=True)
+    else:
+        run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        raw_path = output_dir / f"owasp_3b_benchmark_v2_{run_id}.jsonl"
+        rows = []
+
+    summary_path = output_dir / f"owasp_3b_benchmark_v2_summary_{run_id}.csv"
+    metadata_path = output_dir / f"owasp_3b_benchmark_v2_metadata_{run_id}.json"
+    diagnostics_path = output_dir / f"owasp_3b_benchmark_v2_diagnostics_{run_id}.json"
 
     metadata_path.write_text(json.dumps({
+        "benchmark_version": 2,
         "run_id": run_id,
         "models": models,
         "runs_per_case": runs_per_case,
         "num_ctx": NUM_CTX,
-        "num_predict": NUM_PREDICT,
-        "request_timeout_seconds": REQUEST_TIMEOUT_SECONDS,
+        "num_predict": args.num_predict,
+        "request_timeout_seconds_per_attempt": args.timeout,
+        "max_attempts_per_logical_call": args.max_attempts,
+        "retry_backoff_seconds": args.retry_backoff,
         "temperature": 0,
         "seeds": seeds,
         "case_count": len(cases),
+        "resumed": bool(args.resume),
+        "raw_checkpoint": str(raw_path),
         "ollama_version": subprocess.run(
             ["ollama", "--version"], capture_output=True, text=True, check=False
         ).stdout.strip(),
     }, indent=2), encoding="utf-8")
 
-    rows: list[dict[str, Any]] = []
-    total = len(models) * len(cases) * runs_per_case
-    completed = 0
+    expected_keys = {
+        (model, repeat, test_case["id"])
+        for model in models
+        for repeat in range(1, runs_per_case + 1)
+        for test_case in cases
+    }
+    saved_keys = {logical_key(row) for row in rows}
+    duplicate_count = len(rows) - len(saved_keys)
+    if duplicate_count:
+        raise SystemExit(
+            f"Resume checkpoint contains {duplicate_count} duplicate logical rows; "
+            "refusing to skew the metrics."
+        )
+    completed = len(saved_keys & expected_keys)
+    total = len(expected_keys)
 
     for model in models:
-        pull_model(model)
+        model_pending = any(key[0] == model and key not in saved_keys for key in expected_keys)
+        if not model_pending:
+            print(f"Skipping completed model {model}.", flush=True)
+            continue
+
+        if not args.skip_pull:
+            pull_model(model)
         print(f"Warming up {model} ...", flush=True)
-        warm_up(model)
+        warm_up_with_retries(
+            model, args.timeout, args.max_attempts, args.retry_backoff
+        )
 
         for repeat, seed in enumerate(seeds, start=1):
             for test_case in cases:
+                key = (model, repeat, test_case["id"])
+                if key in saved_keys:
+                    continue
+
                 completed += 1
                 print(
                     f"[{completed}/{total}] {model} | repeat={repeat} | {test_case['id']}",
@@ -702,6 +945,7 @@ def main() -> None:
                 )
                 row: dict[str, Any] = {
                     "run_id": run_id,
+                    "benchmark_version": 2,
                     "timestamp_utc": datetime.now(timezone.utc).isoformat(),
                     "model": model,
                     "repeat": repeat,
@@ -712,31 +956,38 @@ def main() -> None:
                     "expected_statuses": test_case["expected_statuses"],
                 }
                 try:
-                    output, usage = run_case(model, test_case, seed)
+                    output, usage, error = run_case_with_retries(
+                        model=model,
+                        test_case=test_case,
+                        seed=seed,
+                        request_timeout=args.timeout,
+                        num_predict=args.num_predict,
+                        max_attempts=args.max_attempts,
+                        retry_backoff=args.retry_backoff,
+                    )
                     row["output"] = output
                     row["usage"] = usage
-                    row["scores"] = score_output(test_case, output)
-                    row["error"] = None
-                except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, ValueError) as exc:
-                    row["output"] = None
-                    row["usage"] = {}
-                    row["scores"] = {}
-                    row["error"] = f"{type(exc).__name__}: {exc}"
+                    row["scores"] = score_output(test_case, output) if output else {}
+                    row["error"] = error
                 except Exception as exc:
                     row["output"] = None
                     row["usage"] = {}
                     row["scores"] = {}
-                    row["error"] = f"{type(exc).__name__}: {exc}"
+                    row["error"] = f"UnexpectedError: {type(exc).__name__}: {exc}"
 
                 rows.append(row)
+                saved_keys.add(key)
+                # One durable checkpoint line per completed logical call.
                 with raw_path.open("a", encoding="utf-8") as handle:
                     handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+                    handle.flush()
 
         unload(model)
 
-    summary = summarize(rows, models)
+    selected_rows = [row for row in rows if logical_key(row) in expected_keys]
+    summary = summarize(selected_rows, models)
     diagnostics_path.write_text(
-        json.dumps(build_diagnostics(rows, models), indent=2, ensure_ascii=False),
+        json.dumps(build_diagnostics(selected_rows, models), indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
     with summary_path.open("w", newline="", encoding="utf-8") as handle:
@@ -748,13 +999,15 @@ def main() -> None:
     for rank, item in enumerate(summary, start=1):
         print(
             f"{rank}. {item['model']} | complete={item['completion_rate']:.3f} | "
-            f"macro_f1={item['status_macro_f1']:.3f} | "
+            f"first_try={item['first_attempt_completion_rate']:.3f} | "
+            f"recovered={item['recovered_calls']} | macro_f1={item['status_macro_f1']:.3f} | "
             f"status_overall={item['overall_status_match_rate']:.3f} | "
             f"schema_overall={item['overall_schema_success_rate']:.3f} | "
             f"evidence={item['mean_evidence_coverage']:.3f} | "
-            f"median={item['median_latency_seconds']:.2f}s | tok/s={item['mean_output_tokens_per_second']:.2f}"
+            f"median_e2e={item['median_latency_seconds']:.2f}s | "
+            f"tok/s={item['mean_output_tokens_per_second']:.2f}"
         )
-    print(f"\nRaw results: {raw_path}")
+    print(f"\nRaw/checkpoint: {raw_path}")
     print(f"Summary CSV: {summary_path}")
     print(f"Metadata: {metadata_path}")
     print(f"Diagnostics: {diagnostics_path}")

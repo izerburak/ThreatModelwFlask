@@ -39,10 +39,10 @@ Every case was executed three times, resulting in 45 attempted calls per model a
 
 3. Aggregate Results
 
-Model                                  Completion   Status*   Status**  Evidence  Actionability  Median   P95     Tokens/s
-qwen2.5:3b-instruct-q4_K_M                66.67%      60.00%     40.00%    36.67%       56.67%      4.568s   7.897s   49.942
-ministral-3:3b-instruct-2512-q4_K_M      100.00%      35.56%     35.56%    74.44%       15.56%      5.133s   6.297s   46.588
-llama3.2:3b-instruct-q4_K_M              100.00%      33.33%     33.33%    68.89%      100.00%      3.780s   4.407s   47.783
+Model                                  Completion   Status*   Status**  Macro-F1  Evidence  Actionability  Median   P95     Tokens/s
+qwen2.5:3b-instruct-q4_K_M                66.67%      60.00%     40.00%    0.2619    36.67%       56.67%      4.568s   7.897s   49.942
+ministral-3:3b-instruct-2512-q4_K_M      100.00%      35.56%     35.56%    0.2531    74.44%       15.56%      5.133s   6.297s   46.588
+llama3.2:3b-instruct-q4_K_M              100.00%      33.33%     33.33%    0.1667    68.89%      100.00%      3.780s   4.407s   47.783
 
 * Status agreement calculated only over calls that returned a usable response.
 ** Operational status agreement calculated over all 45 attempted calls, treating a
@@ -146,11 +146,15 @@ profile.
 7. Provisional Selection Decision
 
 Applying the precondition that a candidate model must first complete requests
-reliably, Qwen does not pass the reliability gate in this run. Between the two models
-with 100% completion, Llama 3.2 3B provides the strongest operational baseline because
-it has the lowest median and P95 latency and the highest actionability conformance.
-Accordingly, if a model had to be selected solely from this run, Llama 3.2 3B would be
-the provisional operational choice.
+reliably, Qwen does not pass the reliability gate in this run. Both Ministral and
+Llama pass the gate with 100% completion and schema success. Under the declared
+selection rule, status macro-F1 is the primary ranking metric after the reliability
+gate. The macro-F1 values recalculated from the original raw JSONL are 0.2531 for
+Ministral and 0.1667 for Llama. Therefore, if the declared rule is applied strictly
+to the original pilot, Ministral is the provisional model-selection winner. Llama
+remains the strongest operational profile because it is faster and has much stronger
+actionability conformance, but those are secondary metrics rather than the primary
+classification metric.
 
 This is not yet a final scientific base-model selection. The result is based on only
 15 unique cases from five risk families, and the three repeated executions are not
@@ -200,14 +204,18 @@ Files to keep together:
 - model_selection_analysis_en.txt: interpretation and handoff document
 
 
-TODO 1 - Correct the standalone benchmark before running it again
+COMPLETED CODE CORRECTIONS - Verify before running
 
-Edit colab_3b_owasp_benchmark.py and make these changes:
+The LLM-Selection/colab_3b_owasp_benchmark.py file has already been updated with
+the following corrections. Verify that they are still present after copying the
+folder to another computer:
 
 1. Add a fixed generation limit for every request. Use num_predict=512 for the
    current single-candidate cases. Apply the same value to every model.
-2. Keep the request timeout identical for every model. A 120-second timeout is
-   sufficient after adding the generation limit. Record a timeout as a failed call.
+2. Keep the request timeout identical for every model. The corrected script uses a
+   generous 600-second ceiling together with the fixed 512-token generation limit.
+   Record a timeout as a failed call. The long ceiling gives Qwen sufficient time,
+   while the token limit prevents unbounded generation.
 3. Add the definitions of all ten threat patterns to SYSTEM_PROMPT. The first pilot
    supplied the pattern names through the schema but did not explain their meanings.
    Use the pattern descriptions from the production Threat-Identification prompt.
@@ -219,10 +227,10 @@ Edit colab_3b_owasp_benchmark.py and make these changes:
    case order, and three repeats for all models.
 
 
-TODO 2 - Correct the metric calculations
+COMPLETED METRIC CORRECTIONS - Verify the new output files
 
-The original summary excluded failed calls from several quality metrics. Correct the
-calculation as follows:
+The corrected script now calculates the metrics as follows. Confirm these fields are
+present in the new CSV and diagnostics JSON after the rerun:
 
 1. Completion rate = usable responses / all attempted calls.
 2. Overall schema success = schema-valid responses / all attempted calls.
@@ -296,13 +304,13 @@ After the corrected pilot behaves as expected:
 Continue the 3B local-LLM base-model selection experiment in the LLM-Selection
 folder. First read model_selection_analysis_en.txt, the original summary CSV,
 metadata JSON, and raw JSONL. The first pilot is not a final result: Qwen timed out
-on 15 of 45 calls, the original short summary excluded those failures from its
-conditional status score, generation was not capped, and the standalone prompt did
-not define the ten threat patterns. Modify colab_3b_owasp_benchmark.py according to
-Section 9 of the analysis: add num_predict=512, use the same fixed seeds across
-models, add the production threat-pattern definitions, enum-constrain DFD ids, count
-all failed calls as zero in overall metrics, and add a status confusion matrix plus
-macro-F1. Verify the modified script locally without overwriting any original result
-files. Then provide simple Google Colab T4 instructions for a quick run followed by
-the corrected 135-call pilot. Do not declare a final base model until the corrected
-pilot has been evaluated.
+on 15 of 45 calls and the original short summary excluded those failures from its
+conditional status score. The standalone colab_3b_owasp_benchmark.py has already
+been corrected: it uses num_predict=512, a common 600-second timeout, the same fixed
+seeds across models, production threat-pattern definitions, enum-constrained DFD
+ids, failure-inclusive overall metrics, a status confusion matrix, and macro-F1.
+Verify that the script compiles, but do not redo these corrections or overwrite the
+original result files. Provide simple Google Colab T4 instructions for a quick run,
+then run the corrected 135-call pilot and analyse the new JSONL, CSV, metadata, and
+diagnostics files. Apply the reliability gate first and status macro-F1 second. Do
+not declare a final base model until the corrected pilot has been evaluated.

@@ -1,0 +1,13 @@
+{
+  "run_id": "20260916T204135Z",
+  "models": [
+    "qwen2.5:3b-instruct-q4_K_M",
+    "llama3.2:3b-instruct-q4_K_M",
+    "ministral-3:3b-instruct-2512-q4_K_M"
+  ],
+  "runs_per_case": 3,
+  "num_ctx": 8192,
+  "temperature": 0,
+  "case_count": 15,
+  "ollama_version": "ollama version is 0.34.1"
+}
