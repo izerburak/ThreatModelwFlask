@@ -14,7 +14,7 @@ DFD = {
 }
 
 
-def _det(code="LLM01", answer="Anonymous public internet users"):
+def _det(code="LLM01:2026", answer="Anonymous public internet users"):
     return [{
         "code": code,
         "name": code,
@@ -27,7 +27,7 @@ def _det(code="LLM01", answer="Anonymous public internet users"):
 
 def _threat(**overrides):
     threat = {
-        "code": "LLM01",
+        "code": "LLM01:2026",
         "name": "Prompt Injection",
         "status": "confirmed",
         "threat_pattern": "prompt_context_manipulation",
@@ -61,7 +61,7 @@ class GroundingValidatorTests(unittest.TestCase):
         self.assertIn("edge_FAKE", result["report"]["stripped_edge_ids"])
 
     def test_non_deterministic_code_demoted_to_secondary(self):
-        # API7 is not in the deterministic set (only LLM01) -> must not be primary.
+        # API7 is not in the deterministic set (only LLM01:2026) -> must not be primary.
         result = validate_threats(_ident([_threat(code="API7:2023")]), DFD, _det())
         self.assertEqual(result["primary_threats"], [])
         self.assertTrue(any(f["code"] == "API7:2023" for f in result["secondary_findings"]))
@@ -90,10 +90,10 @@ class GroundingValidatorTests(unittest.TestCase):
         self.assertEqual(result["primary_threats"][0]["status"], "confirmed")
 
     def test_unaddressed_candidate_is_backfilled_not_scored(self):
-        # Deterministic set has LLM01 + LLM02, but the LLM only addresses LLM01.
-        # LLM02 must not vanish: it is backfilled as needs_more_info (not scored).
+        # Deterministic set has LLM01:2026 + LLM02:2026, but the LLM only addresses LLM01:2026.
+        # LLM02:2026 must not vanish: it is backfilled as needs_more_info (not scored).
         det = _det(answer="Yes") + [{
-            "code": "LLM02",
+            "code": "LLM02:2026",
             "name": "Sensitive Information Disclosure",
             "framework": "owasp_llm",
             "affected_assets": [],
@@ -102,11 +102,11 @@ class GroundingValidatorTests(unittest.TestCase):
         }]
         result = validate_threats(_ident([_threat(affected_nodes=["llm_gateway"])]), DFD, det)
         primary_codes = {t["code"] for t in result["primary_threats"]}
-        self.assertNotIn("LLM02", primary_codes)
-        self.assertIn("LLM02", result["report"]["unidentified_deterministic_codes"])
+        self.assertNotIn("LLM02:2026", primary_codes)
+        self.assertIn("LLM02:2026", result["report"]["unidentified_deterministic_codes"])
         unaddressed = result["unaddressed_candidates"]
         self.assertEqual(len(unaddressed), 1)
-        self.assertEqual(unaddressed[0]["code"], "LLM02")
+        self.assertEqual(unaddressed[0]["code"], "LLM02:2026")
         self.assertEqual(unaddressed[0]["status"], "needs_more_info")
         self.assertFalse(unaddressed[0]["validated"])
 

@@ -20,7 +20,7 @@ OLD_STYLE_QUESTION = {
     "text": "What is the primary purpose of the LLM in this system?",
     "type": "single",
     "options": ["Customer support assistant"],
-    "owasp_llm": ["LLM09"],
+    "owasp_llm": ["LLM07:2026"],
     "severity_weight": 2,
     "confidence_weight": 4,
 }
@@ -30,7 +30,7 @@ NEW_STYLE_QUESTION = {
     "text": "Which web application entry points can initiate or influence the LLM workflow?",
     "type": "multi",
     "options": ["Public chat page"],
-    "owasp_llm": ["LLM01"],
+    "owasp_llm": ["LLM01:2026"],
     "severity_weight": 4,
     "confidence_weight": 5,
     "category": "web_attack_surface",
@@ -126,7 +126,7 @@ class PipelineCompatibilityTests(unittest.TestCase):
         self.assertEqual(risk_payload["answers_analyzed"], 2)
 
         llm_codes = {risk["code"] for risk in risk_payload["owasp_llm"]}
-        self.assertIn("LLM01", llm_codes)  # prompt injection always applies to an LLM surface
+        self.assertIn("LLM01:2026", llm_codes)  # prompt injection always applies to an LLM surface
 
         # Every risk must be DREAD-scored, level-banded, and grounded in answers that
         # were actually present (Q1 or Q48 only) - never a question that was not asked.
@@ -153,9 +153,9 @@ class PipelineCompatibilityTests(unittest.TestCase):
         risk_payload = build_risk_analysis(str(self.app_dir), response_payload)
         mapped_codes = {risk["code"] for risk in risk_payload["owasp_llm"]}
 
-        self.assertIn("LLM01", mapped_codes)   # always applies
-        self.assertIn("LLM10", mapped_codes)   # anonymous public surface (Q2)
-        self.assertIn("LLM02", mapped_codes)   # sensitive data (Q4/Q24)
+        self.assertIn("LLM01:2026", mapped_codes)   # always applies
+        self.assertIn("LLM06:2026", mapped_codes)   # unbounded consumption on anonymous public surface (Q2)
+        self.assertIn("LLM02:2026", mapped_codes)   # sensitive data (Q4/Q24)
 
         # Evidence only cites questions that were answered.
         for risk in risk_payload["unified_risks"]:
@@ -169,7 +169,7 @@ class PipelineCompatibilityTests(unittest.TestCase):
         self.assertIn("Replay/reproducibility behavior was not provided.", risk_payload["missing_information"])
 
     def test_owasp_framework_code_names_are_resolved(self):
-        self.assertEqual(_risk_name("owasp_llm", "LLM06"), "Excessive Agency")
+        self.assertEqual(_risk_name("owasp_llm", "LLM03:2026"), "Excessive Agency")
         self.assertEqual(_risk_name("owasp_web", "A05:2025"), "Injection")
         self.assertEqual(_risk_name("owasp_api", "API5:2023"), "Broken Function Level Authorization")
         self.assertEqual(_risk_name("owasp_web", "A99:2025"), "A99:2025")

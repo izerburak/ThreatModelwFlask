@@ -26,17 +26,17 @@ class ThreatIdentificationUnavailable(RuntimeError):
     """
 
 
-OWASP_LLM_2025 = {
-    "LLM01": "Prompt Injection",
-    "LLM02": "Sensitive Information Disclosure",
-    "LLM03": "Supply Chain",
-    "LLM04": "Data and Model Poisoning",
-    "LLM05": "Improper Output Handling",
-    "LLM06": "Excessive Agency",
-    "LLM07": "System Prompt Leakage",
-    "LLM08": "Vector and Embedding Weaknesses",
-    "LLM09": "Misinformation",
-    "LLM10": "Unbounded Consumption",
+OWASP_LLM_2026 = {
+    "LLM01:2026": "Prompt Injection",
+    "LLM02:2026": "Sensitive Information Disclosure",
+    "LLM03:2026": "Excessive Agency",
+    "LLM04:2026": "Supply Chain",
+    "LLM05:2026": "Data and Model Poisoning",
+    "LLM06:2026": "Unbounded Consumption",
+    "LLM07:2026": "Misinformation",
+    "LLM08:2026": "Hidden Context Exposure",
+    "LLM09:2026": "Vector and Embedding Weaknesses",
+    "LLM10:2026": "Improper Output Handling",
 }
 
 OWASP_WEB_2025 = {
@@ -70,45 +70,45 @@ OWASP_API_2023 = {
 # DREAD-aware mitigations are generated on top of these per risk (see
 # _dread_aware_mitigations) and listed first.
 OWASP_MITIGATIONS = {
-    "LLM01": [
+    "LLM01:2026": [
         "Separate the system prompt from user input and treat all model input as untrusted.",
         "Constrain model role/format and apply least privilege to any action the model can trigger.",
     ],
-    "LLM02": [
+    "LLM02:2026": [
         "Minimize and redact sensitive data before it reaches the model, responses, or logs.",
         "Enforce data-access controls so the model only sees data the user is authorized for.",
     ],
-    "LLM03": [
-        "Pin and verify the provenance of models, libraries, and datasets.",
-        "Vet third-party models/plugins and monitor them for known vulnerabilities.",
-    ],
-    "LLM04": [
-        "Validate and quarantine ingested/RAG content before indexing.",
-        "Use only reviewed, trusted sources for training and indexing.",
-    ],
-    "LLM05": [
-        "Treat model output as untrusted; validate/encode it before downstream use.",
-        "Disable auto-execution and use schema/allowlist validation for structured output.",
-    ],
-    "LLM06": [
+    "LLM03:2026": [
         "Limit tool scope and permissions to the minimum required (least privilege).",
         "Require human approval for state-changing or high-impact actions.",
     ],
-    "LLM07": [
-        "Keep secrets and authorization server-side; never place them in the system prompt.",
-        "Assume the system prompt can leak and design controls accordingly.",
+    "LLM04:2026": [
+        "Pin and verify the provenance of models, libraries, adapters, and datasets.",
+        "Vet third-party suppliers and verify model artifacts with signatures and immutable hashes.",
     ],
-    "LLM08": [
+    "LLM05:2026": [
+        "Validate and quarantine ingested, training, fine-tuning, and RAG content before use.",
+        "Track data/model lineage and restrict write access to training and retrieval sources.",
+    ],
+    "LLM06:2026": [
+        "Enforce per-user rate limits, quotas, and token/output/tool-execution caps.",
+        "Monitor cost and resource anomalies and add timeouts and circuit breakers.",
+    ],
+    "LLM07:2026": [
+        "Ground high-impact claims in authoritative, current sources and expose citations.",
+        "Require human verification before misinformation-prone output drives decisions or actions.",
+    ],
+    "LLM08:2026": [
+        "Keep secrets and authorization server-side; never place them in the system prompt.",
+        "Assume all hidden context can be exposed and minimize sensitive instructions and metadata.",
+    ],
+    "LLM09:2026": [
         "Enforce per-tenant/per-user access control on vector stores and indexes.",
         "Sanitize and isolate documents before embedding.",
     ],
-    "LLM09": [
-        "Ground responses in retrieved context and show citations.",
-        "Add human review and disclaimers for high-stakes outputs.",
-    ],
-    "LLM10": [
-        "Enforce per-user rate limits, quotas, and token/output caps.",
-        "Monitor for abusive usage and add circuit breakers.",
+    "LLM10:2026": [
+        "Treat model output as untrusted; validate and encode it before downstream use.",
+        "Disable auto-execution and use schema and allowlist validation for structured output.",
     ],
     "A01:2025": [
         "Enforce server-side authorization on every request and object; deny by default.",
@@ -164,16 +164,16 @@ OWASP_MITIGATIONS = {
 
 # One high-impact, low-effort action per code, used to build the quick-wins list.
 OWASP_QUICK_WINS = {
-    "LLM01": "Isolate the system prompt from user-supplied content.",
-    "LLM02": "Redact PII/secrets from prompts, responses, and logs.",
-    "LLM03": "Pin model/dependency versions and verify checksums.",
-    "LLM04": "Quarantine and review user-supplied content before indexing.",
-    "LLM05": "Validate/encode model output before rendering or executing it.",
-    "LLM06": "Require human approval for state-changing actions.",
-    "LLM07": "Move secrets and authorization out of the system prompt.",
-    "LLM08": "Apply per-user access control to the vector store.",
-    "LLM09": "Ground answers in retrieved sources and show citations.",
-    "LLM10": "Add per-user rate limits and token/output caps.",
+    "LLM01:2026": "Isolate instructions from untrusted content and constrain model capabilities.",
+    "LLM02:2026": "Redact PII and secrets from prompts, responses, traces, and logs.",
+    "LLM03:2026": "Require human approval for state-changing or high-impact actions.",
+    "LLM04:2026": "Pin, sign, and verify models, adapters, datasets, and dependencies.",
+    "LLM05:2026": "Quarantine and review content before training, fine-tuning, or indexing.",
+    "LLM06:2026": "Add per-user token, cost, request, and tool-execution limits.",
+    "LLM07:2026": "Ground high-impact claims in authoritative sources and require verification.",
+    "LLM08:2026": "Remove secrets and security-critical data from hidden model context.",
+    "LLM09:2026": "Apply per-user and per-tenant access control inside vector queries.",
+    "LLM10:2026": "Validate and encode model output before rendering or executing it.",
     "A01:2025": "Add server-side authorization checks on every endpoint and object.",
     "A02:2025": "Disable debug/verbose errors and harden default configs.",
     "A03:2025": "Pin and scan dependencies (SBOM/SCA).",
@@ -474,16 +474,16 @@ def _raw_by_number(answers):
 # assets it threatens, so each risk points at concrete architecture when a DFD is
 # available. Falls back to [] when no DFD is supplied.
 _CODE_ASSET_SELECTORS = {
-    "LLM01": ("entry_", "llm_gateway", "process_preprocessor", "process_orchestrator"),
-    "LLM02": ("store_", "llm_gateway", "process_logging_monitoring"),
-    "LLM03": ("external_model_provider", "llm_runtime", "llm_gateway"),
-    "LLM04": ("store_vector_db", "process_rag_orchestrator", "store_knowledge_base", "store_documentation"),
-    "LLM05": ("process_output_validator", "llm_gateway", "entry_"),
-    "LLM06": ("process_tool_layer", "tool_", "business_"),
-    "LLM07": ("llm_gateway", "process_orchestrator", "process_tool_layer"),
-    "LLM08": ("store_vector_db", "process_rag_orchestrator"),
-    "LLM09": ("llm_gateway", "entry_", "business_decisioning"),
-    "LLM10": ("entry_", "llm_gateway", "process_tool_layer"),
+    "LLM01:2026": ("entry_", "llm_gateway", "process_preprocessor", "process_orchestrator"),
+    "LLM02:2026": ("store_", "llm_gateway", "process_logging_monitoring"),
+    "LLM03:2026": ("process_tool_layer", "tool_", "business_"),
+    "LLM04:2026": ("external_model_provider", "llm_runtime", "llm_gateway"),
+    "LLM05:2026": ("store_vector_db", "process_rag_orchestrator", "store_knowledge_base", "store_documentation"),
+    "LLM06:2026": ("entry_", "llm_gateway", "process_tool_layer"),
+    "LLM07:2026": ("llm_gateway", "entry_", "business_decisioning"),
+    "LLM08:2026": ("llm_gateway", "process_orchestrator", "process_tool_layer"),
+    "LLM09:2026": ("store_vector_db", "process_rag_orchestrator"),
+    "LLM10:2026": ("process_output_validator", "llm_gateway", "entry_"),
     "A01:2025": ("entry_", "process_tool_layer", "tool_"),
     "A02:2025": ("entry_", "process_api_connector"),
     "A03:2025": ("external_model_provider", "llm_runtime"),
@@ -530,12 +530,12 @@ def _affected_assets(code, dfd_payload):
 
 # Per-code key questions whose Unknown/absence weakens confidence in that risk.
 _RISK_KEY_QUESTIONS = {
-    "LLM01": (30, 84),
-    "LLM02": (24, 32, 88),
-    "LLM06": (16, 44, 80),
-    "LLM07": (45,),
-    "LLM08": (36,),
-    "LLM10": (77, 78),
+    "LLM01:2026": (30, 84),
+    "LLM02:2026": (24, 32, 88),
+    "LLM03:2026": (16, 44, 80),
+    "LLM06:2026": (77, 78),
+    "LLM08:2026": (45,),
+    "LLM09:2026": (36,),
     "A01:2025": (26, 28),
     "A04:2025": (73,),
     "API6:2023": (80,),
@@ -660,13 +660,13 @@ def _extract_risks(extract_payload):
             continue
 
         code = str(risk.get("code") or "").strip().upper()
-        if code not in OWASP_LLM_2025:
+        if code not in OWASP_LLM_2026:
             continue
 
         risks.append(
             {
                 "code": code,
-                "name": str(risk.get("name") or OWASP_LLM_2025[code]).strip(),
+                "name": str(risk.get("name") or OWASP_LLM_2026[code]).strip(),
                 "risk_level": _normalize_level(risk.get("risk_level")) or "Medium",
                 "why": str(risk.get("why") or "").strip(),
                 "evidence": _string_list(risk.get("evidence")),
@@ -691,7 +691,7 @@ def _overall_status(extract_payload, unified_risks):
 def _unified_risk_bucket(code, name):
     return {
         "code": code,
-        "name": str(name or OWASP_LLM_2025.get(code) or code).strip(),
+        "name": str(name or OWASP_LLM_2026.get(code) or code).strip(),
         "risk_level": "Low",
         "score": 0,
         "average": None,
@@ -826,7 +826,7 @@ def _quick_wins(unified_risks, extract_payload):
 
 def _risk_name(framework_key, code):
     if framework_key == "owasp_llm":
-        return OWASP_LLM_2025.get(code, code)
+        return OWASP_LLM_2026.get(code, code)
     if framework_key == "owasp_web":
         return OWASP_WEB_2025.get(code, code)
     if framework_key == "owasp_api":

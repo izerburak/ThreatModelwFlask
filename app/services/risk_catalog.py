@@ -88,16 +88,16 @@ def _always(idx):
 # --- catalog ----------------------------------------------------------------
 # (code, framework, applies, evidence_question_numbers)
 _CATALOG = [
-    ("LLM01", "owasp_llm", _always, [5, 6, 20, 30, 83, 84, 2, 48]),
-    ("LLM02", "owasp_llm", lambda idx: _sensitive_data(idx) or _has(idx, 47, "full prompts") or _has(idx, 88, "without clear deletion"), [4, 24, 32, 47, 88]),
-    ("LLM03", "owasp_llm", lambda idx: _has(idx, 17, "third party", "external vendor", "hybrid") or _has(idx, 18, "different models", "fallback", "routing") or _has(idx, 35, "no validation", "manual trust"), [17, 18, 35]),
-    ("LLM04", "owasp_llm", lambda idx: _rag_enabled(idx) or _has(idx, 6, "file uploads", "web urls", "public repositories") or _has(idx, 43, "training", "both indexing") or _has(idx, 68, "may affect") or _has(idx, 69, "no dedicated"), [6, 8, 43, 68, 69]),
-    ("LLM05", "owasp_llm", _output_consumed, [21, 22, 31, 64, 65, 66]),
-    ("LLM06", "owasp_llm", _has_tools, [11, 12, 14, 15, 16, 39, 44, 79, 80, 91]),
-    ("LLM07", "owasp_llm", lambda idx: _secrets_access(idx) or _has(idx, 19, "hardcoded", "configuration files", "dynamically generated") or _has(idx, 20, "yes"), [19, 20, 45]),
-    ("LLM08", "owasp_llm", lambda idx: _has(idx, 13, "vector db") or _rag_enabled(idx) or _has(idx, 36, "no dedicated", "partially") or _has(idx, 68, "may affect"), [8, 13, 36, 68]),
-    ("LLM09", "owasp_llm", lambda idx: _has(idx, 39, "decisions", "low impact", "moderate", "high impact") or _has(idx, 22, "web interface", "backend automation") or not idx.get(39), [1, 39, 31, 22]),
-    ("LLM10", "owasp_llm", lambda idx: _has(idx, 34, "no protections", "basic request") or _has(idx, 77, "no effective", "partial", "inconsistent") or _has(idx, 78, "weak", "partially") or _has(idx, 2, "anonymous public"), [34, 77, 78, 2]),
+    ("LLM01:2026", "owasp_llm", _always, [5, 6, 20, 30, 83, 84, 2, 48]),
+    ("LLM02:2026", "owasp_llm", lambda idx: _sensitive_data(idx) or _has(idx, 47, "full prompts") or _has(idx, 88, "without clear deletion"), [4, 24, 32, 47, 88]),
+    ("LLM03:2026", "owasp_llm", _has_tools, [11, 12, 14, 15, 16, 39, 44, 79, 80, 91]),
+    ("LLM04:2026", "owasp_llm", lambda idx: _has(idx, 17, "third party", "external vendor", "hybrid") or _has(idx, 18, "different models", "fallback", "routing") or _has(idx, 35, "no validation", "manual trust"), [17, 18, 35]),
+    ("LLM05:2026", "owasp_llm", lambda idx: _rag_enabled(idx) or _has(idx, 6, "file uploads", "web urls", "public repositories") or _has(idx, 43, "training", "both indexing") or _has(idx, 68, "may affect") or _has(idx, 69, "no dedicated"), [6, 8, 43, 68, 69]),
+    ("LLM06:2026", "owasp_llm", lambda idx: _has(idx, 34, "no protections", "basic request") or _has(idx, 77, "no effective", "partial", "inconsistent") or _has(idx, 78, "weak", "partially") or _has(idx, 2, "anonymous public"), [34, 77, 78, 2]),
+    ("LLM07:2026", "owasp_llm", lambda idx: _has(idx, 39, "decisions", "low impact", "moderate", "high impact") or _has(idx, 22, "web interface", "backend automation") or not idx.get(39), [1, 39, 31, 22]),
+    ("LLM08:2026", "owasp_llm", lambda idx: _secrets_access(idx) or _has(idx, 19, "hardcoded", "configuration files", "dynamically generated") or _has(idx, 20, "yes"), [19, 20, 45]),
+    ("LLM09:2026", "owasp_llm", lambda idx: _has(idx, 13, "vector db") or _rag_enabled(idx) or _has(idx, 36, "no dedicated", "partially") or _has(idx, 68, "may affect"), [8, 13, 36, 68]),
+    ("LLM10:2026", "owasp_llm", _output_consumed, [21, 22, 31, 64, 65, 66]),
 
     ("A01:2025", "owasp_web", lambda idx: _web_surface(idx) or _has(idx, 26, "no authorization") or _has(idx, 28, "no, same behavior"), [26, 28, 49, 50, 53]),
     ("A02:2025", "owasp_web", lambda idx: _has(idx, 52, "wildcard", "broad", "overly permissive") or _has(idx, 76, "detailed internal errors") or _web_surface(idx), [52, 76, 49]),

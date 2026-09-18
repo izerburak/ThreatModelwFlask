@@ -57,7 +57,7 @@ class DreadAverageBandTests(unittest.TestCase):
         self.assertEqual(level_from_average(2.7), "Critical")
 
     def test_score_block_exposes_total_average_and_level(self):
-        block = score_code("LLM01", _idx({"Q2": ["Anonymous public internet users"]}))
+        block = score_code("LLM01:2026", _idx({"Q2": ["Anonymous public internet users"]}))
         self.assertEqual(block["average"], round(block["total"] / 5.0, 2))
         self.assertEqual(block["risk_level"], level_from_average(block["average"]))
         self.assertIn(block["band"], {"Low", "Medium", "High", "Critical"})
@@ -67,16 +67,16 @@ class InputHandlingTests(unittest.TestCase):
     def test_q83_q84_increase_exploitability(self):
         base = {"Q2": ["Authenticated public users"]}
         risky = {**base, "Q83": ["HTML or rendered content", "Code or scripts"], "Q84": "Yes, parsed and inserted with minimal validation"}
-        base_e = score_code("LLM01", _idx(base))["exploitability"]
-        risky_e = score_code("LLM01", _idx(risky))["exploitability"]
+        base_e = score_code("LLM01:2026", _idx(base))["exploitability"]
+        risky_e = score_code("LLM01:2026", _idx(risky))["exploitability"]
         self.assertGreater(risky_e, base_e)
 
     def test_strict_parsing_lowers_exploitability(self):
         base = {"Q2": ["Authenticated public users"]}
         strict = {**base, "Q84": "Yes, parsed with strict validation and normalization"}
         self.assertLess(
-            score_code("LLM01", _idx(strict))["exploitability"],
-            score_code("LLM01", _idx(base))["exploitability"],
+            score_code("LLM01:2026", _idx(strict))["exploitability"],
+            score_code("LLM01:2026", _idx(base))["exploitability"],
         )
 
     def test_q83_q84_show_up_as_exploitability_signals(self):
@@ -123,37 +123,37 @@ class ArchitectureInventoryTests(unittest.TestCase):
 
 class ImpactAndScaleTests(unittest.TestCase):
     def test_q86_raises_affected_users_for_public_scale(self):
-        low = score_code("LLM01", _idx({"Q86": "Single user or local-only use"}))["affected_users"]
-        high = score_code("LLM01", _idx({"Q86": "Public internet-scale user base"}))["affected_users"]
+        low = score_code("LLM01:2026", _idx({"Q86": "Single user or local-only use"}))["affected_users"]
+        high = score_code("LLM01:2026", _idx({"Q86": "Public internet-scale user base"}))["affected_users"]
         self.assertLess(low, high)
         self.assertEqual(high, 3)
 
     def test_q87_raises_damage_floor(self):
-        base = score_code("LLM01", _idx({}))["damage"]
-        severe = score_code("LLM01", _idx({"Q87": "Severe impact such as large-scale data breach, fraud, or critical service disruption"}))["damage"]
+        base = score_code("LLM01:2026", _idx({}))["damage"]
+        severe = score_code("LLM01:2026", _idx({"Q87": "Severe impact such as large-scale data breach, fraud, or critical service disruption"}))["damage"]
         self.assertGreater(severe, base)
         self.assertEqual(severe, 3)
 
     def test_q88_long_retention_raises_data_damage(self):
-        base = score_code("LLM02", _idx({"Q4": "No", "Q24": ["No sensitive data"]}))["damage"]
-        retained = score_code("LLM02", _idx({"Q4": "No", "Q24": ["No sensitive data"], "Q88": "Long-term retention without clear deletion controls"}))["damage"]
+        base = score_code("LLM02:2026", _idx({"Q4": "No", "Q24": ["No sensitive data"]}))["damage"]
+        retained = score_code("LLM02:2026", _idx({"Q4": "No", "Q24": ["No sensitive data"], "Q88": "Long-term retention without clear deletion controls"}))["damage"]
         self.assertGreater(retained, base)
 
     def test_q89_mature_incident_response_reduces_damage(self):
-        base = score_code("LLM01", _idx({}))["damage"]
-        mature = score_code("LLM01", _idx({"Q89": "Documented and periodically tested process"}))["damage"]
+        base = score_code("LLM01:2026", _idx({}))["damage"]
+        mature = score_code("LLM01:2026", _idx({"Q89": "Documented and periodically tested process"}))["damage"]
         self.assertLess(mature, base)
 
 
 class ReproducibilityTests(unittest.TestCase):
     def test_q91_replay_raises_reproducibility(self):
-        blocked = score_code("LLM01", _idx({"Q91": "No, replay is blocked or requires fresh authorization"}))["reproducibility"]
-        open_replay = score_code("LLM01", _idx({"Q91": "State-changing or sensitive actions can be replayed without strong controls"}))["reproducibility"]
+        blocked = score_code("LLM01:2026", _idx({"Q91": "No, replay is blocked or requires fresh authorization"}))["reproducibility"]
+        open_replay = score_code("LLM01:2026", _idx({"Q91": "State-changing or sensitive actions can be replayed without strong controls"}))["reproducibility"]
         self.assertGreater(open_replay, blocked)
 
     def test_q90_affects_reproducibility_and_discoverability(self):
-        none = score_code("LLM01", _idx({"Q90": "No testing performed"}))
-        mature = score_code("LLM01", _idx({"Q90": "Continuous adversarial testing or regression tests are in place"}))
+        none = score_code("LLM01:2026", _idx({"Q90": "No testing performed"}))
+        mature = score_code("LLM01:2026", _idx({"Q90": "Continuous adversarial testing or regression tests are in place"}))
         self.assertGreater(none["reproducibility"], mature["reproducibility"])
         self.assertGreater(none["discoverability"], mature["discoverability"])
 
@@ -165,7 +165,7 @@ class ReproducibilityTests(unittest.TestCase):
 
 class CatalogAndLegacyTests(unittest.TestCase):
     def test_catalog_codes_are_known_owasp_codes(self):
-        known = set(risk_analysis_service.OWASP_LLM_2025) | set(risk_analysis_service.OWASP_WEB_2025) | set(risk_analysis_service.OWASP_API_2023)
+        known = set(risk_analysis_service.OWASP_LLM_2026) | set(risk_analysis_service.OWASP_WEB_2025) | set(risk_analysis_service.OWASP_API_2023)
         for code in all_catalog_codes():
             self.assertIn(code, known)
 

@@ -20,7 +20,7 @@ THREAT_PATTERNS = [
             "leak, or subvert system instructions (direct or indirect prompt injection, "
             "system-prompt leakage)."
         ),
-        "typical_codes": ["LLM01", "LLM07"],
+        "typical_codes": ["LLM01:2026", "LLM08:2026"],
     },
     {
         "id": "untrusted_input_crossing_trust_boundary",
@@ -30,7 +30,7 @@ THREAT_PATTERNS = [
             "flows across a trust boundary into a higher-trust process with weak validation or "
             "parsing of rich/structured formats."
         ),
-        "typical_codes": ["A05:2025", "LLM01", "API10:2023"],
+        "typical_codes": ["A05:2025", "LLM01:2026", "API10:2023"],
     },
     {
         "id": "rag_or_memory_contamination",
@@ -39,7 +39,7 @@ THREAT_PATTERNS = [
             "Retrieved documents, indexed content, or conversational memory can be poisoned or "
             "influenced by untrusted sources and later affect other requests or users."
         ),
-        "typical_codes": ["LLM04", "LLM08"],
+        "typical_codes": ["LLM05:2026", "LLM09:2026"],
     },
     {
         "id": "sensitive_data_exposure",
@@ -48,7 +48,7 @@ THREAT_PATTERNS = [
             "Sensitive data (PII, secrets, business data) is reachable by the model, returned in "
             "responses, retained, or written to logs without adequate minimization or access control."
         ),
-        "typical_codes": ["LLM02", "A04:2025", "API1:2023"],
+        "typical_codes": ["LLM02:2026", "A04:2025", "API1:2023"],
     },
     {
         "id": "excessive_tool_or_workflow_agency",
@@ -57,7 +57,7 @@ THREAT_PATTERNS = [
             "The model can trigger tools, actions, or business workflows (state changes, "
             "transactions) with insufficient scoping, approval, or least-privilege controls."
         ),
-        "typical_codes": ["LLM06", "API5:2023", "API6:2023"],
+        "typical_codes": ["LLM03:2026", "API5:2023", "API6:2023"],
     },
     {
         "id": "weak_authentication_authorization",
@@ -75,7 +75,7 @@ THREAT_PATTERNS = [
             "Model output is consumed downstream (rendered HTML/markdown, executed, used in "
             "queries or automation) without validation, encoding, or allowlisting."
         ),
-        "typical_codes": ["LLM05", "A05:2025"],
+        "typical_codes": ["LLM10:2026", "A05:2025"],
     },
     {
         "id": "vector_store_or_embedding_isolation",
@@ -84,7 +84,7 @@ THREAT_PATTERNS = [
             "Vector stores / embeddings lack per-tenant or per-user isolation and access control, "
             "allowing cross-tenant retrieval or inference leakage."
         ),
-        "typical_codes": ["LLM08", "A01:2025"],
+        "typical_codes": ["LLM09:2026", "A01:2025"],
     },
     {
         "id": "secrets_logging_transport_exposure",
@@ -93,7 +93,7 @@ THREAT_PATTERNS = [
             "Secrets/credentials are reachable at runtime, logs capture sensitive prompt/response "
             "data, or transport is unencrypted/unclear across trust boundaries."
         ),
-        "typical_codes": ["LLM07", "A04:2025", "A09:2025"],
+        "typical_codes": ["LLM08:2026", "A04:2025", "A09:2025"],
     },
     {
         "id": "missing_monitoring_limits_incident_response",
@@ -102,7 +102,7 @@ THREAT_PATTERNS = [
             "No effective rate/resource limits, no security monitoring/alerting, or no tested "
             "incident-response process for LLM misuse."
         ),
-        "typical_codes": ["LLM10", "API4:2023", "A09:2025"],
+        "typical_codes": ["LLM06:2026", "API4:2023", "A09:2025"],
     },
 ]
 

@@ -1,0 +1,572 @@
+[
+  {
+    "label": "LLM01:2026",
+    "name": "Prompt Injection",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 1,
+    "range_end": 50,
+    "survey_question_ids": [
+      "Q6",
+      "Q20",
+      "Q30",
+      "Q83",
+      "Q84",
+      "Q90"
+    ]
+  },
+  {
+    "label": "LLM02:2026",
+    "name": "Sensitive Information Disclosure",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 51,
+    "range_end": 100,
+    "survey_question_ids": [
+      "Q4",
+      "Q24",
+      "Q32",
+      "Q46",
+      "Q47",
+      "Q88"
+    ]
+  },
+  {
+    "label": "LLM03:2026",
+    "name": "Excessive Agency",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 101,
+    "range_end": 150,
+    "survey_question_ids": [
+      "Q11",
+      "Q12",
+      "Q15",
+      "Q16",
+      "Q39",
+      "Q44",
+      "Q80",
+      "Q91"
+    ]
+  },
+  {
+    "label": "LLM04:2026",
+    "name": "Supply Chain",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 151,
+    "range_end": 200,
+    "survey_question_ids": [
+      "Q17",
+      "Q18",
+      "Q35",
+      "Q42",
+      "Q71"
+    ]
+  },
+  {
+    "label": "LLM05:2026",
+    "name": "Data and Model Poisoning",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 201,
+    "range_end": 250,
+    "survey_question_ids": [
+      "Q6",
+      "Q8",
+      "Q43",
+      "Q68",
+      "Q69",
+      "Q71"
+    ]
+  },
+  {
+    "label": "LLM06:2026",
+    "name": "Unbounded Consumption",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 251,
+    "range_end": 300,
+    "survey_question_ids": [
+      "Q2",
+      "Q34",
+      "Q77",
+      "Q78",
+      "Q86"
+    ]
+  },
+  {
+    "label": "LLM07:2026",
+    "name": "Misinformation",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 301,
+    "range_end": 350,
+    "survey_question_ids": [
+      "Q1",
+      "Q22",
+      "Q31",
+      "Q37",
+      "Q39",
+      "Q87"
+    ]
+  },
+  {
+    "label": "LLM08:2026",
+    "name": "Hidden Context Exposure",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 351,
+    "range_end": 400,
+    "survey_question_ids": [
+      "Q19",
+      "Q20",
+      "Q24",
+      "Q45",
+      "Q47",
+      "Q76"
+    ]
+  },
+  {
+    "label": "LLM09:2026",
+    "name": "Vector and Embedding Weaknesses",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 401,
+    "range_end": 450,
+    "survey_question_ids": [
+      "Q8",
+      "Q13",
+      "Q27",
+      "Q36",
+      "Q46",
+      "Q68",
+      "Q69"
+    ]
+  },
+  {
+    "label": "LLM10:2026",
+    "name": "Improper Output Handling",
+    "framework": "owasp_llm",
+    "version": "2026",
+    "range_start": 451,
+    "range_end": 500,
+    "survey_question_ids": [
+      "Q21",
+      "Q22",
+      "Q31",
+      "Q64",
+      "Q65",
+      "Q66"
+    ]
+  },
+  {
+    "label": "A01:2025",
+    "name": "Broken Access Control",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 501,
+    "range_end": 550,
+    "survey_question_ids": [
+      "Q26",
+      "Q28",
+      "Q49",
+      "Q50",
+      "Q53",
+      "Q70"
+    ]
+  },
+  {
+    "label": "A02:2025",
+    "name": "Security Misconfiguration",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 551,
+    "range_end": 600,
+    "survey_question_ids": [
+      "Q49",
+      "Q52",
+      "Q70",
+      "Q72",
+      "Q76"
+    ]
+  },
+  {
+    "label": "A03:2025",
+    "name": "Software Supply Chain Failures",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 601,
+    "range_end": 650,
+    "survey_question_ids": [
+      "Q17",
+      "Q18",
+      "Q35",
+      "Q42",
+      "Q71",
+      "Q90"
+    ]
+  },
+  {
+    "label": "A04:2025",
+    "name": "Cryptographic Failures",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 651,
+    "range_end": 700,
+    "survey_question_ids": [
+      "Q24",
+      "Q45",
+      "Q72",
+      "Q73",
+      "Q81",
+      "Q82"
+    ]
+  },
+  {
+    "label": "A05:2025",
+    "name": "Injection",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 701,
+    "range_end": 750,
+    "survey_question_ids": [
+      "Q21",
+      "Q31",
+      "Q64",
+      "Q65",
+      "Q66",
+      "Q83",
+      "Q84"
+    ]
+  },
+  {
+    "label": "A06:2025",
+    "name": "Insecure Design",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 751,
+    "range_end": 800,
+    "survey_question_ids": [
+      "Q37",
+      "Q38",
+      "Q39",
+      "Q57",
+      "Q79",
+      "Q80",
+      "Q90",
+      "Q91"
+    ]
+  },
+  {
+    "label": "A07:2025",
+    "name": "Authentication Failures",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 801,
+    "range_end": 850,
+    "survey_question_ids": [
+      "Q2",
+      "Q25",
+      "Q41",
+      "Q50",
+      "Q56"
+    ]
+  },
+  {
+    "label": "A08:2025",
+    "name": "Software or Data Integrity Failures",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 851,
+    "range_end": 900,
+    "survey_question_ids": [
+      "Q35",
+      "Q42",
+      "Q43",
+      "Q68",
+      "Q69",
+      "Q71"
+    ]
+  },
+  {
+    "label": "A09:2025",
+    "name": "Security Logging and Alerting Failures",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 901,
+    "range_end": 950,
+    "survey_question_ids": [
+      "Q33",
+      "Q38",
+      "Q74",
+      "Q89",
+      "Q90"
+    ]
+  },
+  {
+    "label": "A10:2025",
+    "name": "Mishandling of Exceptional Conditions",
+    "framework": "owasp_web",
+    "version": "2025",
+    "range_start": 951,
+    "range_end": 1000,
+    "survey_question_ids": [
+      "Q31",
+      "Q66",
+      "Q75",
+      "Q76",
+      "Q89"
+    ]
+  },
+  {
+    "label": "API1:2023",
+    "name": "Broken Object Level Authorization",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1001,
+    "range_end": 1050,
+    "survey_question_ids": [
+      "Q26",
+      "Q41",
+      "Q50",
+      "Q53",
+      "Q56"
+    ]
+  },
+  {
+    "label": "API2:2023",
+    "name": "Broken Authentication",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1051,
+    "range_end": 1100,
+    "survey_question_ids": [
+      "Q2",
+      "Q25",
+      "Q41",
+      "Q50",
+      "Q56"
+    ]
+  },
+  {
+    "label": "API3:2023",
+    "name": "Broken Object Property Level Authorization",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1101,
+    "range_end": 1150,
+    "survey_question_ids": [
+      "Q31",
+      "Q41",
+      "Q53",
+      "Q54",
+      "Q65"
+    ]
+  },
+  {
+    "label": "API4:2023",
+    "name": "Unrestricted Resource Consumption",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1151,
+    "range_end": 1200,
+    "survey_question_ids": [
+      "Q2",
+      "Q34",
+      "Q77",
+      "Q78",
+      "Q86"
+    ]
+  },
+  {
+    "label": "API5:2023",
+    "name": "Broken Function Level Authorization",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1201,
+    "range_end": 1250,
+    "survey_question_ids": [
+      "Q26",
+      "Q28",
+      "Q41",
+      "Q44",
+      "Q55",
+      "Q56",
+      "Q57"
+    ]
+  },
+  {
+    "label": "API6:2023",
+    "name": "Unrestricted Access to Sensitive Business Flows",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1251,
+    "range_end": 1300,
+    "survey_question_ids": [
+      "Q15",
+      "Q16",
+      "Q39",
+      "Q79",
+      "Q80",
+      "Q91"
+    ]
+  },
+  {
+    "label": "API7:2023",
+    "name": "Server Side Request Forgery",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1301,
+    "range_end": 1350,
+    "survey_question_ids": [
+      "Q14",
+      "Q57",
+      "Q60",
+      "Q62",
+      "Q63"
+    ]
+  },
+  {
+    "label": "API8:2023",
+    "name": "Security Misconfiguration",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1351,
+    "range_end": 1400,
+    "survey_question_ids": [
+      "Q52",
+      "Q59",
+      "Q63",
+      "Q70",
+      "Q72",
+      "Q76"
+    ]
+  },
+  {
+    "label": "API9:2023",
+    "name": "Improper Inventory Management",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1401,
+    "range_end": 1450,
+    "survey_question_ids": [
+      "Q57",
+      "Q58",
+      "Q59",
+      "Q71",
+      "Q89"
+    ]
+  },
+  {
+    "label": "API10:2023",
+    "name": "Unsafe Consumption of APIs",
+    "framework": "owasp_api",
+    "version": "2023",
+    "range_start": 1451,
+    "range_end": 1500,
+    "survey_question_ids": [
+      "Q14",
+      "Q60",
+      "Q61",
+      "Q62",
+      "Q63",
+      "Q84"
+    ]
+  },
+  {
+    "label": "NO_THREAT",
+    "name": "No concrete threat",
+    "framework": "none",
+    "version": null,
+    "range_start": 1501,
+    "range_end": 1550,
+    "survey_question_ids": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q6",
+      "Q7",
+      "Q8",
+      "Q10",
+      "Q11",
+      "Q12",
+      "Q13",
+      "Q14",
+      "Q15",
+      "Q16",
+      "Q17",
+      "Q18",
+      "Q19",
+      "Q20",
+      "Q21",
+      "Q22",
+      "Q24",
+      "Q25",
+      "Q26",
+      "Q27",
+      "Q28",
+      "Q30",
+      "Q31",
+      "Q32",
+      "Q33",
+      "Q34",
+      "Q35",
+      "Q36",
+      "Q39",
+      "Q40",
+      "Q41",
+      "Q42",
+      "Q43",
+      "Q44",
+      "Q45",
+      "Q46",
+      "Q47",
+      "Q48",
+      "Q49",
+      "Q50",
+      "Q51",
+      "Q52",
+      "Q53",
+      "Q54",
+      "Q55",
+      "Q56",
+      "Q57",
+      "Q58",
+      "Q59",
+      "Q60",
+      "Q61",
+      "Q62",
+      "Q63",
+      "Q64",
+      "Q65",
+      "Q66",
+      "Q67",
+      "Q68",
+      "Q69",
+      "Q70",
+      "Q71",
+      "Q72",
+      "Q73",
+      "Q74",
+      "Q75",
+      "Q76",
+      "Q77",
+      "Q78",
+      "Q79",
+      "Q80",
+      "Q81",
+      "Q82",
+      "Q83",
+      "Q84",
+      "Q85",
+      "Q86",
+      "Q87",
+      "Q88",
+      "Q89",
+      "Q90",
+      "Q91"
+    ]
+  }
+]

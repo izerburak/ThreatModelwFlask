@@ -149,7 +149,7 @@ class PipelineStartApiTests(unittest.TestCase):
                     "overall_status": "High",
                     "unified_risks": [
                         {
-                            "code": "LLM01",
+                            "code": "LLM01:2026",
                             "name": "Prompt Injection",
                             "risk_level": "High",
                             "mitigations": ["Validate instructions before tool use."],

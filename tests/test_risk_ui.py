@@ -13,7 +13,7 @@ class RiskViewModelTests(unittest.TestCase):
             "quick_wins": ["First", "Second", "Third", "Fourth", "Fifth"],
             "unified_risks": [
                 {
-                    "code": "LLM01", "name": "Prompt Injection",
+                    "code": "LLM01:2026", "name": "Prompt Injection",
                     "framework": "owasp_llm", "risk_level": "Critical",
                     "status": "confirmed", "mitigations": ["Isolate input."],
                 },

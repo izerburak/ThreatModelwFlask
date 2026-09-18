@@ -1,7 +1,30 @@
-Main Research Question. To what extent can local Large Language Models improve the threat modeling process for LLM-integrated systems?
+RQ 1 - Effectiveness improvement: How can local LLM threat-identification effectiveness be improved?
 
-Sub-Research Questions
-RQ1. To what extent can local Large Language Models identify threats against LLM-integrated systems during the threat modeling process?
-RQ2. How can the effectiveness of local Large Language Models in identifying threats against LLM-integrated systems be improved?
-RQ3. To what extent can local Large Language Models generate relevant mitigation strategies for threats identified in LLM-integrated systems?
-RQ4. How can an LLM-assisted threat modeling tool for LLM-integrated systems be kept up to date with emerging attack vectors and evolving threat patterns?
+RQ 2 - Mitigation generation:To what extent can local LLMs generate relevant mitigation strategies?
+RQ3 (Sustainability) — Extraction fidelity: Given an unstructured threat source (CVE description, vendor advisory, CTI report), how accurately can the system extract structured threat entities (asset, attack vector, technique, impact) and map them onto an existing threat taxonomy (STRIDE, CAPEC, MITRE ATT&CK)?
+RQ 4 (Sustainability) - Model consistency over time: As threats are added incrementally, does the threat model remain internally consistent (no duplicate/contradictory nodes, correct risk re-scoring, no drift from the original architecture) compared to a full from-scratch rebuild? 
+
+Experiments
+
+Ground Truth:  (human annotated data, some risks might be automatically generated from some question answers, rest can be determined by large models.)
+Decision: ChatGPT generated  Claude approved  labels decide on a subset of OWASP 10 class.
+A success metric for threat detection: TBD and justified.
+
+For RQ1: You can think of different success metrics and see how successfully risks are identified by vanilla or fine-tuned LLMs. You can also classify risks (OWASP or CVE, CWE categories) and test success of vanilla/fine-tuned LLMs on these categories. You can also check the effect of query structure used by LLM (fix the local LLM here: fine tuned or vanilla).
+Exp 1: Success comparison wrt vanilla 
+Exp 2: Model parameters: Learning rate, epoch size, model size, context length
+RQ2: Same experiments with RQ1 but for mitigation
+RQ3: 
+Exp 1: Ask experts and check succes wrt OWASP 10.
+Exp 2: Evaluate mitigation in addition to threat identification
+RQ4:
+Exp 1: Does training with new threats affect the success rate of previous decisions.
+Exp 2: Can previously undetected threats be detected with new data
+
+--------------------
+Detection accuracy: Does fine-tuning improve the model's ability to correctly classify/detect threats (true positive rate) without inflating false positives?
+Experiment: Curate a labeled test set of threat scenarios (log snippets, code diffs, network events, CVE descriptions — whatever your input modality is) with ground-truth labels. Evaluate base model vs. fine-tuned model on:
+Precision, recall, F1, per threat category
+Confusion matrix across categories (e.g., which threat types get confused with which)
+ROC/PR curves if you can get confidence scores
+Hold out a test set the fine-tuning data never touched, and ideally use k-fold cross-validation on the training data itself to check fine-tuning stability.

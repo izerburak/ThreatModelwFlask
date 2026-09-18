@@ -17,10 +17,10 @@ DFD = {
 }
 
 DETERMINISTIC = [
-    {"code": "LLM01", "name": "Prompt Injection", "framework": "owasp_llm",
+    {"code": "LLM01:2026", "name": "Prompt Injection", "framework": "owasp_llm",
      "affected_assets": [], "missing_information": [],
      "evidence": [{"question": "Q2", "text": "Who can reach it", "answer": "Anonymous public internet users"}]},
-    {"code": "LLM06", "name": "Excessive Agency", "framework": "owasp_llm",
+    {"code": "LLM03:2026", "name": "Excessive Agency", "framework": "owasp_llm",
      "affected_assets": [], "missing_information": [],
      "evidence": [{"question": "Q15", "text": "Actions", "answer": "Execute workflows or transactions"}]},
 ]
@@ -40,7 +40,7 @@ class ThreatIdentificationTests(unittest.TestCase):
         schema = chat_mock.call_args.kwargs["response_format"]
         item = schema["properties"]["identified_threats"]["items"]["properties"]
         # PRIMARY codes are enum-constrained to the deterministic candidate codes.
-        self.assertEqual(item["code"]["enum"], ["LLM01", "LLM06"])
+        self.assertEqual(item["code"]["enum"], ["LLM01:2026", "LLM03:2026"])
         # affected_nodes / affected_edges are enum-constrained to real DFD ids.
         self.assertEqual(item["affected_nodes"]["items"]["enum"], ["llm_gateway", "entry_web_chat"])
         self.assertEqual(item["affected_edges"]["items"]["enum"], ["edge_entry_web_chat_to_llm_gateway_llm_request"])
@@ -52,23 +52,23 @@ class ThreatIdentificationTests(unittest.TestCase):
         identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD)
 
         payload = json.loads(chat_mock.call_args.args[0][1]["content"])
-        self.assertEqual(payload["instructions"]["primary_codes_allowed"], ["LLM01", "LLM06"])
+        self.assertEqual(payload["instructions"]["primary_codes_allowed"], ["LLM01:2026", "LLM03:2026"])
         self.assertEqual(len(payload["threat_patterns"]), 10)
         self.assertEqual({n["id"] for n in payload["dfd"]["nodes"]}, {"llm_gateway", "entry_web_chat"})
         # Candidate-first: the deterministic candidate risks are the analysis spine the
         # LLM must inspect (the template guides HOW, the candidate set decides WHICH).
-        self.assertEqual([r["code"] for r in payload["deterministic_risks"]], ["LLM01", "LLM06"])
+        self.assertEqual([r["code"] for r in payload["deterministic_risks"]], ["LLM01:2026", "LLM03:2026"])
 
     @patch("app.services.llm_threat_identification.chat")
     def test_completed_output_is_returned(self, chat_mock):
         chat_mock.return_value = _chat_return(
             {
                 "identified_threats": [
-                    {"code": "LLM01", "name": "Prompt Injection", "status": "confirmed",
+                    {"code": "LLM01:2026", "name": "Prompt Injection", "status": "confirmed",
                      "threat_pattern": "prompt_context_manipulation", "evidence": ["Q2: public"],
                      "affected_nodes": ["llm_gateway"], "affected_edges": [], "abuse_path": ["a"],
                      "control_gap": "no isolation", "confidence": "high", "missing_information": []},
-                    {"code": "LLM06", "name": "Excessive Agency", "status": "not_applicable",
+                    {"code": "LLM03:2026", "name": "Excessive Agency", "status": "not_applicable",
                      "threat_pattern": "excessive_tool_or_workflow_agency", "evidence": ["Q15"],
                      "affected_nodes": [], "affected_edges": [], "abuse_path": [],
                      "control_gap": "", "confidence": "medium", "missing_information": []}
@@ -79,7 +79,7 @@ class ThreatIdentificationTests(unittest.TestCase):
         result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD)
         self.assertEqual(result["status"], "completed")
         self.assertEqual(len(result["identified_threats"]), 2)
-        self.assertEqual(result["identified_threats"][0]["code"], "LLM01")
+        self.assertEqual(result["identified_threats"][0]["code"], "LLM01:2026")
         self.assertEqual(result["missing_primary_codes"], [])
 
     @patch("app.services.llm_threat_identification.chat")
@@ -87,7 +87,7 @@ class ThreatIdentificationTests(unittest.TestCase):
         chat_mock.return_value = _chat_return(
             {
                 "identified_threats": [
-                    {"code": "LLM01", "name": "Prompt Injection", "status": "plausible",
+                    {"code": "LLM01:2026", "name": "Prompt Injection", "status": "plausible",
                      "threat_pattern": "prompt_context_manipulation", "evidence": ["Q2"],
                      "affected_nodes": [], "affected_edges": [], "abuse_path": ["a"],
                      "control_gap": "gap", "confidence": "medium", "missing_information": []}
@@ -99,7 +99,7 @@ class ThreatIdentificationTests(unittest.TestCase):
         result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD)
 
         self.assertEqual(result["status"], "partial")
-        self.assertEqual(result["missing_primary_codes"], ["LLM06"])
+        self.assertEqual(result["missing_primary_codes"], ["LLM03:2026"])
 
     @patch("app.services.llm_threat_identification.chat")
     def test_unavailable_when_ollama_down(self, chat_mock):
@@ -134,10 +134,10 @@ class ThreatIdentificationTests(unittest.TestCase):
         result = identify_threats("/tmp/app", {"Q2": ["x"]}, DETERMINISTIC, {}, DFD,
                                   {"LLM_THREAT_ID_CHUNK_SIZE": 1})
 
-        self.assertEqual(chat_mock.call_count, 2)  # LLM01 + LLM06 in separate calls
+        self.assertEqual(chat_mock.call_count, 2)  # LLM01:2026 + LLM03:2026 in separate calls
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["chunks_total"], 2)
-        self.assertEqual({t["code"] for t in result["identified_threats"]}, {"LLM01", "LLM06"})
+        self.assertEqual({t["code"] for t in result["identified_threats"]}, {"LLM01:2026", "LLM03:2026"})
         # identical secondary finding from both chunks is de-duplicated.
         self.assertEqual(len(result["suggested_secondary_findings"]), 1)
 

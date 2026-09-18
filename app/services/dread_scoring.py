@@ -225,16 +225,16 @@ def _impact_ceiling(idx):
 
 _DAMAGE_DRIVER = {
     # data-exposure risks: damage scales with sensitive data / secrets
-    "LLM02": "data", "LLM07": "data", "LLM08": "data",
+    "LLM02:2026": "data", "LLM08:2026": "data", "LLM09:2026": "data",
     "A04:2025": "data", "API1:2023": "data", "API3:2023": "data",
     # agency / action risks: damage scales with what the model can do
-    "LLM01": "agency", "LLM05": "agency", "LLM06": "agency",
+    "LLM01:2026": "agency", "LLM03:2026": "agency", "LLM10:2026": "agency",
     "A01:2025": "agency", "A05:2025": "agency",
     "API5:2023": "agency", "API6:2023": "agency", "API7:2023": "agency",
     # availability / resource-consumption risks
-    "LLM10": "availability", "API4:2023": "availability",
+    "LLM06:2026": "availability", "API4:2023": "availability",
     # integrity / poisoning risks
-    "LLM03": "integrity", "LLM04": "integrity",
+    "LLM04:2026": "integrity", "LLM05:2026": "integrity",
     "A03:2025": "integrity", "A08:2025": "integrity", "API10:2023": "integrity",
     # broken-auth (access) risks: damage from sensitive data OR agency
     "A07:2025": "access", "API2:2023": "access",
@@ -287,8 +287,8 @@ def _damage_driver(code, idx):
         if _sensitive_data(idx) and _high_agency(idx):
             return 3
         return 1 if not _sensitive_data(idx) and not _high_agency(idx) else 2
-    # generic: misinformation (LLM09) gets worse when responses drive decisions
-    if code.upper() == "LLM09":
+    # generic: misinformation (LLM07:2026) gets worse when responses drive decisions
+    if code.upper() == "LLM07:2026":
         if _has(idx, 39, "high impact"):
             return 3
         return 1 if _has(idx, 39, "informational use only") else 2
@@ -301,14 +301,14 @@ def _damage_driver(code, idx):
 # "unknown" is intentionally NOT a weak marker: an unknown answer means the
 # assessor is unsure, not that the control is absent -> it falls through to 2.
 _SAFEGUARD = {
-    "LLM01": (30, ("no safeguards",), ("context isolation", "instruction hierarchy", "detection", "scanning")),
-    "LLM05": (31, ("not validated",), ("schema validation", "human in the loop", "rule based")),
-    "LLM02": (32, ("no safeguards",), ("access controls", "scoped retrieval", "dlp", "content inspection", "redaction", "masking")),
-    "LLM07": (45, ("sensitive data such as api keys",), ("no access to secrets",)),
-    "LLM08": (36, ("no dedicated protection",), ("strongly protected",)),
-    "LLM10": (77, ("no effective limits",), ("anomaly detection",)),
-    "LLM04": (69, ("no dedicated protection",), ("strong write controls", "review")),
-    "LLM06": (80, ("no additional controls", "basic confirmation"), ("risk based approval", "step up")),
+    "LLM01:2026": (30, ("no safeguards",), ("context isolation", "instruction hierarchy", "detection", "scanning")),
+    "LLM02:2026": (32, ("no safeguards",), ("access controls", "scoped retrieval", "dlp", "content inspection", "redaction", "masking")),
+    "LLM03:2026": (80, ("no additional controls", "basic confirmation"), ("risk based approval", "step up")),
+    "LLM05:2026": (69, ("no dedicated protection",), ("strong write controls", "review")),
+    "LLM06:2026": (77, ("no effective limits",), ("anomaly detection",)),
+    "LLM08:2026": (45, ("sensitive data such as api keys",), ("no access to secrets",)),
+    "LLM09:2026": (36, ("no dedicated protection",), ("strongly protected",)),
+    "LLM10:2026": (31, ("not validated",), ("schema validation", "human in the loop", "rule based")),
     "API7:2023": (62, ("arbitrary urls", "internal addresses"), ("no arbitrary url", "only allowlisted")),
     "API4:2023": (77, ("no effective limits",), ("anomaly detection",)),
     "A05:2025": (66, ("no dedicated controls",), ("strict blocking", "allowlisting")),

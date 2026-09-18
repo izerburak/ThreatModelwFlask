@@ -172,7 +172,7 @@ def case(
 
 CASES = [
     case(
-        "TC-LLM01-POS-01", "LLM01", "Prompt Injection", "positive",
+        "TC-LLM01-POS-01", "LLM01:2026", "Prompt Injection", "positive",
         {"Q5": "Retrieved internal documents", "Q6": "Web URLs",
          "Q20": "Yes, through retrieved documents or memory", "Q30": "No safeguards",
          "Q84": "Yes, parsed and inserted with minimal validation"},
@@ -180,7 +180,7 @@ CASES = [
         ["Q20", "Q30", "Q84"], ["rag_retriever", "llm_gateway"],
     ),
     case(
-        "TC-LLM01-CTRL-01", "LLM01", "Prompt Injection", "control",
+        "TC-LLM01-CTRL-01", "LLM01:2026", "Prompt Injection", "control",
         {"Q5": "Direct user prompts", "Q6": "User text input only", "Q20": "No",
          "Q30": "Context isolation and instruction hierarchy controls",
          "Q84": "Yes, parsed with strict validation and normalization"},
@@ -188,21 +188,21 @@ CASES = [
         ["Q20", "Q30", "Q84"], [],
     ),
     case(
-        "TC-LLM01-UNK-01", "LLM01", "Prompt Injection", "unknown",
+        "TC-LLM01-UNK-01", "LLM01:2026", "Prompt Injection", "unknown",
         {"Q5": "Retrieved internal documents", "Q6": "Web URLs", "Q20": "Unknown",
          "Q30": "Unknown", "Q84": "Unknown"},
         DFD_PROMPT_INJECTION, ["needs_more_info"], "prompt_context_manipulation",
         ["Q20", "Q30", "Q84"], [],
     ),
     case(
-        "TC-LLM02-POS-01", "LLM02", "Sensitive Information Disclosure", "positive",
+        "TC-LLM02-POS-01", "LLM02:2026", "Sensitive Information Disclosure", "positive",
         {"Q24": ["Personally identifiable information (PII)", "API keys or credentials"],
          "Q32": "No safeguards", "Q47": "Logs contain full prompts and responses"},
         DFD_SENSITIVE_DATA, ["confirmed"], "sensitive_data_exposure",
         ["Q24", "Q32", "Q47"], ["llm_gateway", "log_store"],
     ),
     case(
-        "TC-LLM02-CTRL-01", "LLM02", "Sensitive Information Disclosure", "control",
+        "TC-LLM02-CTRL-01", "LLM02:2026", "Sensitive Information Disclosure", "control",
         {"Q24": "Personally identifiable information (PII)",
          "Q32": "DLP or content inspection mechanisms",
          "Q47": "Logs contain non-sensitive metadata only"},
@@ -210,13 +210,13 @@ CASES = [
         ["Q24", "Q32", "Q47"], [],
     ),
     case(
-        "TC-LLM02-UNK-01", "LLM02", "Sensitive Information Disclosure", "unknown",
+        "TC-LLM02-UNK-01", "LLM02:2026", "Sensitive Information Disclosure", "unknown",
         {"Q24": "Unknown", "Q32": "Unknown", "Q47": "Unknown"},
         DFD_SENSITIVE_DATA, ["needs_more_info"], "sensitive_data_exposure",
         ["Q24", "Q32", "Q47"], [],
     ),
     case(
-        "TC-LLM05-POS-01", "LLM05", "Improper Output Handling", "positive",
+        "TC-LLM10-POS-01", "LLM10:2026", "Improper Output Handling", "positive",
         {"Q21": ["HTML or rendered content", "Code or scripts"],
          "Q22": "Directly used in backend automation", "Q31": "Not validated",
          "Q64": "HTML/rich content without reliable sanitization",
@@ -225,7 +225,7 @@ CASES = [
         ["Q31", "Q64", "Q65", "Q66"], ["llm_gateway", "web_renderer", "backend_automation"],
     ),
     case(
-        "TC-LLM05-CTRL-01", "LLM05", "Improper Output Handling", "control",
+        "TC-LLM10-CTRL-01", "LLM10:2026", "Improper Output Handling", "control",
         {"Q21": "Plain text only", "Q22": "User-facing web interface",
          "Q31": "Rule-based or schema validation", "Q64": "Markdown with sanitization",
          "Q65": "No structured output drives downstream operations",
@@ -234,14 +234,14 @@ CASES = [
         ["Q31", "Q64", "Q65", "Q66"], [],
     ),
     case(
-        "TC-LLM05-UNK-01", "LLM05", "Improper Output Handling", "unknown",
+        "TC-LLM10-UNK-01", "LLM10:2026", "Improper Output Handling", "unknown",
         {"Q21": "Structured JSON", "Q22": "Directly used in backend automation",
          "Q31": "Unknown", "Q64": "Unknown", "Q65": "Unknown", "Q66": "Unknown"},
         DFD_OUTPUT, ["needs_more_info", "plausible"], "unsafe_output_handling",
         ["Q31", "Q65", "Q66"], [],
     ),
     case(
-        "TC-LLM06-POS-01", "LLM06", "Excessive Agency", "positive",
+        "TC-LLM03-POS-01", "LLM03:2026", "Excessive Agency", "positive",
         {"Q11": "Agent workflow", "Q12": ["Internal APIs", "Admin tools"],
          "Q15": ["Execute workflows or transactions", "Modify system configurations"],
          "Q16": "Yes, in business-critical actions", "Q44": "No separation of permissions"},
@@ -249,7 +249,7 @@ CASES = [
         ["Q12", "Q15", "Q16", "Q44"], ["llm_orchestrator", "tool_runtime", "admin_tool"],
     ),
     case(
-        "TC-LLM06-CTRL-01", "LLM06", "Excessive Agency", "control",
+        "TC-LLM03-CTRL-01", "LLM03:2026", "Excessive Agency", "control",
         {"Q11": "Basic logic", "Q12": "Search", "Q15": "Generate text responses only",
          "Q16": "No, human approval is always required",
          "Q44": "Granular permissions including admin or destructive actions"},
@@ -257,7 +257,7 @@ CASES = [
         ["Q15", "Q16", "Q44"], [],
     ),
     case(
-        "TC-LLM06-UNK-01", "LLM06", "Excessive Agency", "unknown",
+        "TC-LLM03-UNK-01", "LLM03:2026", "Excessive Agency", "unknown",
         {"Q11": "Agent workflow", "Q12": "Internal APIs", "Q16": "Unknown", "Q44": "Unknown"},
         DFD_AGENCY, ["needs_more_info"], "excessive_tool_or_workflow_agency",
         ["Q16", "Q44"], [],

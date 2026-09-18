@@ -1,0 +1,149 @@
+{
+  "source_pdf": "OWASP-GenAI-LLM-Top-10-2026-v1.0.pdf",
+  "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+  "license": "CC BY-SA 4.0",
+  "categories": 10,
+  "attack_scenarios": 63,
+  "mitigations": 96,
+  "common_risk_examples": 72,
+  "per_category": [
+    {
+      "code": "LLM01:2026",
+      "name": "Prompt Injection",
+      "source_pages": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "attack_scenarios": 9,
+      "mitigations": 11,
+      "common_risk_examples": 8
+    },
+    {
+      "code": "LLM02:2026",
+      "name": "Sensitive Information Disclosure",
+      "source_pages": [
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "attack_scenarios": 10,
+      "mitigations": 19,
+      "common_risk_examples": 7
+    },
+    {
+      "code": "LLM03:2026",
+      "name": "Excessive Agency",
+      "source_pages": [
+        23,
+        24,
+        25,
+        26
+      ],
+      "attack_scenarios": 1,
+      "mitigations": 9,
+      "common_risk_examples": 6
+    },
+    {
+      "code": "LLM04:2026",
+      "name": "Supply Chain",
+      "source_pages": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "attack_scenarios": 8,
+      "mitigations": 7,
+      "common_risk_examples": 7
+    },
+    {
+      "code": "LLM05:2026",
+      "name": "Data and Model Poisoning",
+      "source_pages": [
+        33,
+        34,
+        35,
+        36,
+        37
+      ],
+      "attack_scenarios": 9,
+      "mitigations": 12,
+      "common_risk_examples": 9
+    },
+    {
+      "code": "LLM06:2026",
+      "name": "Unbounded Consumption",
+      "source_pages": [
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "attack_scenarios": 8,
+      "mitigations": 10,
+      "common_risk_examples": 9
+    },
+    {
+      "code": "LLM07:2026",
+      "name": "Misinformation",
+      "source_pages": [
+        43,
+        44,
+        45
+      ],
+      "attack_scenarios": 7,
+      "mitigations": 10,
+      "common_risk_examples": 7
+    },
+    {
+      "code": "LLM08:2026",
+      "name": "Hidden Context Exposure",
+      "source_pages": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "attack_scenarios": 2,
+      "mitigations": 3,
+      "common_risk_examples": 5
+    },
+    {
+      "code": "LLM09:2026",
+      "name": "Vector and Embedding Weaknesses",
+      "source_pages": [
+        50,
+        51,
+        52,
+        53,
+        54
+      ],
+      "attack_scenarios": 3,
+      "mitigations": 6,
+      "common_risk_examples": 7
+    },
+    {
+      "code": "LLM10:2026",
+      "name": "Improper Output Handling",
+      "source_pages": [
+        55,
+        56,
+        57
+      ],
+      "attack_scenarios": 6,
+      "mitigations": 9,
+      "common_risk_examples": 7
+    }
+  ]
+}

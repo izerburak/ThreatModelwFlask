@@ -132,7 +132,7 @@ class ThreatPipelineIntegrationTests(unittest.TestCase):
                     "framework": "owasp_web", "evidence": [],
                 },
                 {
-                    "code": "LLM01", "name": "Prompt Injection",
+                    "code": "LLM01:2026", "name": "Prompt Injection",
                     "framework": "owasp_llm",
                     "evidence": [{"question": "Q2", "answer": "Public"}],
                 },
@@ -144,9 +144,9 @@ class ThreatPipelineIntegrationTests(unittest.TestCase):
 
         self.assertEqual(repaired["display_backfilled_count"], 1)
         self.assertEqual(risks["A01:2025"]["name"], "Broken Access Control")
-        self.assertEqual(risks["LLM01"]["risk_level"], "Unscored")
-        self.assertEqual(risks["LLM01"]["status"], "needs_more_info")
-        self.assertTrue(risks["LLM01"]["mitigations"])
+        self.assertEqual(risks["LLM01:2026"]["risk_level"], "Unscored")
+        self.assertEqual(risks["LLM01:2026"]["status"], "needs_more_info")
+        self.assertTrue(risks["LLM01:2026"]["mitigations"])
 
     def test_mitigation_cannot_add_new_risks(self):
         dfd = _dfd()

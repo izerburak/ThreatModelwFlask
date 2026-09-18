@@ -1,198 +1,515 @@
-# PROJE DEVİR NOTU — START HERE (güncelleme 2026-07-09)
+# PROJE DEVİR NOTU - GÜNCEL DURUM
 
-> Yeni bir makinede/Claude Code oturumunda devam ederken **önce bunu**, sonra `RQ.txt`
-> (kanonik GÜNCEL RQ seti; eski `RQ Ideas.txt` SİLİNDİ) ve `THESIS_PROJECT_CONTEXT.md`'yi oku.
-> **Faz: kod DONDU, TEZ YAZIMI sürüyor.**
-> ✅ `THESIS_PROJECT_CONTEXT.md` güncel V1 akışını yansıtıyor
-> (eski extraction/`llm_risk_review`/MS-TMT-STRIDE-GPT/82-soru içeriği tamamen çıkarıldı).
+Son doğrulama: **19 Eylül 2026**
 
-## TEZ RESMÎ KÜNYE (main.tex — Sabancı `sabanci-template`, OTORİTE)
-- **Title (EN):** *Automated Threat Modeling for LLM-Enabled Applications Using Local Large Language
-  Models and DREAD Risk Assessment*
-- **Başlık (TR):** *LLM-Destekli Uygulamalar için Yerel Büyük Dil Modelleri ve DREAD Risk
-  Değerlendirmesi Kullanarak Otomatik Tehdit Modelleme*
-- **Yazar:** Burak İzer · **Derece:** Master · **Program:** Cyber Security / Siber Güvenlik ·
-  **Enstitü:** Graduate School of Engineering and Natural Sciences
-- **Danışman:** Prof. Süha Orhun Mutluergil · **Jüri:** Assoc. Prof. Feyzullah Orçun Çetin,
-  Asst. Prof. Julio Hernandez-Castro · **Onay tarihi:** 01-06-2026
-- **Keywords (EN):** Threat modeling; LLM-enabled applications; Secure design; Automated DFD
-  generation; DREAD risk assessment; OWASP Top 10 (LLM/Web/API); LLM grounding; **LoRA-based
-  supervised fine-tuning**. → Fine-tune yöntemi = **LoRA** (SFT); anahtar kelime, ama merkezi RQ değil.
-- **Tez yapısı (main.tex `\import`):** `Chapters/Introduction/Chapter/Introduction` →
-  `Chapters/Chapter_2/Chapter/Chapter2` (background/related work) →
-  `Chapters/Metodology/Chapter/Metodology`; ardından bibliography + `Chapters/Chapter_2/Appendix/Appendix2`.
-  (Bu repo kökünde yalnız `thesis_intro_chapter1_v01.tex` var; asıl tez ağacı ayrı — muhtemelen Overleaf.)
+Repository: `C:\Users\user\Desktop\ThreatModelwFlask`
 
-**Resmî ABSTRACT (EN, ≤250 kelime — main.tex'ten):** Threat modeling provides significant value
-during secure design, yet existing approaches remain difficult to apply because they often require
-manual DFD construction, STRIDE expertise, and produce generic, weakly contextualized outputs —
-amplified for LLM-enabled apps that combine web, API, and LLM components with overlapping attack
-surfaces modeled through separate taxonomies. The thesis investigates a **deterministic-first,
-questionnaire-driven** workflow for the combined attack surface of **generic** LLM-enabled
-applications. A single adaptive **91-question** questionnaire drives automatic static DFD generation,
-unified OWASP Web/API/LLM candidate-risk mapping, and **reproducible DREAD** scoring without manual
-modeling. The deterministic layer is the authoritative core; a **constrained local LLM** only
-enriches with system-specific threat descriptions, abuse paths, control gaps, and actionable
-mitigations — it does not generate the DFD, compute severity, or introduce primary risks outside the
-candidate set. A grounding validator removes hallucinated codes / non-existent DFD references.
-Evaluation uses automatic structural metrics comparing deterministic fallback vs base local LLM vs an
-**optionally fine-tuned** local LLM (same inputs): DFD integrity, risk coverage, grounding validity,
-schema conformance, system-specificity, mitigation actionability, prevention of LLM-driven severity
-changes. Even without the LLM, the deterministic fallback guarantees a valid risk output.
-> ⚠️ **Tutarlılık:** abstract "optionally fine-tuned" ifadesini **değerlendirme** cümlesinde
-> kullanıyor — bu OK ve tutarlı (fine-tune deneysel/opsiyonel). "optionally fine-tuned"ı yalnız
-> **MAIN RQ**'dan çıkardık (intro §1.3); abstract'a dokunmaya gerek yok.
-> **Definition — "generic LLM-enabled applications":** not restricted to a single vertical
-> (healthcare/finance) but sharing web/API entry points, LLM orchestration, retrieval/memory, tool
-> use, external services, logging/monitoring.
+Branch: `master`
 
-## TEZ YAZIM DURUMU (2026-07-07)
-- **Bölüm 1 — Introduction: TASLAK YAZILDI** → `thesis_intro_chapter1_v01.tex` (motivasyon, 1.1
-  Problem, 1.2 Proposed Approach, 1.3 RQ'lar [Main + RQ1–RQ4], 1.4 Contributions [7 madde — 6.
-  sustainability update pipeline + 7. SFT dataset/fine-tuning eval eklendi], 1.5 Scope&Evaluation).
-  Citation'lar `% TODO-CITE` olarak işaretli. Açık borç: DREAD-seçimi intro'da motive edilmemiş
-  (STRIDE illüstratif; skorlama DREAD) — metodolojiye bırakılabilir.
-- **Metodoloji 3.1–3.6** drafted+verified (bkz. `THESIS_PROJECT_CONTEXT` companion notlar).
-- **Metodoloji 3.9 — "Model-Agnostic Local LLM Integration and Deterministic Resilience": YAZILDI**,
-  kodla doğrulandı, sıkıştırıldı (16→~12 paragraf + resilience tablosu). Küçük rötuş notu: fallback'te
-  deterministik mitigation her durumda iliştirilir (alternatif değil, taban).
-- **Sıradaki:** 3.7 DREAD bölümü; intro citation'larını doldur.
+Son commit: `bbb8504` - `Adding tests for base model` (17 Eylül 2026)
 
-## PROJE NEDİR
-Flask tabanlı, **deterministik-first, anket güdümlü** tehdit modelleme aracı — LLM-tabanlı
-uygulamalar için. Tek adaptif anketle OWASP **LLM + Web + API** risklerini birlikte:
-**BUL → EŞLE → SKORLA (DREAD) → MİTİGE**. Yerel LLM (Ollama) opsiyonel yardımcı katman. Master tezi.
+Bu dosya mevcut repository, güncel `RQ.txt`, tez PDF'si, datasetler, benchmark
+çıktıları ve çalışan testler birlikte incelenerek sıfırdan yazılmıştır. Eski handoff
+bilgileri geçersizdir.
 
-## ÇIKIŞ NOKTASI (motivasyon)
-Mevcut TM araçları (örn. Microsoft Threat Modeling Tool, illüstratif örnek) hem **kullanımı zor**
-(manuel DFD çizimi, STRIDE uzmanlığı, jenerik gürültü) hem **risk değerlendirmesinde zayıf** (her
-elemana şablon tehdit, bağlama duyarlı önceliklendirme yok). Asıl boşluk: LLM tabanlı uygulamalar
-aynı anda **Web + API + LLM** saldırı yüzeyini taşır, ama araçlar bunları ayrı taksonomi/akışlarla
-ele alır; domain-specific çözümler (örn. healthcare) generalize olmaz. Tool buna cevap: **tek anketle,
-birleşik, sisteme-yönelik, deterministik-first** bir akış.
-⚠️ **Değerlendirme İÇSEL** (deterministic vs base LLM vs fine-tuned) — **dış araç kıyası YOK** (MS TMT
-ve STRIDE GPT foil olarak DÜŞTÜ) ve **insan/uzman değerlendirmesi YOK** (kullanıcı test ettiremiyor);
-tüm metrikler otomatik/yapısal. Ayrıntı: `RQ.txt` (GÜNCEL RQ seti) + RQ DURUMU bölümü.
+## 1. Otorite sırası
 
-## GÜNCEL DURUM (working tree, 115/115 test geçiyor — V1 uncommitted)
-- Phases 1-4 + 91q DREAD migration + **V1 template-guided threat pipeline** (working tree'de, henüz
-  push edilmedi). Son commit `24a1e8b` "Local Developments".
-- **SKORLAMA = DETERMİNİSTİK DREAD** (`app/services/dread_scoring.py`). Her koda D/R/E/A/D (1-3),
-  toplam 5-15; risk seviyesi DREAD **ORTALAMASINDAN** türetilir (`level_from_average`):
-  **≥2.7 Critical / ≥2.2 High / ≥1.5 Medium / <1.5 Low** (eşdeğer total: 14-15 / 11-13 / 8-10 / 5-7).
-  Anket cevaplarından; her kural okuduğu soruyu belgeliyor (izlenebilir). `score_code` →
-  `block["band"] = level_from_average(average)` → `risk_level` HER ZAMAN buradan, ASLA LLM'den.
-- **LLM UÇTAN UCA AKIŞ (V1):** `pipeline_orchestrator.run_risk_analysis` →
-  1. DFD: `static_dfd_mapper.build_static_dfd_from_answers` (deterministik, LLM yok)
-  2. `discover_candidate_risks` (deterministik aday kodlar, `risk_catalog`, LLM yok)
-  3. `llm_threat_identification.identify_threats` (LLM/qwen3:8b, CHUNK'lı @ `LLM_THREAT_ID_CHUNK_SIZE`=10;
-     primary `code` enum ile deterministik adaylara kilitli, node/edge id'leri gerçek DFD'ye kilitli)
-  4. `threat_grounding_validator.validate_threats` (pure-Python: halüsinasyon id strip, aday-olmayan
-     kodu secondary'ye demote, unknown-only ≠ confirmed, değinilmeyen adayları `unaddressed_candidates`
-     olarak backfill)
-  5. `score_validated_threats` → deterministik DREAD (yukarıdaki)
-  6. `llm_mitigation_service.generate_mitigations` (LLM, BATCH'li @ `LLM_MITIGATION_BATCH_SIZE`=3,
-     best-effort; yoksa statik `OWASP_MITIGATIONS` fallback)
-- ⚠️ **Eski `llm_risk_review.py` (V0 tek-çağrılı review) 2026-07-02'de TAMAMEN SİLİNDİ** (dosya + testi +
-  `LEGACY_LLM_RISK_REVIEW_ENABLED` flag'i). Artık kodda yok.
-- Pipeline'dan **LLM EXTRACTION ÇIKARILDI** (`770f775`). **Garak backend de tamamen kaldırıldı.**
-  (Manuel/lab yolu `/api/reactflow/from-extract` **kasıtlı duruyor** — pipeline değil.)
-- ⚠️ **"Add Question" servisi 2026-07-03'te KALDIRILDI** (route `/add-question`, `add_question.html`,
-  nav linki, `save_utils.append_question_to_catalog`/`_append_question_to_flow`/`append_question_to_layer`).
-  Anket **91 soruda sabit**; çalışma-anında soru ekleme yolu bilinçli olarak yok (ortam bulanmasın).
-- Sistem **LLM olmadan da tam çalışır**: Ollama down / herhangi bir exception ⇒ 5-katmanlı fallback
-  zinciri orchestrator'ın catch-all'ında `_deterministic_risk_analysis`'e düşer ⇒ **her zaman geçerli
-  risks.json** (`pipeline_mode=deterministic_fallback` + `pipeline_warning` damgalı). DREAD hiçbir
-  koşulda LLM'e bağımlı değil.
+Çelişki olduğunda aşağıdaki sıra kullanılmalıdır:
 
-## MODEL-AGNOSTİK (tezin satış noktası)
-LLM katmanı tamamen model-bağımsız: `ollama_client.get_ollama_config` → `OLLAMA_MODEL` /
-`OLLAMA_HOST`. Model değiştirmek tek satır config; tüm threat-ID+mitigation katmanı kod değişmeden
-iyileşir. qwen3:8b base zayıf (uniform Critical→High) ama bu **modele özel, tasarıma değil**.
-Büyük/uzak model = base'de bile iyi sonuç. Deterministik guardrail'ler model-swap'i güvenli kılar
-(halüsinasyon geri gelmez). **LLM'i "zayıf" diye genelleme — qwen3:8b'ye özel.**
+1. Araştırma soruları ve deney niyeti için **`RQ.txt`**.
+2. Uygulamanın gerçek davranışı için **aktif kod ve testler**.
+3. Yeni deney datası için **`datasets/rq1_owasp31_survey/`** ve
+   **`datasets/owasp_llm_2026_official/`**.
+4. Yazılmış tez metninin durumunu görmek için
+   **`Automated_Threat_Modeling_for_LLM_Enabled_Applications_Using_Local_Large_Language_Models_and_DREAD_Risk_Assessment.pdf`**.
+5. `THESIS_PROJECT_CONTEXT.md`, eski `training/` dosyaları, eski pipeline koşuları
+   ve eski benchmark çıktıları yalnız tarihsel bağlamdır; güncel gerçeğin üzerinde
+   değildir.
 
-## FINE-TUNE (repo DIŞI, deneysel — DOKUNMA) — RQ2 & RQ4'ün ortak mekanizması
-> Not: fine-tuning artık tek bir RQ değil. **RQ2** = sabit bilgi setinde threat-ID etkinliğini
-> iyileştirme; **RQ4** = aynı fine-tune mekanizmasını update pipeline'dan gelen YENİ tehdit bilgisini
-> modele aktarmanın aracı olarak kullanma. İntroduction bu ikili rolü ayırıyor.
-VALAR HPC'de koşacak. **GÜNCEL dataset (2026-07-06) = görev-bölünmüş, chat-format** — `training/`
-altında (git'e yeni eklendi, untracked): `threatid_{3000,5000}.jsonl` (threat-ID görevi) +
-`mitigation_{3000,5000}.jsonl` (mitigation görevi). İkisi de **fine-tune-READY** (dedup düzeltildi,
-kayıtlar unique, 29 kod). ⚠️ **ESKİ `train_dread_{700,1500,2804}.json` ({input,output} risk-report
-seti) ARTIK OBSOLETE — kullanma.**
-- Fine-tune = iki LLM-destekli aşamayı (threat-ID + mitigation) deterministik-grounded artefaktlarla
-  **distile** etmek (base modelin "her şey Critical→High" çöküşünü düzeltmek). Base model yerelde
-  kalır; fine-tune remote, **karışma**.
-- Açık notlar: `secondary_findings=0`; dağılım Critical-ağırlıklı.
-- ⚠️ Dairesellik: değerlendirmede deterministik scorer'ı / aynı-dağılım etiketleri **gold-standard
-  olarak kullanma** → trivial. Fine-tune sadece **yapısal conformance** (schema/grounding/actionability/
-  system-specificity) + **held-out** ile ölçülür; "semantic kalite daha iyi" iddiası kapsam DIŞI
-  (insan değerlendirmesi yok). SFT'de olmayan held-out test tut. (bkz. [[project-sft-dataset]])
+## 2. Kısa yönetici özeti
 
-## RQ DURUMU (GÜNCEL SET — kanonik metin `RQ.txt`, revize 2026-07-09)
-> ⚠️ **2026-07-09 REFRAME:** RQ seti eski "deterministic-first pipeline + LLM ne katkı sağlar"
-> çerçevesinden **LLM-merkezli**e çevrildi (bkz. [[feedback-local-llm-is-headline]]). Şema = **Main +
-> RQ1–RQ4** (eski "RQ1 + RQ1.1–1.4" ve daha eski deterministic-first RQ1–RQ4 metni ARTIK OBSOLETE).
-> Eski RQ1 (unified pipeline) ve RQ3 (guardrail) artık **RQ değil, contribution** (intro §1.4).
-Master scope: **"bir açık vardı → tool ne ölçüde patchledi"**; "to what extent" kısmi/dürüst cevaba
-izin verir. **Dış araç kıyası + insan değerlendirmesi YOK** (bkz. ÇIKIŞ NOKTASI). Özet:
-- **MAIN:** To what extent can local Large Language Models improve the threat modeling process for
-  LLM-integrated systems?
-- **RQ1 (threat identification):** yerel LLM'ler, TM sürecinde LLM-entegre sistemlere karşı tehditleri
-  ne ölçüde tanımlayabiliyor?
-- **RQ2 (effectiveness improvement):** yerel LLM'lerin tehdit tanımlama etkinliği nasıl iyileştirilebilir?
-  *(Mekanizma = supervised fine-tuning / LoRA.)*
-- **RQ3 (mitigation generation):** yerel LLM'ler, tanımlanan tehditler için ne ölçüde ilgili mitigation
-  stratejileri üretebiliyor?
-- **RQ4 (sustainability — deneysel):** LLM-destekli TM aracı, ortaya çıkan yeni saldırı vektörleri ve
-  değişen tehdit örüntüleriyle nasıl güncel tutulabilir? *(Güvenilir kaynaklardan gelen yeni tehdit/
-  mitigation bilgisini görev-özel eğitim verisine çevirip yerel LLM'i periyodik güncelleyen update
-  pipeline; grounding/traceability/reproducibility korunarak.)*
-RQ1 & RQ3 = taşıyıcı (inşa edildi, otomatik ölçülebilir). RQ2 & RQ4 = fine-tuning'e dayanan deneysel
-frontier (uzaktaki VALAR fine-tune; RQ2 = sabit bilgi setinde kalite, RQ4 = fine-tune'u YENİ bilgi
-aktarımının aracı olarak kullanma). Eski RQ metni için `git log` / önceki commit'ler.
+- Uygulama çalışan, testli ve deterministic-first bir Flask tehdit modelleme
+  pipeline'ıdır.
+- Anket 91 sorudur ve iki soru veritabanı birebir aynıdır.
+- Aktif LLM kataloğu **OWASP GenAI LLM Top 10:2026** sürümüne geçirilmiştir.
+- Web kataloğu **OWASP Web Top 10:2025**, API kataloğu **OWASP API Security
+  Top 10:2023** olarak kalmıştır.
+- Güncel RQ1 bootstrap dataseti hazırdır: **31 sınıf x 50 = 1.550 kayıt**.
+- OWASP LLM 2026 PDF'sinden ayrıca **63 resmî saldırı senaryosu, 72 yaygın risk
+  örneği ve 96 mitigation** çıkarılmıştır.
+- Tüm testler geçmektedir: **134/134**.
+- Tez PDF'si 85 sayfa ve tüm ana bölümleri içerir; ancak araştırma soruları,
+  dataset açıklaması ve Results bölümü güncel proje durumunun gerisindedir.
+- Tezdeki 500/1000/1500 fine-tuning sonuçları yeni RQ1 dataseti için geçerli
+  sonuçlar değildir. Bunlar eski 2025 LLM kodlu task-output datasetlerine dayanır.
+- Yeni dataset ile vanilla-vs-LoRA deneyi henüz koşulmamıştır. RQ1 açısından
+  dataset hazırlığı tamam, esas deney ve raporlama beklemektedir.
 
-## YENİ PC KURULUMU (temiz aktarım)
-1. Repoyu klonla/kopyala. Python 3.12 (mevcut makinede 3.12).
-2. venv: `python -m venv venv-win` → `venv-win\Scripts\activate` (Windows) veya `venv/bin/activate`.
-3. `pip install -r requirements.txt` (saf Flask; LLM için ekstra Python paketi YOK — `ollama_client`
-   düz HTTP/urllib kullanır. Frontend DFD editörü CDN'den React/React Flow çeker, npm adımı yok).
-4. **Uygulamayı çalıştır:** `python run.py` → http://127.0.0.1:5000 (Flask debug). Anket = `/llm_sec`,
-   pipeline = `/pipeline`, risk çıktısı = `/risk`.
-5. **LLM (opsiyonel):** Ollama'yı ayrıca kur, `ollama pull qwen3:8b`, servis 127.0.0.1:11434'te ayakta
-   olsun. Model/host değiştirmek için env: `OLLAMA_MODEL`, `OLLAMA_HOST`. **Ollama olmasa da araç tam
-   çalışır** (deterministik fallback). Diğer tunable env'ler: `LLM_REQUEST_TIMEOUT`=400,
-   `LLM_THREAT_ID_CHUNK_SIZE`=10, `LLM_MITIGATION_BATCH_SIZE`=3, flag'ler `app/__init__.py`'de.
-6. **Durum JSON dosyalarında:** `responses/` (gitignored), `pipelines/`, `generated_models/dfd_runs/`.
-   DB yok. Kanonik anket: `app/questions/questionsDb.json` (91 soru), akış `TM-Questions/QaT.txt`.
+## 3. Güncel araştırma soruları
 
-## DOĞRULAMA (testler)
-Testler **unittest** (pytest DEĞİL). `tests/` içinde `__init__.py` YOK → importlib ile
-`tests/test_*.py` yükleniyor. Çalıştır: **`python -m unittest discover -s tests -q`**. Şu an
-**115/115 geçiyor**. Hızlı duman testi: `python -c "import app; app.create_app(); print('OK')"`.
+`RQ.txt` kanonik kaynaktır. Mevcut set şöyledir:
 
-## SON VERİFİKASYONLAR (2026-06-14 oturumu)
-- Trial run `pipelines/20260614...-Codex-Trial-Public-RAG-Support/risks.json`: DREAD çıktısı
-  **geçerli ve tutarlı** (30 risk, değerler 1-3, total=toplam, band=risk_level). Dağılım bu run'da
-  High16/Medium14 (E/A/Dc sistem-maruziyeti sabit → tek senaryoda bant dar; geniş dağılım
-  senaryolar-arası bir özellik).
-- `risks.json` 23k satır = **bug değil**; aynı 30 riski 4 görünümde tutan verbose şema
-  (`mapped_risks` + `mapped_risks_by_framework` + `owasp_llm/web/api` + `unified_risks`) +
-  pretty-print. Redundancy zararsız; frontend tam test edilemediği için **sadeleştirilmedi** (bilerek).
+### RQ1 - Effectiveness improvement
 
-## YARIM / SIRADAKİ
-- **Akış DONDU — sıra TEZ YAZIMINDA** (2026-07-03). V1 pipeline working tree'de, testler yeşil.
-  Kod commit'i **kullanıcıda** (push'u da hep kullanıcı yapar).
-- Değerlendirme protokolünü yaz: her RQ → hangi deney → hangi otomatik metrik → hangi tablo (dış
-  araç/insan yok; deterministic vs base LLM vs fine-tuned, çok-koşum + varyans).
-- RQ1 için soru→OWASP eşlemesi hand-tagged → CWE/ASVS/ATLAS grounding + traceability matrisi (future
-  work olarak da yazılabilir).
-- Fine-tune'u VALAR'da koşmak (repo dışı, RQ2 & RQ4 — deneysel uzantı; sonuçsuz çıkarsa future work).
-- (Minör, tez-opsiyonel) orchestrator catch-all fallback + JSON-parse-error yolu için doğrudan
-  unit test yok; `.env.example`/`config.py` yok (flag'ler `app/__init__.py` + env).
+**How can local LLM threat-identification effectiveness be improved?**
 
-## ÇALIŞMA TARZI NOTLARI (önceki oturumdan)
-- LLM'i zayıf diye genelleme (model-agnostik; qwen3:8b'ye özel).
-- Master tezi — PhD-seviyesi exhaustive kanıt dayatma; "ne ölçüde" kısmi cevaba izin verir.
-- Üretilmiş artifact'ler (pipelines/, generated_models/) git'te tracked; yeni run'lar untracked düşer.
+Ana deney: aynı sabit model/prompt üzerinde vanilla ve LoRA fine-tuned modelin
+tehdit sınıflandırma performansını karşılaştırmak. Güncel kontrollü etiket uzayı:
+OWASP LLM 2026 + Web 2025 + API 2023 + `NO_THREAT`.
+
+### RQ2 - Mitigation generation
+
+**To what extent can local LLMs generate relevant mitigation strategies?**
+
+RQ1'e benzer vanilla/fine-tuned karşılaştırma yapılacak; ancak mitigation çıktısı
+tek etiket sınıflandırması değildir. Senaryo, control gap ve uygulanabilir kontrol
+arasındaki ilişki korunmalıdır.
+
+### RQ3 - Sustainability / extraction fidelity
+
+**Given an unstructured threat source (CVE description, vendor advisory, CTI
+report), how accurately can the system extract structured threat entities (asset,
+attack vector, technique, impact) and map them onto an existing threat taxonomy
+(STRIDE, CAPEC, MITRE ATT&CK)?**
+
+### RQ4 - Sustainability / model consistency over time
+
+**As threats are added incrementally, does the threat model remain internally
+consistent (no duplicate/contradictory nodes, correct risk re-scoring, no drift
+from the original architecture) compared to a full from-scratch rebuild?**
+
+### Tez PDF'siyle uyuşmazlık
+
+Tez PDF'sindeki Section 1.3 hâlâ şu eski yapıyı kullanır:
+
+- RQ1: threat identification capability,
+- RQ2: effectiveness improvement,
+- RQ3: mitigation generation,
+- RQ4: genel sustainability/update pipeline.
+
+Bu nedenle tez PDF'sindeki RQ numaraları ve RQ'lara verilen cevaplar güncel
+`RQ.txt` ile eşleşmez. Yeni yazımda `RQ.txt` esas alınmalı ve Abstract,
+Introduction 1.3, Contributions, Scope, Methodology, Results, Discussion ve
+Conclusion birlikte güncellenmelidir. Sadece RQ başlıklarını değiştirmek yeterli
+değildir.
+
+## 4. Tezin mevcut yazılı durumu
+
+İncelenen PDF:
+`Automated_Threat_Modeling_for_LLM_Enabled_Applications_Using_Local_Large_Language_Models_and_DREAD_Risk_Assessment.pdf`
+
+- 85 sayfa, A4, derlenme tarihi 10 Temmuz 2026.
+- Kapak, Abstract/Özet, Introduction, Background, Methodology, Results,
+  Discussion and Conclusion, Bibliography ve Appendix mevcut.
+- Approval sayfasındaki tarih: **17 Temmuz 2026**.
+- Repository içinde güncel TeX kaynak ağacı bulunmuyor. PDF'nin kaynakları başka
+  yerde/Overleaf'te tutuluyor olmalı. Tez değişiklikleri bu repository'de doğrudan
+  yapılamaz; güncel kaynak ağacı ayrıca temin edilmelidir.
+
+### PDF'de iyi durumda olan bölümler
+
+- 91 soruluk questionnaire-driven yaklaşım açık anlatılmış.
+- Deterministik DFD, candidate mapping, grounding validator ve DREAD ayrımı net.
+- LLM'nin DFD üretmediği ve severity hesaplamadığı doğru biçimde belirtilmiş.
+- Local LLM threat identification ve mitigation rolleri metodolojik olarak
+  sınırlandırılmış.
+- Fine-tuning sonuç grafiklerinin PDF yerleşimi okunaklı ve görsel olarak sağlam.
+
+### PDF'de güncellenmesi gereken kritik noktalar
+
+1. **Araştırma soruları eski.** Section 1.3 ve RQ referanslı tüm bölümler güncel
+   `RQ.txt` ile yeniden hizalanmalı.
+2. **OWASP LLM sürümü açıkça 2026'ya sabitlenmeli.** Aktif kod ve yeni dataset
+   `LLMxx:2026` kullanırken eski eğitim dosyaları bare `LLM01`-`LLM10` kodlarını
+   kullanıyor.
+3. **Section 3.10 ve Chapter 4'teki fine-tuning deneyi artık güncel RQ1 deneyini
+   temsil etmiyor.** Yeni 31-sınıflı dataset sınıflandırma odaklıdır; mevcut tez
+   sonuçları ise pipeline-format threat-ID/mitigation üretimini ölçmektedir.
+4. **500/1000/1500 sonuçları yeniden değerlendirilmeden nihai kanıt olarak
+   kullanılmamalı.** Repository'de training scripti, W&B exportu veya ham metric
+   logları yoktur; yalnız `ft_commands.txt`, eski datasetler ve PDF'ye gömülü
+   grafikler vardır. Sonuçlar mevcut repository'den tekrar üretilemiyor.
+5. **Mitigation training datasında tekrar problemi var.** Eski mitigation
+   dosyalarının benzersiz satır sayıları 500 için 329, 1000 için 552, 1500 için
+   777'dir. Bu durum mevcut mitigation learning curve yorumlarını zayıflatır.
+6. **Bibliography nihai değil.** Çok sayıda kaynakta PDF içinde doğrudan
+   `Metadata incomplete`, `should be verified`, `unknown` ve `n.d.` notları
+   görünmektedir. Teslimden önce bütün bibliyografik metadata doğrulanmalıdır.
+7. Results bölümü yeni RQ3 extraction fidelity ve RQ4 incremental consistency
+   deneylerini içermiyor.
+
+## 5. Uygulamanın güncel teknik durumu
+
+### Ana pipeline
+
+Akış:
+
+1. 91 soruluk adaptif questionnaire,
+2. deterministic static DFD,
+3. deterministic OWASP candidate-risk mapping,
+4. local LLM threat identification,
+5. pure-Python grounding validation,
+6. deterministic DREAD scoring,
+7. local LLM mitigation generation,
+8. LLM başarısızsa deterministic fallback.
+
+Temel servisler:
+
+- `app/services/pipeline_orchestrator.py`
+- `app/services/static_dfd_mapper.py`
+- `app/services/risk_catalog.py`
+- `app/services/llm_threat_identification.py`
+- `app/services/threat_grounding_validator.py`
+- `app/services/dread_scoring.py`
+- `app/services/llm_mitigation_service.py`
+- `app/services/risk_analysis_service.py`
+
+Varsayılan local model `qwen3:8b`'dir. Model `OLLAMA_MODEL`, host
+`OLLAMA_HOST` ile değiştirilebilir. Threat-ID chunk boyutu 10, mitigation batch
+boyutu 3, varsayılan LLM timeout 400 saniyedir.
+
+### OWASP sürümleri
+
+- LLM: **2026**, kodlar `LLM01:2026` ... `LLM10:2026`.
+- Web: **2025**, kodlar `A01:2025` ... `A10:2025`.
+- API: **2023**, kodlar `API1:2023` ... `API10:2023`.
+
+2026 LLM anlam sırası:
+
+| Kod | Kategori |
+|---|---|
+| `LLM01:2026` | Prompt Injection |
+| `LLM02:2026` | Sensitive Information Disclosure |
+| `LLM03:2026` | Excessive Agency |
+| `LLM04:2026` | Supply Chain |
+| `LLM05:2026` | Data and Model Poisoning |
+| `LLM06:2026` | Unbounded Consumption |
+| `LLM07:2026` | Misinformation |
+| `LLM08:2026` | Hidden Context Exposure |
+| `LLM09:2026` | Vector and Embedding Weaknesses |
+| `LLM10:2026` | Improper Output Handling |
+
+Numaralar 2025'ten 2026'ya mekanik olarak taşınmamalıdır. Örneğin Excessive
+Agency `LLM06` iken 2026'da `LLM03:2026`; Improper Output Handling `LLM05`
+iken 2026'da `LLM10:2026` olmuştur.
+
+### Questionnaire doğrulaması
+
+- `app/questions/questionsDb.json`: 91 soru.
+- `TM-Questions/questionsDb.json`: 91 soru.
+- İki dosyanın SHA-256 hash'i aynıdır:
+  `64d8fde4fb8afd75b4be17bdcad4b8685e636ce6ec8215007852307f9e551aab`.
+- `TM-Questions/QaT.txt`: 91 adet `Q<number>` akış düğümü.
+
+### Test durumu
+
+Komut:
+
+```powershell
+python -m unittest discover -s tests -q
+```
+
+Son sonuç: **134 test, tamamı geçti**.
+
+## 6. Dataset envanteri ve kararlar
+
+### 6.1 Güncel RQ1 dataseti - kullanılacak
+
+Klasör: `datasets/rq1_owasp31_survey/`
+
+Ana dosya: `owasp31_survey_single_label.jsonl`
+
+- 31 sınıf.
+- Her sınıf 50 örnek.
+- Toplam 1.550 kayıt.
+- 10 LLM 2026 + 10 Web 2025 + 10 API 2023 + `NO_THREAT`.
+- Train: 1.085.
+- Validation: 155.
+- Test: 310.
+- Her sınıf için 35/5/10 split.
+- 1.550 benzersiz ID ve 1.550 benzersiz `input_text`.
+- Scenario group'lar split'ler arasında kesişmiyor.
+- Aynı soru desenini güvenli cevaplarla aynalayan `NO_THREAT` hard negative'leri
+  mevcut.
+- Bütün kayıtlar `human_validated=false`.
+
+Bu dataset **LoRA bootstrap deneyi için teknik olarak hazırdır**, fakat uzman
+onaylı gerçek-world ground truth değildir. Tezde `survey-grounded synthetic
+bootstrap dataset` olarak adlandırılmalıdır.
+
+Önemli sınırlamalar:
+
+- Tek etiket yaklaşımı Web/API/LLM örtüşmelerini sadeleştirir.
+- Soru metinleri bazı kategori adlarını veya güçlü ipuçlarını taşır; yüksek
+  in-distribution skor genelleme kanıtı değildir.
+- Harici, farklı dille yazılmış ve eğitim üretiminden bağımsız bir test seti
+  olmadan gerçek dünya başarısı iddia edilmemelidir.
+- `A06:2025` datasette vardır; aktif app candidate catalogunda ayrı risk satırı
+  değildir. Sınıflandırma deneyiyle uygulama pipeline çıktısı karıştırılmamalıdır.
+
+### 6.2 OWASP LLM 2026 resmî kaynak havuzu - kullanılacak
+
+Klasör: `datasets/owasp_llm_2026_official/`
+
+- `official_attack_scenarios.jsonl`: 63 resmî saldırı senaryosu.
+- `official_common_risk_examples.jsonl`: 72 resmî risk örneği.
+- `official_mitigations.jsonl`: 96 resmî mitigation maddesi.
+- `official_llm2026_catalog.json`: kategori bazlı tam çıkarım.
+- Toplam 231 benzersiz kaynak kaydı, 10 LLM 2026 etiketi.
+- Kaynak sayfaları, resmî URL ve CC BY-SA 4.0 lisansı kayıtlıdır.
+- Extraction scripti deterministiktir; yeniden üretimde hash'ler aynı kalmıştır.
+
+Bu dosyalar doğrudan nihai scenario-to-mitigation çiftleri değildir. Bir
+kategorinin bütün mitigation'ları o kategorideki her senaryoya otomatik olarak
+uygulanmamalıdır. Önce scenario control gap'i belirlenmeli, ilgili mitigation
+seçilmeli ve eşleştirme gözden geçirilmelidir.
+
+### 6.3 Eski `training/` datasetleri - yeni deneyde kullanılmayacak
+
+Dosyalar:
+
+- `training/threatid_{500,1000,1500}.jsonl`
+- `training/mitigation_{500,1000,1500}.jsonl`
+
+Durum:
+
+- Bare 2025 LLM kodlarını kullanırlar; `LLMxx:2026` içermezler.
+- 29 risk kodlu eski pipeline-output görev formatındadırlar.
+- Threat-ID dosyalarında satırlar benzersizdir; mitigation dosyalarında yoğun
+  tekrar vardır.
+- Tez PDF'sindeki mevcut learning curves bu dataset ailesine aittir.
+- Tarihsel kanıt olarak saklanabilirler; yeni RQ1/RQ2 deneyinde girdi olarak
+  kullanılmamalıdırlar.
+
+| Dosya | Satır | Benzersiz satır |
+|---|---:|---:|
+| `threatid_500.jsonl` | 500 | 500 |
+| `threatid_1000.jsonl` | 1.000 | 1.000 |
+| `threatid_1500.jsonl` | 1.500 | 1.500 |
+| `mitigation_500.jsonl` | 500 | 329 |
+| `mitigation_1000.jsonl` | 1.000 | 552 |
+| `mitigation_1500.jsonl` | 1.500 | 777 |
+
+## 7. RQ bazında gerçek ilerleme
+
+### RQ1 - Dataset hazır, deney bekliyor
+
+Hazır olanlar:
+
+- 31 sınıflı 1.550 kayıtlık dataset.
+- Grup güvenli train/validation/test split.
+- `NO_THREAT` hard negative dengesi.
+- Aktif app kodlarının LLM 2026'ya taşınması.
+- Base-model pilot benchmark scriptlerinin 2026 kodlarına güncellenmesi.
+
+Eksik olanlar:
+
+- Seçilen vanilla modelin yeni test split'inde baseline sonucu.
+- Aynı modelin LoRA fine-tune koşusu.
+- Sabit prompt/decoding ile adil karşılaştırma.
+- Accuracy yanında macro/micro F1, sınıf bazlı precision/recall/F1, confusion
+  matrix ve `NO_THREAT` false-positive analizi.
+- Mümkünse confidence skoru varsa PR/ROC; yoksa zorla üretilmemeli.
+- En az bir bağımsız external test set.
+- Seed'ler ve run metadata ile tekrarlanabilir deney kaydı.
+
+Not: RQ1'in güncel tanımı tek etiket threat classification deneyine uygundur.
+Eski tezdeki uzun structured threat report generation metriği RQ1'in yerine
+geçmez; ayrı bir pipeline-conformance deneyi olarak tutulabilir.
+
+### RQ2 - Kaynak mitigation havuzu hazır, supervised pair set hazır değil
+
+Hazır olanlar:
+
+- OWASP LLM 2026'dan 96 resmî mitigation.
+- Eski mitigation generation promptu ve pipeline servisi.
+- Mitigation JSON şeması, target component, validation step ve evidence mapping
+  alanları.
+
+Eksik olanlar:
+
+- Senaryo/control-gap -> doğru mitigation eşleştirmeleri.
+- Uygulanamaz veya yanlış mitigation negatifleri.
+- Train/validation/test split ve leakage kontrolü.
+- Vanilla vs fine-tuned mitigation benchmarkı.
+- `relevance` için savunulabilir gold label veya insan değerlendirme protokolü.
+
+Eski mitigation datasetinin tekrar problemi çözülmeden mevcut sonuçlar RQ2
+kanıtı olarak kullanılmamalıdır.
+
+### RQ3 - Extraction prototipi var, fidelity deneyi yok
+
+Hazır olanlar:
+
+- `/sustainability` arXiv cs.CR taraması.
+- Keyword filtreleme ve strong-candidate seçimi.
+- Seçili arXiv abstract/full-text veya elle yapıştırılan metin için extraction UI.
+- `paper-extraction.v1` JSON schema.
+- Attack surface, mitigation ve source-exact evidence quote çıkarımı.
+- Evidence quote'un kaynakta gerçekten bulunduğunu ve mitigation referanslarının
+  geçerli attack-surface ID'lerine bağlandığını doğrulayan local validator.
+- JSON ve chat-format JSONL export.
+- Unit testler.
+
+Sınırlamalar:
+
+- Yalnız OpenAI provider adapterı uygulanmış; local model extraction benchmarkı
+  yok.
+- Canlı API başarısı bu oturumda doğrulanmadı; testler mock provider kullanıyor.
+- `sustainability/extractions/` altında gerçek kaydedilmiş extraction run'ı yok.
+- Güncel schema RQ3'teki asset/attack vector/technique/impact ve
+  STRIDE/CAPEC/MITRE ATT&CK mapping alanlarının tamamını içermiyor.
+- İnsan-annotated gold set, precision/recall/F1 ve taxonomy-mapping accuracy
+  deneyi yok.
+
+Dolayısıyla bu modül RQ3 için başlangıç prototipidir, RQ3 sonucu değildir.
+
+### RQ4 - Deney taslağı var, uygulama/sonuç yok
+
+Mevcut pipeline aynı questionnaire için deterministic DFD ve DREAD üretebilir;
+bu RQ4 deneyinin kontrol temelini sağlar. Fakat incremental threat update ile full
+rebuild karşılaştırmasını otomatik yürüten bir deney harness'i ve sonuç dosyası
+yoktur.
+
+Gerekli deney:
+
+1. Başlangıç threat seti ve zaman sıralı yeni-threat paketleri tanımla.
+2. Her adımda incremental update modeli ile sıfırdan rebuild modelini aynı
+   architecture input üzerinde çalıştır.
+3. Duplicate/contradictory node ve threat sayısı, DFD node/edge drift'i,
+   candidate-risk farkı, DREAD re-score doğruluğu ve eski sınıflarda forgetting
+   ölç.
+4. Daha önce görülmeyen yeni threat setinde kazanımı ayrıca ölç.
+5. Bütün adımlarda aynı split ailesini ve kaynak sürümünü koru.
+
+## 8. Base-model pilot benchmark durumu
+
+`LLM-Selection/` altında 11 Eylül 2026 tarihli 3B model pilotu bulunur:
+
+- qwen2.5 3B,
+- llama3.2 3B,
+- ministral-3 3B.
+
+Pilot 15 vaka x 3 tekrar kullanır ve eski LLM kod adlandırmasına dayanır. Sonuçta
+Qwen timeout yaşamış; Ministral strict macro-F1 kuralıyla provisional winner,
+Llama ise en iyi operasyonel profile sahip görünmüştür. Bu sonuç yalnız pilot
+olarak kullanılmalıdır; 15 benzersiz vaka genel model seçimi için yeterli değildir.
+
+Aktif benchmark scriptleri 2026 kodlarına taşınmıştır, fakat 16 Eylül tarihli
+root metadata dosyasının yanında tamamlanmış yeni JSONL/summary bulunmamaktadır.
+Bu nedenle 2026 migration sonrası benchmark tamamlanmış sayılmamalıdır.
+
+## 9. Saklanan artifactlerin sürüm durumu
+
+- `pipelines/20260627...` koşuları başarılı tarihsel pipeline artifactleridir.
+- Bu koşular bare `LLM01`-`LLM10` kodlarını taşır ve LLM 2026 migration öncesidir.
+- Güncel kod davranışının kanıtı olarak kullanılmadan önce aynı senaryo yeniden
+  çalıştırılmalıdır.
+- Eski benchmark ve pipeline JSON'ları silinmemelidir; tarihsel karşılaştırma için
+  tutulabilir, fakat sonuç tablolarında sürümü açıkça belirtilmelidir.
+
+## 10. Öncelikli yapılacaklar
+
+1. **RQ setini tez kaynaklarında güncelle.** Abstract'tan Conclusion'a kadar RQ
+   numaralarını ve iddiaları yeniden hizala.
+2. **Yeni RQ1 deneyini koş.** Vanilla baseline -> LoRA -> aynı held-out test ->
+   precision/recall/F1/confusion matrix/false positives.
+3. **External test set hazırla.** OWASP resmî senaryoları kullanılabilir; ancak
+   bunlardan üretilen paraphrase'ler aynı scenario group içinde tutulmalı ve
+   train-test sızıntısı yapılmamalıdır.
+4. **RQ2 pairing dataseti oluştur.** Her scenario için control gap ve gerçekten
+   ilgili mitigation seç; uzman/onay statüsünü kaydet.
+5. **RQ3 schema ve benchmarkı RQ metnine göre genişlet.** Asset, attack vector,
+   technique, impact ve taxonomy mappings ekle; gold extraction seti oluştur.
+6. **RQ4 experiment harness'i yaz.** Incremental update ile full rebuild'i aynı
+   kaynak snapshotları üzerinde karşılaştır.
+7. **OWASP migration sonrası yeni pipeline ve model benchmark koşuları üret.**
+8. **Tez Chapter 4'ü gerçek yeni deney sonuçlarıyla değiştir.** Eski learning
+   curves yeni RQ1/RQ2 kanıtı olarak bırakılmamalıdır.
+9. **Bibliography metadata'yı temizle.** PDF'de görünen placeholder notların hiçbiri
+   final teslimde kalmamalıdır.
+10. **Reproducibility paketi ekle.** Training scripti/config, random seed, exact
+    base model revision, tokenizer, hardware, split hashes ve ham metric exportları
+    repository'de veya tez ekinde bulunmalıdır.
+
+## 11. Kurulum ve doğrulama
+
+```powershell
+python -m venv venv-win
+venv-win\Scripts\Activate.ps1
+pip install -r requirements.txt
+python run.py
+```
+
+Uygulama: `http://127.0.0.1:5000`
+
+Önemli sayfalar:
+
+- Survey: `/llm_sec`
+- Pipeline: `/pipeline`
+- Risk sonucu: `/risk`
+- Sustainability scanner: `/sustainability`
+- Paper extraction: `/sustainability/extract`
+
+Local LLM için Ollama ayrıca kurulmalıdır. Varsayılan model `qwen3:8b`'dir.
+Paper extraction için server environment'ta `OPENAI_API_KEY` gerekir; anahtar UI'ya
+yazılmamalıdır.
+
+Test:
+
+```powershell
+python -m unittest discover -s tests -q
+```
+
+Beklenen güncel sonuç: **134 test, OK**.
+
+## 12. Working tree uyarısı
+
+Working tree temiz değildir. Güncel değişiklikler arasında:
+
+- `RQ.txt`,
+- OWASP LLM 2026 catalog/scoring/template değişiklikleri,
+- benchmark scriptlerinin 2026 kodlarına taşınması,
+- ilgili test güncellemeleri,
+- yeni `datasets/` klasörü,
+- OWASP LLM 2026 PDF'si
+
+bulunmaktadır. Kullanıcının mevcut değişiklikleri korunmalıdır. `git reset --hard`
+veya toplu geri alma yapılmamalıdır. Commit/push kullanıcı kararıdır.
+
+## 13. Tezde güvenle yapılabilecek ve yapılamayacak iddialar
+
+### Güvenli iddialar
+
+- Sistem 91 soruluk questionnaire'dan deterministic DFD ve OWASP candidate set
+  üretir.
+- DREAD severity LLM tarafından değil deterministik kurallarla hesaplanır.
+- LLM çıktısı gerçek DFD ID'leri ve candidate codes ile sınırlandırılır ve local
+  validator tarafından kontrol edilir.
+- LLM olmadan deterministic fallback geçerli risk artifacti üretebilir.
+- Güncel RQ1 dataseti dengeli, grup güvenli ve tekrar içermeyen sentetik bootstrap
+  datasettir.
+- OWASP LLM 2026 kaynak havuzu resmî PDF'ye izlenebilirdir.
+
+### Şimdilik yapılmaması gereken iddialar
+
+- Fine-tuning'in yeni RQ1 datasetinde başarıyı artırdığı.
+- 1.550 sentetik kaydın gerçek dünya tehdit sınıflandırmasını kanıtladığı.
+- Mitigation'ların uzman düzeyinde doğru veya ilgili olduğu.
+- RQ3 extraction'ın insan anotasyonuna göre yüksek fidelity sağladığı.
+- Incremental update'in full rebuild kadar tutarlı olduğu.
+- Temmuz PDF'sindeki 500/1000/1500 grafiklerinin güncel deney setini temsil ettiği.
+- Eski LLM 2025 artifactlerinin LLM 2026 ile doğrudan karşılaştırılabilir olduğu.
+
+## 14. Hızlı başlangıç - bir sonraki oturum
+
+Bir sonraki çalışma şu sırayla başlamalıdır:
+
+1. `HANDOFF.md` ve `RQ.txt` oku.
+2. `datasets/rq1_owasp31_survey/README.md` ve
+   `datasets/owasp_llm_2026_official/README.md` oku.
+3. `python -m unittest discover -s tests -q` çalıştır.
+4. RQ1 vanilla baseline için seçilecek model ve evaluation scriptini sabitle.
+5. Aynı split ve promptla vanilla sonucu üretmeden LoRA eğitimine başlama.
+6. Her deney çıktısına dataset hash'i, model revision, seed, command ve timestamp
+   yaz.
