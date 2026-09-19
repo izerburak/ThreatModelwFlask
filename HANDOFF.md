@@ -42,8 +42,9 @@ bilgileri geçersizdir.
   dataset açıklaması ve Results bölümü güncel proje durumunun gerisindedir.
 - Tezdeki 500/1000/1500 fine-tuning sonuçları yeni RQ1 dataseti için geçerli
   sonuçlar değildir. Bunlar eski 2025 LLM kodlu task-output datasetlerine dayanır.
-- Yeni dataset ile vanilla-vs-LoRA deneyi henüz koşulmamıştır. RQ1 açısından
-  dataset hazırlığı tamam, esas deney ve raporlama beklemektedir.
+- Yeni dataset ile ilk vanilla-vs-QLoRA koşusu 19 Eylül 2026'da Colab'da
+  tamamlanmıştır. Run01 held-out testte %92,58 strict accuracy ve %92,42 macro
+  F1 üretmiştir; ayrıntılar bu dosyanın 15. bölümündedir.
 
 ## 3. Güncel araştırma soruları
 
@@ -292,26 +293,30 @@ Durum:
 
 ## 7. RQ bazında gerçek ilerleme
 
-### RQ1 - Dataset hazır, deney bekliyor
+### RQ1 - İlk kontrollü deney tamamlandı
 
-Hazır olanlar:
+Tamamlananlar:
 
 - 31 sınıflı 1.550 kayıtlık dataset.
 - Grup güvenli train/validation/test split.
 - `NO_THREAT` hard negative dengesi.
 - Aktif app kodlarının LLM 2026'ya taşınması.
 - Base-model pilot benchmark scriptlerinin 2026 kodlarına güncellenmesi.
+- Sabit Ministral 3 3B model/revision, prompt, split ve greedy decoding ile
+  310 kayıtlık vanilla baseline.
+- Aynı model üzerinde QLoRA Run01 eğitimi ve aynı held-out testte değerlendirme.
+- Accuracy, macro/micro/weighted metrikler, sınıf bazlı metrikler, confusion
+  matrix, prediction distribution, latency ve `NO_THREAT` analizi.
+- Checkpoint, final adapter, ham tahminler ve run metadata'nın Google Drive'a
+  kaydedilmesi.
 
 Eksik olanlar:
 
-- Seçilen vanilla modelin yeni test split'inde baseline sonucu.
-- Aynı modelin LoRA fine-tune koşusu.
-- Sabit prompt/decoding ile adil karşılaştırma.
-- Accuracy yanında macro/micro F1, sınıf bazlı precision/recall/F1, confusion
-  matrix ve `NO_THREAT` false-positive analizi.
-- Mümkünse confidence skoru varsa PR/ROC; yoksa zorla üretilmemeli.
+- Overfit riskini azaltan, ayrı klasör ve run kimliği kullanan QLoRA Run02.
+- Run01 ve Run02 için aynı test protokolünde doğrudan karşılaştırma grafikleri.
+- Confidence skoru savunulabilir biçimde üretilirse PR/ROC; yoksa zorlanmamalı.
 - En az bir bağımsız external test set.
-- Seed'ler ve run metadata ile tekrarlanabilir deney kaydı.
+- Colab hücrelerinin kalıcı training/evaluation scriptine dönüştürülmesi.
 
 Not: RQ1'in güncel tanımı tek etiket threat classification deneyine uygundur.
 Eski tezdeki uzun structured threat report generation metriği RQ1'in yerine
@@ -412,8 +417,8 @@ Bu nedenle 2026 migration sonrası benchmark tamamlanmış sayılmamalıdır.
 
 1. **RQ setini tez kaynaklarında güncelle.** Abstract'tan Conclusion'a kadar RQ
    numaralarını ve iddiaları yeniden hizala.
-2. **Yeni RQ1 deneyini koş.** Vanilla baseline -> LoRA -> aynı held-out test ->
-   precision/recall/F1/confusion matrix/false positives.
+2. **RQ1 Run02'yi koş.** Run01'i değiştirmeden ayrı run klasöründe daha güçlü
+   regularization ve early stopping kullan; aynı held-out test protokolünü koru.
 3. **External test set hazırla.** OWASP resmî senaryoları kullanılabilir; ancak
    bunlardan üretilen paraphrase'ler aynı scenario group içinde tutulmalı ve
    train-test sızıntısı yapılmamalıdır.
@@ -493,7 +498,8 @@ veya toplu geri alma yapılmamalıdır. Commit/push kullanıcı kararıdır.
 
 ### Şimdilik yapılmaması gereken iddialar
 
-- Fine-tuning'in yeni RQ1 datasetinde başarıyı artırdığı.
+- Run01'in %92,58 test doğruluğunun bağımsız gerçek dünya genellemesini
+  kanıtladığı. Bu yalnız survey-grounded sentetik bootstrap testindeki sonuçtur.
 - 1.550 sentetik kaydın gerçek dünya tehdit sınıflandırmasını kanıtladığı.
 - Mitigation'ların uzman düzeyinde doğru veya ilgili olduğu.
 - RQ3 extraction'ın insan anotasyonuna göre yüksek fidelity sağladığı.
@@ -509,7 +515,94 @@ Bir sonraki çalışma şu sırayla başlamalıdır:
 2. `datasets/rq1_owasp31_survey/README.md` ve
    `datasets/owasp_llm_2026_official/README.md` oku.
 3. `python -m unittest discover -s tests -q` çalıştır.
-4. RQ1 vanilla baseline için seçilecek model ve evaluation scriptini sabitle.
-5. Aynı split ve promptla vanilla sonucu üretmeden LoRA eğitimine başlama.
-6. Her deney çıktısına dataset hash'i, model revision, seed, command ve timestamp
-   yaz.
+4. Bölüm 15'teki Run01 kimliğini ve Drive artifactlerini kontrol et.
+5. Run02'yi yeni bir experiment ID ve klasörle başlat; Run01 klasörüne yazma.
+6. Model, dataset, prompt, split, seed ve decoding'i sabit tut; kontrollü deney
+   için aynı anda gereksiz sayıda hiperparametre değiştirme.
+7. Her deney çıktısına dataset hash'i, model revision, seed, parametreler ve
+   timestamp yaz.
+
+## 15. RQ1 Colab Run01 - 19 Eylül 2026
+
+Colab defteri: `TrainingTestv1.ipynb`
+
+Base model:
+
+- `mistralai/Ministral-3-3B-Instruct-2512-BF16`
+- Revision: `b6d637bef2393152b3da2b2fde72eecdee30557e`
+- 4-bit NF4, double quantization, FP16 compute
+- Tesla T4 14,56 GB
+
+Dataset ve protokol:
+
+- SHA-256: `444e14e0c05510edc113b40942d63d95c3db782a562b0a58e3001b68e147c1d8`
+- 1.085 train, 155 validation, 310 held-out test
+- 31 dengeli sınıf
+- Maksimum sequence length 1.024; hiçbir kayıt truncate edilmedi
+- Aynı classification promptu ve greedy decoding kullanıldı
+
+QLoRA parametreleri:
+
+- Rank 16, alpha 32, dropout 0,05
+- 182 target module; yalnız language model katmanları
+- 24.707.072 trainable parameter
+- Micro batch 1, gradient accumulation 16, effective batch 16
+- Learning rate `1e-4`, weight decay 0,01, cosine scheduler
+- 11 warmup step, 3 epoch, seed 42
+- `paged_adamw_8bit`, gradient checkpointing
+- LoRA trainable ağırlıkları FP32; base model 4-bit kaldı
+
+Validation eğrisi:
+
+| Epoch | Training loss | Validation loss | Mean token accuracy |
+|---:|---:|---:|---:|
+| 1 | 0,048324 | 0,041527 | 0,980018 |
+| 2 | 0,019340 | 0,024447 | 0,991326 |
+| 3 | 0,004921 | 0,027719 | 0,991326 |
+
+Epoch 3'te validation loss yükseldiği için hafif overfit gözlendi. En iyi model
+epoch 2 / `checkpoint-136` idi. `load_best_model_at_end=True` nedeniyle
+`final_adapter` bu en iyi checkpointi içerir. `checkpoint-204` epoch 3 sonunu da
+korur.
+
+Held-out test sonuçları:
+
+| Koşul | Strict accuracy | Macro F1 | Invalid output rate | NO_THREAT hata |
+|---|---:|---:|---:|---:|
+| Vanilla | 0,058065 | 0,028429 | 0,145161 | 8/10 |
+| QLoRA Run01 | 0,925806 | 0,924211 | 0 | 0/10 |
+
+Run01 toplam 310 test kaydının 287'sini doğru, 23'ünü yanlış sınıflandırdı. Bu
+sonuç sentetik in-distribution held-out test için geçerlidir; bağımsız external
+test olmadan gerçek dünya genellemesi olarak sunulmamalıdır.
+
+Kanonik experiment ID:
+
+`rq1_run01_r16_a32_d0p05_lr1e-4_eb16_ep3_seed42`
+
+Google Drive hedef klasörü:
+
+`/content/drive/MyDrive/ThreatModelwFlask/experiments/rq1_run01_r16_a32_d0p05_lr1e-4_eb16_ep3_seed42/`
+
+Son doğrulanan gerçek klasör runtime disconnect öncesinde hâlâ şuydu:
+
+`/content/drive/MyDrive/ThreatModelwFlask/experiments/ministral3_3b_owasp31_qlora/`
+
+Parametreli klasöre taşıma/arşivleme hücresinin başarıyla tamamlandığı kullanıcı
+çıktısıyla doğrulanmadı. Yeni oturum önce iki yolu salt-okuma kontrol etmeli; eski
+klasör varsa yalnız Drive içi yeniden adlandırma ve manifest üretimi yapmalıdır.
+Bu işlem eğitim gerektirmez.
+
+Klasörde `run_manifest.json`, `hyperparameters.json`, `metrics_summary.json`,
+training history, ham test tahminleri, per-class metrikler, confusion matrix,
+checkpointler ve `final_adapter/` birlikte tutulmalıdır. Runtime disconnect
+olmuştur; yeni oturumda Run01 yeniden eğitilmemeli veya üzerine yazılmamalıdır.
+
+Run02 planı:
+
+- Ayrı experiment ID ve Drive klasörü kullan.
+- Overfit riskini validation tabanlı early stopping ile sınırla.
+- Run01'e göre kontrollü parametre değişikliği yap; model, revision, dataset,
+  split, prompt, seed ve test decoding aynı kalsın.
+- Run02 tamamlanınca aynı 310 kayıtlık test protokolüyle ölç ve Run01/Run02
+  grafikleri üret.
